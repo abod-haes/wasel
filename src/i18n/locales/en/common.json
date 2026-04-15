@@ -1,0 +1,358 @@
+{
+  "app": {
+    "title": "Dashboard Starter"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "actions": "Actions",
+    "all": "All",
+    "welcome": "Welcome",
+    "filters": "Filters",
+    "reset": "Reset",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "close": "Close"
+  },
+  "imageUploader": {
+    "choose": "Choose image",
+    "change": "Change image",
+    "selected": "Selected image",
+    "current": "Current image",
+    "dropHint": "Drop an image here or browse your files",
+    "removeSelection": "Remove selection",
+    "openCurrent": "Open current image"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "settingsGeneral": "General",
+    "settingsPreferences": "Preferences",
+    "login": "Login"
+  },
+  "layout": {
+    "searchPlaceholder": "Search anything...",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "logout": "Logout",
+    "openSidebar": "Open sidebar",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "states": {
+    "empty": {
+      "title": "No data found",
+      "description": "Try changing filters or create a new record"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error happened"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginDescription": "Access your dashboard",
+    "loginAction": "Sign in",
+    "loggingIn": "Signing in...",
+    "phoneNumberLabel": "Phone Number",
+    "phoneNumberPlaceholder": "Enter your phone number",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "errors": {
+      "phoneNumberRequired": "Phone number is required",
+      "passwordRequired": "Password is required"
+    }
+  },
+  "dashboard": {
+    "title": "Overview",
+    "description": "Track your key metrics in one place",
+    "cards": {
+      "activeUsers": "Active Users",
+      "newUsers": "New Users",
+      "conversion": "Conversion",
+      "revenue": "Revenue"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "description": "Latest actions in your workspace",
+      "createdUser": "Created a new user",
+      "updatedSettings": "Updated workspace settings",
+      "invitedUser": "Invited a teammate",
+      "orderPlaced": "Placed a new order",
+      "orderAccepted": "Order moved to accepted",
+      "orderCancelled": "Order was cancelled",
+      "orderUpdated": "Order status updated",
+      "notificationSent": "Sent a notification"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage team access and roles",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "searchPlaceholder": "Search by name or email",
+    "table": {
+      "lastLogin": "Last Login"
+    },
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "phoneNumber": "Phone Number",
+      "password": "Password",
+      "location": "Location",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "phoneNumberVerified": "Phone number verified",
+      "rolePlaceholder": "Select a role",
+      "noRole": "No role",
+      "firstNamePlaceholder": "Enter first name",
+      "lastNamePlaceholder": "Enter last name",
+      "emailPlaceholder": "Enter work email",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "passwordPlaceholder": "Enter password",
+      "passwordEditHint": "Leave blank to keep the current password.",
+      "locationPlaceholder": "Enter location",
+      "latitudePlaceholder": "e.g. 33.5138",
+      "longitudePlaceholder": "e.g. 36.2765"
+    },
+    "status": {
+      "active": "Active",
+      "invited": "Invited",
+      "suspended": "Suspended"
+    },
+    "role": {
+      "admin": "Admin",
+      "editor": "Editor",
+      "viewer": "Viewer"
+    },
+    "messages": {
+      "created": "User created successfully",
+      "updated": "User updated successfully",
+      "deleted": "User deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete this user?",
+      "description": "This user will be removed permanently."
+    }
+  },
+  "products": {
+    "title": "Products",
+    "description": "Browse and monitor product catalog details",
+    "createProduct": "Create Product",
+    "editProduct": "Edit Product",
+    "deleteProduct": "Delete Product",
+    "searchPlaceholder": "Search by product name, code, or description",
+    "filters": {
+      "category": "Category"
+    },
+    "form": {
+      "code": "Code",
+      "description": "Description",
+      "imagePath": "Image",
+      "currentImage": "Current image is kept if you do not upload a new one.",
+      "categoryPlaceholder": "Choose a category (optional)",
+      "namePlaceholder": "Enter product name",
+      "codePlaceholder": "Enter product code",
+      "pricePlaceholder": "Enter product price",
+      "descriptionPlaceholder": "Write a short description (optional)",
+      "imagePathPlaceholder": "Choose an image file"
+    },
+    "table": {
+      "categories": "Categories",
+      "price": "Price",
+      "inCart": "In Cart",
+      "cartQty": "Qty: {{count}}",
+      "favourite": "Favourite"
+    },
+    "messages": {
+      "created": "Product created successfully",
+      "updated": "Product updated successfully",
+      "deleted": "Product deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete this product?",
+      "description": "This product will be removed permanently."
+    },
+    "noCategory": "No category",
+    "notInCart": "No",
+    "favourite": "Yes",
+    "empty": {
+      "title": "No products found",
+      "description": "Try changing search or category filters"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "description": "View category groups and linked products",
+    "createCategory": "Create Category",
+    "editCategory": "Edit Category",
+    "deleteCategory": "Delete Category",
+    "searchPlaceholder": "Search categories",
+    "noDescription": "No description",
+    "noProducts": "No products",
+    "form": {
+      "description": "Description",
+      "imagePath": "Image",
+      "currentImage": "Current image is kept if you do not upload a new one.",
+      "namePlaceholder": "Enter category name",
+      "descriptionPlaceholder": "Write a short description (optional)",
+      "imagePathPlaceholder": "Choose an image file"
+    },
+    "table": {
+      "productsCount": "Products",
+      "sampleProducts": "Sample Products"
+    },
+    "messages": {
+      "created": "Category created successfully",
+      "updated": "Category updated successfully",
+      "deleted": "Category deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete this category?",
+      "description": "This category will be removed permanently."
+    },
+    "empty": {
+      "title": "No categories found",
+      "description": "Try adjusting your search term"
+    }
+  },
+  "orders": {
+    "title": "Orders",
+    "description": "Review incoming orders and take action",
+    "searchPlaceholder": "Search by order id, customer name, or phone",
+    "accept": "Accept",
+    "reject": "Reject",
+    "unknownCustomer": "Unknown customer",
+    "status": {
+      "0": "Pending",
+      "1": "Waiting for Delivery",
+      "2": "Accepted",
+      "3": "Out for Delivery",
+      "4": "Delivered",
+      "5": "Cancelled"
+    },
+    "payment": {
+      "0": "Direct",
+      "1": "ShamCash"
+    },
+    "table": {
+      "order": "Order",
+      "customer": "Customer",
+      "paymentWay": "Payment",
+      "itemsCount": "Items",
+      "totalAmount": "Total"
+    },
+    "messages": {
+      "accepted": "Order accepted successfully",
+      "rejected": "Order rejected successfully"
+    },
+    "confirmAccept": {
+      "title": "Accept this order?",
+      "description": "This order will move to accepted status."
+    },
+    "confirmReject": {
+      "title": "Reject this order?",
+      "description": "This order will be marked as cancelled."
+    },
+    "empty": {
+      "title": "No orders found",
+      "description": "Try changing filters to find matching orders"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Track sent notifications and push new ones",
+    "send": "Send Notification",
+    "searchPlaceholder": "Search notifications by title or body",
+    "broadcast": "Broadcast",
+    "usersCount": "Users: {{count}}",
+    "selectedUsers": "Selected users: {{count}}",
+    "moreUsers": "+{{count}} more",
+    "table": {
+      "title": "Notification",
+      "target": "Target",
+      "createdAt": "Created At",
+      "data": "Data"
+    },
+    "form": {
+      "title": "Title",
+      "body": "Body",
+      "imageUrl": "Image URL",
+      "userIds": "Target users",
+      "titlePlaceholder": "Delivery Update",
+      "bodyPlaceholder": "Your order is on the way.",
+      "userIdsPlaceholder": "Choose users (optional)",
+      "broadcastHint": "Leave empty to send to everyone.",
+      "loadingUsers": "Loading users...",
+      "noUsers": "No users found",
+      "usersLoadError": "Could not load users",
+      "removeUser": "Remove user",
+      "errors": {
+        "titleRequired": "Title is required",
+        "bodyRequired": "Body is required"
+      }
+    },
+    "messages": {
+      "sent": "Notification sent successfully"
+    },
+    "empty": {
+      "title": "No notifications found",
+      "description": "Try changing your search term"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage workspace preferences",
+    "preferencesTitle": "Preferences",
+    "preferencesDescription": "Adjust interface behavior",
+    "form": {
+      "displayName": "Display Name",
+      "email": "Contact Email",
+      "compactSidebar": "Compact sidebar",
+      "emailNotifications": "Email notifications"
+    },
+    "messages": {
+      "saved": "Settings saved"
+    }
+  },
+  "pages": {
+    "unauthorized": {
+      "title": "Unauthorized",
+      "description": "You do not have permission to access this page"
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "The requested page does not exist"
+    }
+  },
+  "confirmDialog": {
+    "title": "Are you sure?",
+    "description": "This action cannot be undone"
+  }
+}

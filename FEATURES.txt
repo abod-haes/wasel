@@ -1,0 +1,83 @@
+Dashboard Starter - Features
+
+1) Core Stack
+- React + TypeScript + Vite
+- Tailwind CSS
+- shadcn-style UI components
+- React Router
+- TanStack React Query
+- i18next + react-i18next (EN/AR)
+- Zustand
+- Axios
+- lucide-react icons
+
+2) Architecture
+- Feature/Module-based structure
+- Each feature includes:
+  pages, components, hooks, api, schemas, types
+
+3) Layout
+- Responsive Sidebar (desktop collapsible + mobile drawer)
+- Header / Topbar
+- Main content area
+- Breadcrumbs
+- User menu
+- Notifications button
+- Theme switcher
+- Language switcher
+
+4) Routing
+- Public route (login)
+- Protected dashboard routes
+- Permission-ready guards
+- Lazy-loaded pages
+- Unauthorized page
+- Not Found page (404)
+
+5) Data Layer
+- QueryClientProvider with default options
+- Global query/mutation error handling
+- Query keys organization
+- API layer separated from UI
+
+6) Shared Components
+- PageContainer
+- SectionHeader
+- DataTable
+- EmptyState
+- ErrorState
+- LoadingScreen
+- ConfirmDialog
+- FormField
+- SidebarNav
+- LanguageSwitcher
+- ThemeSwitcher
+
+7) Example Features
+- dashboard
+- users
+- settings
+
+8) i18n + Direction
+- English + Arabic
+- Auto RTL/LTR switch by selected language
+
+9) UI Components (src/components/ui)
+- avatar
+- badge
+- breadcrumb
+- button
+- card
+- dialog
+- dropdown-menu
+- input
+- label
+- scroll-area
+- select
+- separator
+- sheet
+- skeleton
+- switch
+- table
+- textarea
+- tooltip

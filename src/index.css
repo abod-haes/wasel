@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 20% 98%;
+  --foreground: 222 20% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 20% 16%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 20% 16%;
+  --primary: 215 85% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 200 16% 93%;
+  --secondary-foreground: 221 24% 24%;
+  --muted: 210 16% 94%;
+  --muted-foreground: 215 14% 45%;
+  --accent: 192 82% 56%;
+  --accent-foreground: 205 100% 12%;
+  --destructive: 0 74% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 21% 88%;
+  --input: 214 21% 88%;
+  --ring: 215 85% 45%;
+  --radius: 0.8rem;
+}
+
+.dark {
+  --background: 220 26% 10%;
+  --foreground: 220 20% 96%;
+  --card: 224 28% 14%;
+  --card-foreground: 220 20% 96%;
+  --popover: 224 28% 14%;
+  --popover-foreground: 220 20% 96%;
+  --primary: 210 95% 62%;
+  --primary-foreground: 218 35% 13%;
+  --secondary: 220 18% 20%;
+  --secondary-foreground: 220 16% 88%;
+  --muted: 220 20% 19%;
+  --muted-foreground: 214 10% 68%;
+  --accent: 186 100% 35%;
+  --accent-foreground: 186 100% 92%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 221 19% 28%;
+  --input: 221 19% 28%;
+  --ring: 210 95% 62%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    @apply min-h-screen;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.08), transparent 30%),
+      radial-gradient(circle at 80% 0%, hsl(var(--primary) / 0.08), transparent 35%);
+  }
+}
+
+@layer utilities {
+  .surface-grid {
+    background-image: linear-gradient(to right, hsl(var(--border) / 0.24) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.24) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .animate-stagger {
+    animation: fade-in 0.4s ease-out both;
+  }
+}

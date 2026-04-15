@@ -1,0 +1,358 @@
+{
+  "app": {
+    "title": "لوحة واسل"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "search": "بحث",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "all": "الكل",
+    "welcome": "مرحبًا",
+    "filters": "المرشحات",
+    "reset": "إعادة ضبط",
+    "confirm": "تأكيد",
+    "loading": "جار التحميل...",
+    "close": "إغلاق"
+  },
+  "imageUploader": {
+    "choose": "اختر صورة",
+    "change": "تغيير الصورة",
+    "selected": "الصورة المختارة",
+    "current": "الصورة الحالية",
+    "dropHint": "اسحب صورة هنا أو اخترها من ملفاتك",
+    "removeSelection": "إزالة الاختيار",
+    "openCurrent": "فتح الصورة الحالية"
+  },
+  "language": {
+    "label": "اللغة",
+    "english": "الإنكليزية",
+    "arabic": "العربية"
+  },
+  "theme": {
+    "label": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "products": "المنتجات",
+    "categories": "التصنيفات",
+    "orders": "الطلبات",
+    "notifications": "الإشعارات",
+    "settings": "الإعدادات",
+    "settingsGeneral": "عام",
+    "settingsPreferences": "التفضيلات",
+    "login": "تسجيل الدخول"
+  },
+  "layout": {
+    "searchPlaceholder": "ابحث عن أي شيء...",
+    "notifications": "الإشعارات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "openSidebar": "فتح الشريط الجانبي",
+    "collapse": "تصغير",
+    "expand": "توسيع"
+  },
+  "states": {
+    "empty": {
+      "title": "لا توجد بيانات",
+      "description": "جرّب تغيير المرشحات أو أنشئ سجلًا جديدًا"
+    },
+    "error": {
+      "title": "حدث خطأ",
+      "description": "حدث خطأ غير متوقع"
+    }
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "loginDescription": "ادخل إلى لوحة التحكم",
+    "loginAction": "تسجيل الدخول",
+    "loggingIn": "جار تسجيل الدخول...",
+    "phoneNumberLabel": "رقم الهاتف",
+    "phoneNumberPlaceholder": "أدخل رقم هاتفك",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "errors": {
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "passwordRequired": "كلمة المرور مطلوبة"
+    }
+  },
+  "dashboard": {
+    "title": "نظرة عامة",
+    "description": "تابع مؤشراتك الرئيسية في مكان واحد",
+    "cards": {
+      "activeUsers": "المستخدمون النشطون",
+      "newUsers": "مستخدمون جدد",
+      "conversion": "معدل التحويل",
+      "revenue": "الإيرادات"
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "description": "آخر الإجراءات في مساحة العمل",
+      "createdUser": "تم إنشاء مستخدم جديد",
+      "updatedSettings": "تم تحديث إعدادات المساحة",
+      "invitedUser": "تمت دعوة عضو جديد",
+      "orderPlaced": "تم إنشاء طلب جديد",
+      "orderAccepted": "تم قبول الطلب",
+      "orderCancelled": "تم إلغاء الطلب",
+      "orderUpdated": "تم تحديث حالة الطلب",
+      "notificationSent": "تم إرسال إشعار"
+    }
+  },
+  "users": {
+    "title": "المستخدمون",
+    "description": "إدارة صلاحيات الفريق والأدوار",
+    "createUser": "إنشاء مستخدم",
+    "editUser": "تعديل مستخدم",
+    "deleteUser": "حذف مستخدم",
+    "searchPlaceholder": "ابحث بالاسم أو البريد",
+    "table": {
+      "lastLogin": "آخر تسجيل دخول"
+    },
+    "form": {
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "phoneNumber": "رقم الهاتف",
+      "password": "كلمة المرور",
+      "location": "الموقع",
+      "latitude": "خط العرض",
+      "longitude": "خط الطول",
+      "phoneNumberVerified": "رقم الهاتف موثّق",
+      "rolePlaceholder": "اختر دورًا",
+      "noRole": "بدون دور",
+      "firstNamePlaceholder": "أدخل الاسم الأول",
+      "lastNamePlaceholder": "أدخل اسم العائلة",
+      "emailPlaceholder": "أدخل بريد العمل",
+      "phoneNumberPlaceholder": "أدخل رقم الهاتف",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "passwordEditHint": "اتركها فارغة للإبقاء على كلمة المرور الحالية.",
+      "locationPlaceholder": "أدخل الموقع",
+      "latitudePlaceholder": "مثال: 33.5138",
+      "longitudePlaceholder": "مثال: 36.2765"
+    },
+    "status": {
+      "active": "نشط",
+      "invited": "مدعو",
+      "suspended": "موقوف"
+    },
+    "role": {
+      "admin": "مدير",
+      "editor": "محرر",
+      "viewer": "مشاهد"
+    },
+    "messages": {
+      "created": "تم إنشاء المستخدم بنجاح",
+      "updated": "تم تحديث المستخدم بنجاح",
+      "deleted": "تم حذف المستخدم بنجاح"
+    },
+    "confirmDelete": {
+      "title": "تأكيد حذف هذا المستخدم؟",
+      "description": "سيتم حذف هذا المستخدم بشكل نهائي."
+    }
+  },
+  "products": {
+    "title": "المنتجات",
+    "description": "تصفّح تفاصيل المنتجات ومتابعة حالتها",
+    "createProduct": "إضافة منتج",
+    "editProduct": "تعديل منتج",
+    "deleteProduct": "حذف منتج",
+    "searchPlaceholder": "ابحث بالاسم أو الكود أو الوصف",
+    "filters": {
+      "category": "التصنيف"
+    },
+    "form": {
+      "code": "الكود",
+      "description": "الوصف",
+      "imagePath": "الصورة",
+      "currentImage": "ستبقى الصورة الحالية إذا لم ترفع صورة جديدة.",
+      "categoryPlaceholder": "اختر تصنيفًا (اختياري)",
+      "namePlaceholder": "أدخل اسم المنتج",
+      "codePlaceholder": "أدخل كود المنتج",
+      "pricePlaceholder": "أدخل سعر المنتج",
+      "descriptionPlaceholder": "اكتب وصفًا مختصرًا (اختياري)",
+      "imagePathPlaceholder": "اختر ملف صورة"
+    },
+    "table": {
+      "categories": "التصنيفات",
+      "price": "السعر",
+      "inCart": "في السلة",
+      "cartQty": "الكمية: {{count}}",
+      "favourite": "مفضل"
+    },
+    "messages": {
+      "created": "تمت إضافة المنتج بنجاح",
+      "updated": "تم تحديث المنتج بنجاح",
+      "deleted": "تم حذف المنتج بنجاح"
+    },
+    "confirmDelete": {
+      "title": "تأكيد حذف هذا المنتج؟",
+      "description": "سيتم حذف هذا المنتج بشكل نهائي."
+    },
+    "noCategory": "بدون تصنيف",
+    "notInCart": "لا",
+    "favourite": "نعم",
+    "empty": {
+      "title": "لا توجد منتجات",
+      "description": "جرّب تغيير البحث أو التصنيف"
+    }
+  },
+  "categories": {
+    "title": "التصنيفات",
+    "description": "عرض التصنيفات والمنتجات المرتبطة بها",
+    "createCategory": "إضافة تصنيف",
+    "editCategory": "تعديل تصنيف",
+    "deleteCategory": "حذف تصنيف",
+    "searchPlaceholder": "ابحث في التصنيفات",
+    "noDescription": "لا يوجد وصف",
+    "noProducts": "لا توجد منتجات",
+    "form": {
+      "description": "الوصف",
+      "imagePath": "الصورة",
+      "currentImage": "ستبقى الصورة الحالية إذا لم ترفع صورة جديدة.",
+      "namePlaceholder": "أدخل اسم التصنيف",
+      "descriptionPlaceholder": "اكتب وصفًا مختصرًا (اختياري)",
+      "imagePathPlaceholder": "اختر ملف صورة"
+    },
+    "table": {
+      "productsCount": "عدد المنتجات",
+      "sampleProducts": "نماذج منتجات"
+    },
+    "messages": {
+      "created": "تمت إضافة التصنيف بنجاح",
+      "updated": "تم تحديث التصنيف بنجاح",
+      "deleted": "تم حذف التصنيف بنجاح"
+    },
+    "confirmDelete": {
+      "title": "تأكيد حذف التصنيف؟",
+      "description": "سيتم حذف هذا التصنيف بشكل نهائي."
+    },
+    "empty": {
+      "title": "لا توجد تصنيفات",
+      "description": "جرّب تعديل كلمة البحث"
+    }
+  },
+  "orders": {
+    "title": "الطلبات",
+    "description": "مراجعة الطلبات الواردة واتخاذ الإجراء المناسب",
+    "searchPlaceholder": "ابحث برقم الطلب أو اسم العميل أو الهاتف",
+    "accept": "قبول",
+    "reject": "رفض",
+    "unknownCustomer": "عميل غير معروف",
+    "status": {
+      "0": "قيد الانتظار",
+      "1": "بانتظار التوصيل",
+      "2": "مقبول",
+      "3": "قيد التوصيل",
+      "4": "تم التسليم",
+      "5": "ملغي"
+    },
+    "payment": {
+      "0": "مباشر",
+      "1": "شام كاش"
+    },
+    "table": {
+      "order": "الطلب",
+      "customer": "العميل",
+      "paymentWay": "طريقة الدفع",
+      "itemsCount": "العناصر",
+      "totalAmount": "الإجمالي"
+    },
+    "messages": {
+      "accepted": "تم قبول الطلب بنجاح",
+      "rejected": "تم رفض الطلب بنجاح"
+    },
+    "confirmAccept": {
+      "title": "تأكيد قبول الطلب؟",
+      "description": "سيتم نقل الطلب إلى حالة مقبول."
+    },
+    "confirmReject": {
+      "title": "تأكيد رفض الطلب؟",
+      "description": "سيتم وضع الطلب في حالة ملغي."
+    },
+    "empty": {
+      "title": "لا توجد طلبات",
+      "description": "جرّب تعديل المرشحات للعثور على طلبات"
+    }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "description": "متابعة الإشعارات المرسلة وإرسال إشعارات جديدة",
+    "send": "إرسال إشعار",
+    "searchPlaceholder": "ابحث في الإشعارات بالعنوان أو النص",
+    "broadcast": "إرسال عام",
+    "usersCount": "عدد المستخدمين: {{count}}",
+    "selectedUsers": "المستخدمون المختارون: {{count}}",
+    "moreUsers": "+{{count}} آخرين",
+    "table": {
+      "title": "الإشعار",
+      "target": "الوجهة",
+      "createdAt": "تاريخ الإنشاء",
+      "data": "البيانات"
+    },
+    "form": {
+      "title": "العنوان",
+      "body": "النص",
+      "imageUrl": "رابط الصورة",
+      "userIds": "المستخدمون المستهدفون",
+      "titlePlaceholder": "تحديث التوصيل",
+      "bodyPlaceholder": "طلبك في الطريق.",
+      "userIdsPlaceholder": "اختر مستخدمين (اختياري)",
+      "broadcastHint": "اتركه فارغًا للإرسال إلى الجميع.",
+      "loadingUsers": "جار تحميل المستخدمين...",
+      "noUsers": "لا يوجد مستخدمون",
+      "usersLoadError": "تعذر تحميل المستخدمين",
+      "removeUser": "إزالة المستخدم",
+      "errors": {
+        "titleRequired": "العنوان مطلوب",
+        "bodyRequired": "النص مطلوب"
+      }
+    },
+    "messages": {
+      "sent": "تم إرسال الإشعار بنجاح"
+    },
+    "empty": {
+      "title": "لا توجد إشعارات",
+      "description": "جرّب تغيير كلمة البحث"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة تفضيلات مساحة العمل",
+    "preferencesTitle": "التفضيلات",
+    "preferencesDescription": "ضبط سلوك الواجهة",
+    "form": {
+      "displayName": "اسم العرض",
+      "email": "بريد التواصل",
+      "compactSidebar": "شريط جانبي مضغوط",
+      "emailNotifications": "إشعارات البريد"
+    },
+    "messages": {
+      "saved": "تم حفظ الإعدادات"
+    }
+  },
+  "pages": {
+    "unauthorized": {
+      "title": "غير مصرح",
+      "description": "لا تملك صلاحية الوصول إلى هذه الصفحة"
+    },
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "description": "الصفحة المطلوبة غير متوفرة"
+    }
+  },
+  "confirmDialog": {
+    "title": "هل أنت متأكد؟",
+    "description": "لا يمكن التراجع عن هذا الإجراء"
+  }
+}
