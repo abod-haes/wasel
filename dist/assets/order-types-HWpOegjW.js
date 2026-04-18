@@ -1,1 +1,0 @@
-var e=[0,1,2,3,4,5],t={pending:0,waitingForDelivery:1,accepted:2,outForDelivery:3,delivered:4,cancelled:5};export{t as n,e as t};

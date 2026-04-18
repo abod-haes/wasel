@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "واصل",
+  "name": "داشبورد متجر واصل",
+  "description": "داشبورد متجر واصل لإدارة الطلبات والمنتجات والتصنيفات والإشعارات.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#111827",
   "background_color": "#ffffff"
 }
