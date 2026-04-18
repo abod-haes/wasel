@@ -6,6 +6,8 @@ const toBoolean = (value: string | undefined, fallback = false): boolean => {
   return value.toLowerCase() === 'true';
 };
 
+const API_BASE_URL = 'https://prod.octoserv-comp.com';
+
 const removeTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
 
 const normalizeApiBaseUrl = (value: string | undefined): string => {
@@ -36,6 +38,6 @@ const normalizeApiBaseUrl = (value: string | undefined): string => {
 
 export const env = {
   appName: import.meta.env.VITE_APP_NAME ?? 'Wasel',
-  apiBaseUrl: normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL),
+  apiBaseUrl: normalizeApiBaseUrl(API_BASE_URL),
   enableMockApi: toBoolean(import.meta.env.VITE_ENABLE_MOCK_API, true),
 } as const;

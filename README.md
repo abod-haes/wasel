@@ -31,8 +31,9 @@ cp .env.example .env
 
 المتغيرات المتوفرة:
 - `VITE_APP_NAME`
-- `VITE_API_BASE_URL`
 - `VITE_ENABLE_MOCK_API`
+
+ملاحظة: `API base URL` تم تثبيته داخل [src/env.ts](/home/hares/Desktop/wasel/src/env.ts) في متغير `API_BASE_URL`.
 
 ## Project Structure
 ```text
