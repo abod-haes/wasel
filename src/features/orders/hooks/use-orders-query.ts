@@ -10,6 +10,8 @@ export const useOrdersQuery = (filters: OrdersFilter) => {
   return useQuery({
     queryKey: queryKeys.orders.list(filters),
     queryFn: () => ordersApi.getOrders(filters),
+    refetchInterval: 7_000,
+    refetchIntervalInBackground: false,
   });
 };
 
