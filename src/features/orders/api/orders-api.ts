@@ -5,9 +5,10 @@ import {
   type OrderStatus,
   type OrdersFilter,
 } from '@/features/orders/types/order-types';
+import { paginateLocalData, toPaginatedData } from '@/services/api/pagination';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
-import type { ApiPaginatedResult } from '@/types/api';
+import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
 interface OrderItemApiResponse {
   ProductId?: string;
@@ -213,13 +214,6 @@ const mapOrderResponse = (order: OrderApiResponse): Order => {
   };
 };
 
-const getPaginatedItems = <T>(
-  data: Partial<ApiPaginatedResult<T>> & { items?: T[] }
-): T[] => {
-  const items = data.Items ?? data.items;
-  return Array.isArray(items) ? items : [];
-};
-
 const cloneOrder = (order: Order): Order => {
   return {
     ...order,
@@ -270,22 +264,28 @@ const updateOrderStatusInDb = (orderId: string, status: OrderStatus): Order => {
 };
 
 export const ordersApi = {
-  async getOrders(filters: OrdersFilter): Promise<Order[]> {
+  async getOrders(filters: OrdersFilter, pagination: PaginationParams): Promise<PaginatedData<Order>> {
     if (env.enableMockApi) {
       await delay(400);
-      return applyFilters(ordersDb.map(cloneOrder), filters);
+      const filteredOrders = applyFilters(ordersDb.map(cloneOrder), filters);
+      return paginateLocalData(filteredOrders, pagination);
     }
 
     const { data } = await apiClient.get<OrderPaginatedResponse>('/api/Orders', {
       params: {
-        page: 1,
-        pageSize: 100,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        search: filters.search || undefined,
         status: filters.status === 'all' ? undefined : filters.status,
       },
     });
 
-    const mappedOrders = getPaginatedItems(data).map(mapOrderResponse);
-    return applyFilters(mappedOrders, filters);
+    const paginatedOrders = toPaginatedData(data, pagination);
+
+    return {
+      ...paginatedOrders,
+      items: paginatedOrders.items.map(mapOrderResponse),
+    };
   },
 
   async acceptOrder(orderId: string): Promise<Order> {

@@ -4,3 +4,16 @@ export interface ApiPaginatedResult<T> {
   PageSize: number;
   TotalCount: number;
 }
+
+export interface PaginationParams {
+  page: number;
+  pageSize: number;
+}
+
+export interface PaginatedData<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}

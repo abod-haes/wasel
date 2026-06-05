@@ -8,9 +8,10 @@ import type {
   UserRoleAssignment,
   UsersFilter,
 } from '@/features/users/types/user-types';
+import { paginateLocalData, toPaginatedData } from '@/services/api/pagination';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
-import type { ApiPaginatedResult } from '@/types/api';
+import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
 interface UserRoleApiResponse {
   Id?: string;
@@ -198,13 +199,6 @@ const applyFilters = (users: User[], filters: UsersFilter): User[] => {
 
     return matchesSearch && matchesRole && matchesStatus;
   });
-};
-
-const getPaginatedItems = <T>(
-  data: Partial<ApiPaginatedResult<T>> & { items?: T[] }
-): T[] => {
-  const items = data.Items ?? data.items;
-  return Array.isArray(items) ? items : [];
 };
 
 const resolveIsoDate = (value?: string): string => {
@@ -467,22 +461,30 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
 };
 
 export const usersApi = {
-  async getUsers(filters: UsersFilter): Promise<User[]> {
+  async getUsers(filters: UsersFilter, pagination: PaginationParams): Promise<PaginatedData<User>> {
     if (env.enableMockApi) {
       await delay(450);
-      return applyFilters(usersDb.map(cloneUser), filters);
+      const filteredUsers = applyFilters(usersDb.map(cloneUser), filters);
+      return paginateLocalData(filteredUsers, pagination);
     }
 
     const { data } = await apiClient.get<UsersPaginatedResponse>('/api/Users', {
       params: {
-        page: 1,
-        pageSize: 100,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
         includeRoles: true,
+        search: filters.search || undefined,
+        role: filters.role === 'all' ? undefined : filters.role,
+        status: filters.status === 'all' ? undefined : filters.status,
       },
     });
 
-    const mappedUsers = getPaginatedItems(data).map(mapUserResponse);
-    return applyFilters(mappedUsers, filters);
+    const paginatedUsers = toPaginatedData(data, pagination);
+
+    return {
+      ...paginatedUsers,
+      items: paginatedUsers.items.map(mapUserResponse),
+    };
   },
 
   async createUser(payload: CreateUserInput): Promise<User> {

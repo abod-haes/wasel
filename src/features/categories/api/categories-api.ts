@@ -10,9 +10,10 @@ import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from '@/features/categories/types/category-types';
+import { getPaginatedItems, paginateLocalData, toPaginatedData } from '@/services/api/pagination';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
-import type { ApiPaginatedResult } from '@/types/api';
+import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
 interface CategoryProductSummaryApi {
   Id?: string;
@@ -127,13 +128,6 @@ const mapCategoryResponse = (category: CategoryApiResponse): Category => {
   };
 };
 
-const getPaginatedItems = <T>(
-  data: Partial<ApiPaginatedResult<T>> & { items?: T[] }
-): T[] => {
-  const items = data.Items ?? data.items;
-  return Array.isArray(items) ? items : [];
-};
-
 const cloneCategory = (category: Category): Category => {
   return {
     ...category,
@@ -166,22 +160,28 @@ const applySearchFilter = (categories: Category[], search: string): Category[] =
 };
 
 export const categoriesApi = {
-  async getCategories(filters: CategoriesFilter): Promise<Category[]> {
+  async getCategories(filters: CategoriesFilter, pagination: PaginationParams): Promise<PaginatedData<Category>> {
     if (env.enableMockApi) {
       await delay(350);
-      return applySearchFilter(categoriesDb.map(cloneCategory), filters.search);
+      const filteredCategories = applySearchFilter(categoriesDb.map(cloneCategory), filters.search);
+      return paginateLocalData(filteredCategories, pagination);
     }
 
     const { data } = await apiClient.get<CategoryPaginatedResponse>('/api/Categories', {
       params: {
-        page: 1,
-        pageSize: 100,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
         includeProducts: true,
+        search: filters.search || undefined,
       },
     });
 
-    const mappedCategories = getPaginatedItems(data).map(mapCategoryResponse);
-    return applySearchFilter(mappedCategories, filters.search);
+    const paginatedCategories = toPaginatedData(data, pagination);
+
+    return {
+      ...paginatedCategories,
+      items: paginatedCategories.items.map(mapCategoryResponse),
+    };
   },
 
   async createCategory(payload: CreateCategoryInput): Promise<void> {

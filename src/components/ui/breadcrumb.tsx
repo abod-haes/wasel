@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 
@@ -42,11 +43,21 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
 );
 BreadcrumbPage.displayName = 'BreadcrumbPage';
 
-const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentProps<'li'>): React.JSX.Element => (
-  <li role="presentation" aria-hidden="true" className={cn('[&>svg]:h-3.5 [&>svg]:w-3.5', className)} {...props}>
-    {children ?? <ChevronRight />}
-  </li>
-);
+const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentProps<'li'>): React.JSX.Element => {
+  const { i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
+
+  return (
+    <li
+      role="presentation"
+      aria-hidden="true"
+      className={cn('[&>svg]:h-3.5 [&>svg]:w-3.5', className)}
+      {...props}
+    >
+      {children ?? <ChevronRight className={cn(isRtl && 'rotate-180')} />}
+    </li>
+  );
+};
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
 export { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator };

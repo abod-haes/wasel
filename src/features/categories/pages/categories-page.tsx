@@ -18,6 +18,7 @@ import type {
   Category,
   CreateCategoryInput,
 } from '@/features/categories/types/category-types';
+import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: CategoriesFilter = {
   search: '',
@@ -27,12 +28,13 @@ export default function CategoriesPage(): React.JSX.Element {
   const { t } = useTranslation();
 
   const [filters, setFilters] = useState<CategoriesFilter>(defaultFilters);
+  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
 
-  const categoriesQuery = useCategoriesQuery(filters);
+  const categoriesQuery = useCategoriesQuery(filters, pagination);
   const createCategoryMutation = useCreateCategoryMutation();
   const updateCategoryMutation = useUpdateCategoryMutation();
   const deleteCategoryMutation = useDeleteCategoryMutation();
@@ -110,16 +112,25 @@ export default function CategoriesPage(): React.JSX.Element {
 
       <CategoryFilters
         filters={filters}
-        onChange={setFilters}
-        onReset={() => setFilters(defaultFilters)}
+        onChange={(nextFilters) => {
+          setFilters(nextFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+        onReset={() => {
+          setFilters(defaultFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
       />
 
       <CategoriesTable
-        categories={categoriesQuery.data ?? []}
+        categories={categoriesQuery.data?.items ?? []}
         isLoading={categoriesQuery.isLoading || categoriesQuery.isFetching}
         isMutating={isMutating}
         onEditCategory={openEditDialog}
         onDeleteCategory={setDeleteCategory}
+        pagination={categoriesQuery.data}
+        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
       <CategoryFormDialog

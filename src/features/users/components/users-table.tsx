@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/shared/DataTable';
 import { Badge, Button } from '@/components/ui';
 import type { User } from '@/features/users/types/user-types';
+import type { PaginatedData } from '@/types/api';
 
 interface UsersTableProps {
   users: User[];
@@ -12,6 +13,9 @@ interface UsersTableProps {
   isMutating?: boolean;
   onEditUser: (user: User) => void;
   onDeleteUser: (user: User) => void;
+  pagination?: Pick<PaginatedData<User>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 const statusVariantMap: Record<User['status'], 'success' | 'warning' | 'danger'> = {
@@ -26,6 +30,9 @@ export function UsersTable({
   isMutating = false,
   onEditUser,
   onDeleteUser,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: UsersTableProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -80,5 +87,15 @@ export function UsersTable({
     [isMutating, onDeleteUser, onEditUser, t]
   );
 
-  return <DataTable data={users} columns={columns} getRowKey={(user) => user.id} isLoading={isLoading} />;
+  return (
+    <DataTable
+      data={users}
+      columns={columns}
+      getRowKey={(user) => user.id}
+      isLoading={isLoading}
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+    />
+  );
 }

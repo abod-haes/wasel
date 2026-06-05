@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -9,11 +9,13 @@ import type {
   ProductsFilter,
   UpdateProductInput,
 } from '@/features/products/types/product-types';
+import type { PaginationParams } from '@/types/api';
 
-export const useProductsQuery = (filters: ProductsFilter) => {
+export const useProductsQuery = (filters: ProductsFilter, pagination: PaginationParams) => {
   return useQuery({
-    queryKey: queryKeys.products.list(filters),
-    queryFn: () => productsApi.getProducts(filters),
+    queryKey: queryKeys.products.list({ filters, pagination }),
+    queryFn: () => productsApi.getProducts(filters, pagination),
+    placeholderData: keepPreviousData,
   });
 };
 

@@ -18,6 +18,7 @@ import type {
 import { useUsersQuery } from '@/features/users/hooks/use-users-query';
 import type { UsersFilter } from '@/features/users/types/user-types';
 import { useUiStore } from '@/store/use-ui-store';
+import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: NotificationsFilter = {
   search: '',
@@ -33,10 +34,11 @@ export default function NotificationsPage(): React.JSX.Element {
   const { t } = useTranslation();
 
   const [filters, setFilters] = useState<NotificationsFilter>(defaultFilters);
+  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const notificationsQuery = useNotificationsQuery(filters);
-  const usersQuery = useUsersQuery(usersFilters);
+  const notificationsQuery = useNotificationsQuery(filters, pagination);
+  const usersQuery = useUsersQuery(usersFilters, { page: 1, pageSize: 100 });
   const sendNotificationMutation = useSendNotificationMutation();
   const markNotificationsAsRead = useUiStore((state) => state.markNotificationsAsRead);
 
@@ -68,21 +70,30 @@ export default function NotificationsPage(): React.JSX.Element {
 
       <NotificationsFilters
         filters={filters}
-        onChange={setFilters}
-        onReset={() => setFilters(defaultFilters)}
+        onChange={(nextFilters) => {
+          setFilters(nextFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+        onReset={() => {
+          setFilters(defaultFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
       />
 
       <NotificationsTable
-        notifications={notificationsQuery.data ?? []}
-        users={usersQuery.data ?? []}
+        notifications={notificationsQuery.data?.items ?? []}
+        users={usersQuery.data?.items ?? []}
         isLoading={notificationsQuery.isLoading || notificationsQuery.isFetching}
+        pagination={notificationsQuery.data}
+        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
       <SendNotificationDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         isSubmitting={sendNotificationMutation.isPending}
-        users={usersQuery.data ?? []}
+        users={usersQuery.data?.items ?? []}
         isUsersLoading={usersQuery.isLoading || usersQuery.isFetching}
         isUsersError={usersQuery.isError}
         onSubmit={sendNotification}

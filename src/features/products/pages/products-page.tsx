@@ -19,6 +19,7 @@ import type {
   Product,
   ProductsFilter,
 } from '@/features/products/types/product-types';
+import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: ProductsFilter = {
   search: '',
@@ -29,12 +30,13 @@ export default function ProductsPage(): React.JSX.Element {
   const { t } = useTranslation();
 
   const [filters, setFilters] = useState<ProductsFilter>(defaultFilters);
+  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
 
-  const productsQuery = useProductsQuery(filters);
+  const productsQuery = useProductsQuery(filters, pagination);
   const categoriesQuery = useCategoryOptionsQuery();
   const createProductMutation = useCreateProductMutation();
   const updateProductMutation = useUpdateProductMutation();
@@ -114,16 +116,25 @@ export default function ProductsPage(): React.JSX.Element {
       <ProductFilters
         filters={filters}
         categories={categoriesQuery.data ?? []}
-        onChange={setFilters}
-        onReset={() => setFilters(defaultFilters)}
+        onChange={(nextFilters) => {
+          setFilters(nextFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+        onReset={() => {
+          setFilters(defaultFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
       />
 
       <ProductsTable
-        products={productsQuery.data ?? []}
+        products={productsQuery.data?.items ?? []}
         isLoading={productsQuery.isLoading || productsQuery.isFetching}
         isMutating={isMutating}
         onEditProduct={openEditDialog}
         onDeleteProduct={setDeleteProduct}
+        pagination={productsQuery.data}
+        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
       <ProductFormDialog

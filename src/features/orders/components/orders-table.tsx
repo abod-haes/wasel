@@ -9,6 +9,7 @@ import {
   type Order,
   type OrderStatus,
 } from '@/features/orders/types/order-types';
+import type { PaginatedData } from '@/types/api';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -16,6 +17,9 @@ interface OrdersTableProps {
   onAccept: (order: Order) => void;
   onReject: (order: Order) => void;
   isMutating?: boolean;
+  pagination?: Pick<PaginatedData<Order>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 const statusVariantMap: Record<OrderStatus, 'warning' | 'secondary' | 'success' | 'default' | 'outline' | 'danger'> = {
@@ -40,6 +44,9 @@ export function OrdersTable({
   onAccept,
   onReject,
   isMutating = false,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: OrdersTableProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -133,6 +140,9 @@ export function OrdersTable({
       isLoading={isLoading}
       emptyTitleKey="orders.empty.title"
       emptyDescriptionKey="orders.empty.description"
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
     />
   );
 }

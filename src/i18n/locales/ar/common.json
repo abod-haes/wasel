@@ -19,7 +19,14 @@
     "reset": "إعادة ضبط",
     "confirm": "تأكيد",
     "loading": "جار التحميل...",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "pagination": {
+      "rowsPerPage": "عدد السجلات",
+      "page": "الصفحة {{current}} من {{total}}",
+      "summary": "عرض {{from}}-{{to}} من {{total}}",
+      "previous": "الصفحة السابقة",
+      "next": "الصفحة التالية"
+    }
   },
   "imageUploader": {
     "choose": "اختر صورة",

@@ -21,6 +21,7 @@ import type {
   UserRoleAssignment,
   UsersFilter,
 } from '@/features/users/types/user-types';
+import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: UsersFilter = {
   search: '',
@@ -32,17 +33,19 @@ export default function UsersPage(): React.JSX.Element {
   const { t } = useTranslation();
 
   const [filters, setFilters] = useState<UsersFilter>(defaultFilters);
+  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
 
-  const usersQuery = useUsersQuery(filters);
+  const usersQuery = useUsersQuery(filters, pagination);
+  const rolesSourceQuery = useUsersQuery(defaultFilters, { page: 1, pageSize: 100 });
   const createUserMutation = useCreateUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const deleteUserMutation = useDeleteUserMutation();
   const roleOptions = useMemo<UserRoleAssignment[]>(() => {
-    const users = usersQuery.data ?? [];
+    const users = rolesSourceQuery.data?.items ?? [];
     const uniqueRoleMap = new Map<string, UserRoleAssignment>();
 
     users.forEach((user) => {
@@ -149,14 +152,27 @@ export default function UsersPage(): React.JSX.Element {
         }
       />
 
-      <UserFilters filters={filters} onChange={setFilters} onReset={() => setFilters(defaultFilters)} />
+      <UserFilters
+        filters={filters}
+        onChange={(nextFilters) => {
+          setFilters(nextFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+        onReset={() => {
+          setFilters(defaultFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+      />
 
       <UsersTable
-        users={usersQuery.data ?? []}
+        users={usersQuery.data?.items ?? []}
         isLoading={usersQuery.isLoading || usersQuery.isFetching}
         isMutating={isMutating}
         onEditUser={openEditDialog}
         onDeleteUser={setDeleteUser}
+        pagination={usersQuery.data}
+        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
       <UserFormDialog

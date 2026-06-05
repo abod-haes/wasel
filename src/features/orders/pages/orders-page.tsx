@@ -9,6 +9,7 @@ import {
   useRejectOrderMutation,
 } from '@/features/orders/hooks/use-orders-query';
 import { type Order, type OrdersFilter } from '@/features/orders/types/order-types';
+import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: OrdersFilter = {
   search: '',
@@ -17,10 +18,11 @@ const defaultFilters: OrdersFilter = {
 
 export default function OrdersPage(): React.JSX.Element {
   const [filters, setFilters] = useState<OrdersFilter>(defaultFilters);
+  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [acceptOrder, setAcceptOrder] = useState<Order | null>(null);
   const [rejectOrder, setRejectOrder] = useState<Order | null>(null);
 
-  const ordersQuery = useOrdersQuery(filters);
+  const ordersQuery = useOrdersQuery(filters, pagination);
   const acceptOrderMutation = useAcceptOrderMutation();
   const rejectOrderMutation = useRejectOrderMutation();
 
@@ -58,16 +60,25 @@ export default function OrdersPage(): React.JSX.Element {
 
       <OrderFilters
         filters={filters}
-        onChange={setFilters}
-        onReset={() => setFilters(defaultFilters)}
+        onChange={(nextFilters) => {
+          setFilters(nextFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
+        onReset={() => {
+          setFilters(defaultFilters);
+          setPagination((current) => ({ ...current, page: 1 }));
+        }}
       />
 
       <OrdersTable
-        orders={ordersQuery.data ?? []}
+        orders={ordersQuery.data?.items ?? []}
         isLoading={ordersQuery.isLoading || ordersQuery.isFetching}
         onAccept={setAcceptOrder}
         onReject={setRejectOrder}
         isMutating={acceptOrderMutation.isPending || rejectOrderMutation.isPending}
+        pagination={ordersQuery.data}
+        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
+        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
       <ConfirmDialog

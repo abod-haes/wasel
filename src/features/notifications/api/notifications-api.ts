@@ -4,9 +4,10 @@ import type {
   NotificationsFilter,
   SendNotificationInput,
 } from '@/features/notifications/types/notification-types';
+import { paginateLocalData, toPaginatedData } from '@/services/api/pagination';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
-import type { ApiPaginatedResult } from '@/types/api';
+import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
 interface NotificationApiResponse {
   Id?: string;
@@ -83,13 +84,6 @@ const mapNotificationResponse = (notification: NotificationApiResponse): AppNoti
   };
 };
 
-const getPaginatedItems = <T>(
-  data: Partial<ApiPaginatedResult<T>> & { items?: T[] }
-): T[] => {
-  const items = data.Items ?? data.items;
-  return Array.isArray(items) ? items : [];
-};
-
 const cloneNotification = (notification: AppNotification): AppNotification => {
   return {
     ...notification,
@@ -118,21 +112,30 @@ const buildNotificationId = (): string => {
 };
 
 export const notificationsApi = {
-  async getNotifications(filters: NotificationsFilter): Promise<AppNotification[]> {
+  async getNotifications(
+    filters: NotificationsFilter,
+    pagination: PaginationParams
+  ): Promise<PaginatedData<AppNotification>> {
     if (env.enableMockApi) {
       await delay(350);
-      return applySearchFilter(notificationsDb.map(cloneNotification), filters.search);
+      const filteredNotifications = applySearchFilter(notificationsDb.map(cloneNotification), filters.search);
+      return paginateLocalData(filteredNotifications, pagination);
     }
 
     const { data } = await apiClient.get<NotificationPaginatedResponse>('/api/Notifications', {
       params: {
-        Page: 1,
-        PerPage: 100,
+        Page: pagination.page,
+        PerPage: pagination.pageSize,
+        Search: filters.search || undefined,
       },
     });
 
-    const mappedNotifications = getPaginatedItems(data).map(mapNotificationResponse);
-    return applySearchFilter(mappedNotifications, filters.search);
+    const paginatedNotifications = toPaginatedData(data, pagination);
+
+    return {
+      ...paginatedNotifications,
+      items: paginatedNotifications.items.map(mapNotificationResponse),
+    };
   },
 
   async pushNotification(payload: SendNotificationInput): Promise<AppNotification> {

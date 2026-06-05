@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -9,11 +9,13 @@ import type {
   UpdateUserInput,
   UsersFilter,
 } from '@/features/users/types/user-types';
+import type { PaginationParams } from '@/types/api';
 
-export const useUsersQuery = (filters: UsersFilter) => {
+export const useUsersQuery = (filters: UsersFilter, pagination: PaginationParams) => {
   return useQuery({
-    queryKey: queryKeys.users.list(filters),
-    queryFn: () => usersApi.getUsers(filters),
+    queryKey: queryKeys.users.list({ filters, pagination }),
+    queryFn: () => usersApi.getUsers(filters, pagination),
+    placeholderData: keepPreviousData,
   });
 };
 

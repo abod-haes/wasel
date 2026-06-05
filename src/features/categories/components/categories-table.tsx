@@ -6,6 +6,7 @@ import { DataTable } from '@/components/shared';
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import type { Category } from '@/features/categories/types/category-types';
 import { resolveMediaPath } from '@/lib/utils';
+import type { PaginatedData } from '@/types/api';
 
 interface CategoriesTableProps {
   categories: Category[];
@@ -13,6 +14,9 @@ interface CategoriesTableProps {
   isMutating?: boolean;
   onEditCategory: (category: Category) => void;
   onDeleteCategory: (category: Category) => void;
+  pagination?: Pick<PaginatedData<Category>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 export function CategoriesTable({
@@ -21,6 +25,9 @@ export function CategoriesTable({
   isMutating = false,
   onEditCategory,
   onDeleteCategory,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: CategoriesTableProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -123,6 +130,9 @@ export function CategoriesTable({
       isLoading={isLoading}
       emptyTitleKey="categories.empty.title"
       emptyDescriptionKey="categories.empty.description"
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
     />
   );
 }

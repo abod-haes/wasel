@@ -6,6 +6,7 @@ import { DataTable } from '@/components/shared';
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import type { Product } from '@/features/products/types/product-types';
 import { resolveMediaPath } from '@/lib/utils';
+import type { PaginatedData } from '@/types/api';
 
 interface ProductsTableProps {
   products: Product[];
@@ -13,6 +14,9 @@ interface ProductsTableProps {
   isMutating?: boolean;
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (product: Product) => void;
+  pagination?: Pick<PaginatedData<Product>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 const formatPrice = (value: number): string => {
@@ -28,6 +32,9 @@ export function ProductsTable({
   isMutating = false,
   onEditProduct,
   onDeleteProduct,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: ProductsTableProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -148,6 +155,9 @@ export function ProductsTable({
       isLoading={isLoading}
       emptyTitleKey="products.empty.title"
       emptyDescriptionKey="products.empty.description"
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
     />
   );
 }

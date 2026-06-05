@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -9,11 +9,13 @@ import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from '@/features/categories/types/category-types';
+import type { PaginationParams } from '@/types/api';
 
-export const useCategoriesQuery = (filters: CategoriesFilter) => {
+export const useCategoriesQuery = (filters: CategoriesFilter, pagination: PaginationParams) => {
   return useQuery({
-    queryKey: queryKeys.categories.list(filters),
-    queryFn: () => categoriesApi.getCategories(filters),
+    queryKey: queryKeys.categories.list({ filters, pagination }),
+    queryFn: () => categoriesApi.getCategories(filters, pagination),
+    placeholderData: keepPreviousData,
   });
 };
 

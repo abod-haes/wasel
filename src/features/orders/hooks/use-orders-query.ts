@@ -1,15 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { queryKeys } from '@/constants/query-keys';
 import { ordersApi } from '@/features/orders/api/orders-api';
 import type { OrdersFilter } from '@/features/orders/types/order-types';
+import type { PaginationParams } from '@/types/api';
 
-export const useOrdersQuery = (filters: OrdersFilter) => {
+export const useOrdersQuery = (filters: OrdersFilter, pagination: PaginationParams) => {
   return useQuery({
-    queryKey: queryKeys.orders.list(filters),
-    queryFn: () => ordersApi.getOrders(filters),
+    queryKey: queryKeys.orders.list({ filters, pagination }),
+    queryFn: () => ordersApi.getOrders(filters, pagination),
+    placeholderData: keepPreviousData,
     refetchInterval: 7_000,
     refetchIntervalInBackground: false,
   });

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 
@@ -16,20 +17,25 @@ const DropdownMenuSubTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
     inset?: boolean;
   }
->(({ className, inset, children, ...props }, ref) => (
-  <DropdownMenuPrimitive.SubTrigger
-    ref={ref}
-    className={cn(
-      'flex cursor-default select-none items-center rounded-lg px-2.5 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:bg-primary/10 data-[state=open]:bg-primary/10',
-      inset && 'pl-8',
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <ChevronRight className="ms-auto h-4 w-4" />
-  </DropdownMenuPrimitive.SubTrigger>
-));
+>(({ className, inset, children, ...props }, ref) => {
+  const { i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
+
+  return (
+    <DropdownMenuPrimitive.SubTrigger
+      ref={ref}
+      className={cn(
+        'flex cursor-default select-none items-center rounded-lg px-2.5 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:bg-primary/10 data-[state=open]:bg-primary/10',
+        inset && 'ps-8',
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronRight className={cn('ms-auto h-4 w-4', isRtl && 'rotate-180')} />
+    </DropdownMenuPrimitive.SubTrigger>
+  );
+});
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
 
 const DropdownMenuSubContent = React.forwardRef<
@@ -75,7 +81,7 @@ const DropdownMenuItem = React.forwardRef<
     ref={ref}
     className={cn(
       'relative flex cursor-default select-none items-center rounded-lg px-2.5 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:bg-primary/10 data-[disabled]:pointer-events-none data-[disabled]:opacity-45',
-      inset && 'pl-8',
+      inset && 'ps-8',
       className
     )}
     {...props}
@@ -134,7 +140,7 @@ const DropdownMenuLabel = React.forwardRef<
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
-  <DropdownMenuPrimitive.Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', className)} {...props} />
+  <DropdownMenuPrimitive.Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', inset && 'ps-8', className)} {...props} />
 ));
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
 

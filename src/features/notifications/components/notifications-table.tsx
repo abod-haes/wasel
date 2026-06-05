@@ -5,17 +5,24 @@ import { DataTable } from '@/components/shared';
 import { Badge } from '@/components/ui';
 import type { AppNotification } from '@/features/notifications/types/notification-types';
 import type { User } from '@/features/users/types/user-types';
+import type { PaginatedData } from '@/types/api';
 
 interface NotificationsTableProps {
   notifications: AppNotification[];
   users?: User[];
   isLoading?: boolean;
+  pagination?: Pick<PaginatedData<AppNotification>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 export function NotificationsTable({
   notifications,
   users = [],
   isLoading = false,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: NotificationsTableProps): React.JSX.Element {
   const { t } = useTranslation();
   const usersById = useMemo(() => new Map(users.map((user) => [user.id, user])), [users]);
@@ -106,6 +113,9 @@ export function NotificationsTable({
       isLoading={isLoading}
       emptyTitleKey="notifications.empty.title"
       emptyDescriptionKey="notifications.empty.description"
+      pagination={pagination}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
     />
   );
 }
