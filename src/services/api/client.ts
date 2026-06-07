@@ -6,7 +6,6 @@ import { serializeApiParams } from '@/services/api/params-serializer';
 
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
-  timeout: 10_000,
   paramsSerializer: {
     serialize: serializeApiParams,
   },
