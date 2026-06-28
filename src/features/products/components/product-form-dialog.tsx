@@ -55,6 +55,8 @@ interface FormValues {
   variants: VariantFormValues[];
 }
 
+type ProductFormTab = 'details' | 'variants';
+
 const buildVariantLocalId = (): string => {
   return `variant-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
@@ -133,6 +135,7 @@ export function ProductFormDialog({
 }: ProductFormDialogProps): React.JSX.Element {
   const { t } = useTranslation();
 
+  const [activeTab, setActiveTab] = useState<ProductFormTab>('details');
   const [formValues, setFormValues] = useState<FormValues>(defaultFormValues);
   const [errors, setErrors] = useState<Partial<Record<keyof FormValues, string>>>({});
 
@@ -141,6 +144,7 @@ export function ProductFormDialog({
       return;
     }
 
+    setActiveTab('details');
     setErrors({});
 
     if (mode === 'edit' && defaultProduct) {
@@ -163,6 +167,7 @@ export function ProductFormDialog({
   }, [defaultProduct, mode, open]);
 
   const dialogTitleKey = mode === 'create' ? 'products.createProduct' : 'products.editProduct';
+  const hasVariantsError = Boolean(errors.variants);
 
   function updateVariantRow<Key extends keyof VariantFormValues>(
     localId: string,
@@ -241,8 +246,7 @@ export function ProductFormDialog({
 
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
-
-      setErrors({
+      const nextErrors: Partial<Record<keyof FormValues, string>> = {
         name: fieldErrors.name?.[0],
         code: fieldErrors.code?.[0],
         brand: fieldErrors.brand?.[0],
@@ -253,7 +257,10 @@ export function ProductFormDialog({
         imageFile: fieldErrors.imageFile?.[0],
         categoryId: fieldErrors.categoryId?.[0],
         variants: fieldErrors.variants?.[0],
-      });
+      };
+
+      setErrors(nextErrors);
+      setActiveTab(nextErrors.variants ? 'variants' : 'details');
       return;
     }
 
@@ -264,6 +271,27 @@ export function ProductFormDialog({
     });
   };
 
+  const renderTabButton = (tab: ProductFormTab, label: string, count?: number): React.JSX.Element => {
+    const isActive = activeTab === tab;
+
+    return (
+      <button
+        type="button"
+        onClick={() => setActiveTab(tab)}
+        className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+          isActive
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
+        }`}
+      >
+        <span>{label}</span>
+        {count != null ? (
+          <span className="ms-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{count}</span>
+        ) : null}
+      </button>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
@@ -272,250 +300,259 @@ export function ProductFormDialog({
         </DialogHeader>
 
         <form onSubmit={submitHandler} className="space-y-5">
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField labelKey="common.name" htmlFor="product-name" required error={errors.name}>
-              <Input
-                id="product-name"
-                value={formValues.name}
-                placeholder={t('products.form.namePlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    name: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}>
-              <Input
-                id="product-code"
-                value={formValues.code}
-                placeholder={t('products.form.codePlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    code: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
-              <Input
-                id="product-brand"
-                value={formValues.brand}
-                placeholder="مثال: Arabica"
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    brand: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
-              <Input
-                id="product-type"
-                value={formValues.type}
-                placeholder="مثال: Chips"
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    type: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
-              <Input
-                id="product-weight"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formValues.weight}
-                placeholder="مثال: 50"
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    weight: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="products.table.price" htmlFor="product-price" required error={errors.price}>
-              <Input
-                id="product-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formValues.price}
-                placeholder={t('products.form.pricePlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    price: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="products.filters.category" error={errors.categoryId}>
-              <Select
-                value={formValues.categoryId}
-                onValueChange={(value) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    categoryId: value,
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('products.form.categoryPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{t('products.noCategory')}</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
+          <div className="inline-flex rounded-xl border border-border/70 bg-muted/40 p-1">
+            {renderTabButton('details', 'بيانات المنتج')}
+            {renderTabButton('variants', 'النكهات', formValues.variants.length)}
           </div>
 
-          <FormField labelKey="products.form.description" htmlFor="product-description" error={errors.description}>
-            <Textarea
-              id="product-description"
-              rows={3}
-              value={formValues.description}
-              placeholder={t('products.form.descriptionPlaceholder')}
-              onChange={(event) =>
-                setFormValues((previous) => ({
-                  ...previous,
-                  description: event.target.value,
-                }))
-              }
-            />
-          </FormField>
+          {activeTab === 'details' ? (
+            <div className="space-y-5">
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField labelKey="common.name" htmlFor="product-name" required error={errors.name}>
+                  <Input
+                    id="product-name"
+                    value={formValues.name}
+                    placeholder={t('products.form.namePlaceholder')}
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        name: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
 
-          <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
-            <ImageUploader
-              id="product-image"
-              value={formValues.imageFile}
-              currentImagePath={mode === 'edit' ? defaultProduct?.images[0]?.imagePath : undefined}
-              disabled={isSubmitting}
-              onChange={(imageFile) =>
-                setFormValues((previous) => ({
-                  ...previous,
-                  imageFile,
-                }))
-              }
-            />
-          </FormField>
+                <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}>
+                  <Input
+                    id="product-code"
+                    value={formValues.code}
+                    placeholder={t('products.form.codePlaceholder')}
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        code: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
 
-          <section className="space-y-3 rounded-lg border border-border/70 bg-muted/20 p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">نكهات / متغيرات المنتج</h3>
-                <p className="text-xs text-muted-foreground">
-                  أضف صورة خاصة لكل نكهة. عند اختيار النكهة في التطبيق تظهر صورة النكهة بدل صورة المنتج.
-                </p>
-                {errors.variants ? <p className="mt-1 text-xs text-destructive">{errors.variants}</p> : null}
+                <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
+                  <Input
+                    id="product-brand"
+                    value={formValues.brand}
+                    placeholder="مثال: Arabica"
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        brand: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
+
+                <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
+                  <Input
+                    id="product-type"
+                    value={formValues.type}
+                    placeholder="مثال: Chips"
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        type: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
+
+                <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
+                  <Input
+                    id="product-weight"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formValues.weight}
+                    placeholder="مثال: 50"
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        weight: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
+
+                <FormField labelKey="products.table.price" htmlFor="product-price" required error={errors.price}>
+                  <Input
+                    id="product-price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formValues.price}
+                    placeholder={t('products.form.pricePlaceholder')}
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        price: event.target.value,
+                      }))
+                    }
+                  />
+                </FormField>
+
+                <FormField labelKey="products.filters.category" error={errors.categoryId}>
+                  <Select
+                    value={formValues.categoryId}
+                    onValueChange={(value) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        categoryId: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('products.form.categoryPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t('products.noCategory')}</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={addVariantRow} disabled={isSubmitting}>
-                <Plus className="h-4 w-4" />
-                إضافة نكهة
-              </Button>
+
+              <FormField labelKey="products.form.description" htmlFor="product-description" error={errors.description}>
+                <Textarea
+                  id="product-description"
+                  rows={3}
+                  value={formValues.description}
+                  placeholder={t('products.form.descriptionPlaceholder')}
+                  onChange={(event) =>
+                    setFormValues((previous) => ({
+                      ...previous,
+                      description: event.target.value,
+                    }))
+                  }
+                />
+              </FormField>
+
+              <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
+                <ImageUploader
+                  id="product-image"
+                  value={formValues.imageFile}
+                  currentImagePath={mode === 'edit' ? defaultProduct?.images[0]?.imagePath : undefined}
+                  disabled={isSubmitting}
+                  onChange={(imageFile) =>
+                    setFormValues((previous) => ({
+                      ...previous,
+                      imageFile,
+                    }))
+                  }
+                />
+              </FormField>
             </div>
-
-            {formValues.variants.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-border/70 bg-background/70 p-4 text-sm text-muted-foreground">
-                لا توجد نكهات بعد. المنتج سيستخدم صورته الأساسية فقط.
+          ) : (
+            <section className="space-y-3 rounded-lg border border-border/70 bg-muted/20 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">نكهات / متغيرات المنتج</h3>
+                  <p className="text-xs text-muted-foreground">
+                    أضف صورة خاصة لكل نكهة. عند اختيار النكهة في التطبيق تظهر صورة النكهة بدل صورة المنتج.
+                  </p>
+                  {hasVariantsError ? <p className="mt-1 text-xs text-destructive">{errors.variants}</p> : null}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addVariantRow} disabled={isSubmitting}>
+                  <Plus className="h-4 w-4" />
+                  إضافة نكهة
+                </Button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {formValues.variants.map((variant, index) => (
-                  <div key={variant.localId} className="rounded-lg border border-border/70 bg-background p-3">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <p className="text-sm font-medium text-foreground">النكهة #{index + 1}</p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeVariantRow(variant.localId)}
-                        disabled={isSubmitting}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
 
-                    <div className="grid gap-3 lg:grid-cols-[1fr_140px_150px]">
-                      <label className="space-y-1 text-sm">
-                        <span className="font-medium text-foreground">اسم النكهة</span>
-                        <Input
-                          value={variant.name}
-                          placeholder="مثال: حار، جبنة، كتشب"
+              {formValues.variants.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border/70 bg-background/70 p-4 text-sm text-muted-foreground">
+                  لا توجد نكهات بعد. المنتج سيستخدم صورته الأساسية فقط.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {formValues.variants.map((variant, index) => (
+                    <div key={variant.localId} className="rounded-lg border border-border/70 bg-background p-3">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-foreground">النكهة #{index + 1}</p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeVariantRow(variant.localId)}
                           disabled={isSubmitting}
-                          onChange={(event) => updateVariantRow(variant.localId, 'name', event.target.value)}
-                        />
-                      </label>
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
 
-                      <label className="space-y-1 text-sm">
-                        <span className="font-medium text-foreground">الترتيب</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={variant.sortOrder}
-                          disabled={isSubmitting}
-                          onChange={(event) => updateVariantRow(variant.localId, 'sortOrder', event.target.value)}
-                        />
-                      </label>
+                      <div className="grid gap-3 lg:grid-cols-[1fr_140px_150px]">
+                        <label className="space-y-1 text-sm">
+                          <span className="font-medium text-foreground">اسم النكهة</span>
+                          <Input
+                            value={variant.name}
+                            placeholder="مثال: حار، جبنة، كتشب"
+                            disabled={isSubmitting}
+                            onChange={(event) => updateVariantRow(variant.localId, 'name', event.target.value)}
+                          />
+                        </label>
 
-                      <label className="flex items-center gap-2 rounded-lg border border-border/70 px-3 py-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={variant.isDefault}
-                          disabled={isSubmitting}
-                          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                          onChange={(event) => setDefaultVariant(variant.localId, event.target.checked)}
-                        />
-                        <span className="font-medium text-foreground">النكهة الافتراضية</span>
-                      </label>
-                    </div>
+                        <label className="space-y-1 text-sm">
+                          <span className="font-medium text-foreground">الترتيب</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={variant.sortOrder}
+                            disabled={isSubmitting}
+                            onChange={(event) => updateVariantRow(variant.localId, 'sortOrder', event.target.value)}
+                          />
+                        </label>
 
-                    <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1.2fr]">
-                      <label className="space-y-1 text-sm">
-                        <span className="font-medium text-foreground">رابط / مسار صورة النكهة</span>
-                        <Input
-                          value={variant.imagePath}
-                          placeholder="/storage/products/hot.png"
-                          disabled={isSubmitting}
-                          onChange={(event) => updateVariantRow(variant.localId, 'imagePath', event.target.value)}
-                        />
-                      </label>
+                        <label className="flex items-center gap-2 rounded-lg border border-border/70 px-3 py-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={variant.isDefault}
+                            disabled={isSubmitting}
+                            className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                            onChange={(event) => setDefaultVariant(variant.localId, event.target.checked)}
+                          />
+                          <span className="font-medium text-foreground">النكهة الافتراضية</span>
+                        </label>
+                      </div>
 
-                      <div className="space-y-1 text-sm">
-                        <span className="font-medium text-foreground">رفع صورة النكهة</span>
-                        <ImageUploader
-                          id={`product-variant-image-${variant.localId}`}
-                          value={variant.imageFile}
-                          currentImagePath={variant.imagePath || undefined}
-                          disabled={isSubmitting}
-                          onChange={(imageFile) => updateVariantRow(variant.localId, 'imageFile', imageFile)}
-                        />
+                      <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1.2fr]">
+                        <label className="space-y-1 text-sm">
+                          <span className="font-medium text-foreground">رابط / مسار صورة النكهة</span>
+                          <Input
+                            value={variant.imagePath}
+                            placeholder="/storage/products/hot.png"
+                            disabled={isSubmitting}
+                            onChange={(event) => updateVariantRow(variant.localId, 'imagePath', event.target.value)}
+                          />
+                        </label>
+
+                        <div className="space-y-1 text-sm">
+                          <span className="font-medium text-foreground">رفع صورة النكهة</span>
+                          <ImageUploader
+                            id={`product-variant-image-${variant.localId}`}
+                            value={variant.imageFile}
+                            currentImagePath={variant.imagePath || undefined}
+                            disabled={isSubmitting}
+                            onChange={(imageFile) => updateVariantRow(variant.localId, 'imageFile', imageFile)}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
 
           <DialogFooter className="gap-2">
             <Button variant="outline" type="button" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
