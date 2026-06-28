@@ -26,6 +26,16 @@ const formatPrice = (value: number): string => {
   }).format(value);
 };
 
+const formatWeight = (value?: number): string => {
+  if (value == null) {
+    return '-';
+  }
+
+  return new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
 export function ProductsTable({
   products,
   isLoading = false,
@@ -45,6 +55,7 @@ export function ProductsTable({
         header: t('common.name'),
         renderCell: (product: Product) => {
           const mainImage = product.images.find((image) => image.isMain) ?? product.images[0];
+          const metadata = [product.code, product.brand, product.type].filter(Boolean).join(' • ');
 
           return (
             <div className="flex items-center gap-3">
@@ -81,7 +92,7 @@ export function ProductsTable({
               )}
               <div>
                 <p className="font-medium">{product.name}</p>
-                <p className="text-xs text-muted-foreground">{product.code}</p>
+                <p className="text-xs text-muted-foreground">{metadata || product.code}</p>
               </div>
             </div>
           );
@@ -118,6 +129,11 @@ export function ProductsTable({
             </div>
           );
         },
+      },
+      {
+        key: 'weight',
+        header: 'الوزن',
+        renderCell: (product: Product) => <span className="font-medium">{formatWeight(product.weight)}</span>,
       },
       {
         key: 'price',
