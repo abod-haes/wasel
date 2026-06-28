@@ -4,7 +4,6 @@ export const ROUTES = {
   dashboard: '/dashboard',
   users: '/users',
   products: '/products',
-  productVariants: '/product-variants',
   categories: '/categories',
   orders: '/orders',
   notifications: '/notifications',
