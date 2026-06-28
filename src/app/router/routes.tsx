@@ -13,7 +13,6 @@ import UnauthorizedPage from '@/pages/unauthorized-page';
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'));
 const UsersPage = lazy(() => import('@/features/users/pages/users-page'));
 const ProductsPage = lazy(() => import('@/features/products/pages/products-page'));
-const ProductVariantsPage = lazy(() => import('@/features/product-variants/pages/product-variants-page'));
 const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
@@ -79,17 +78,6 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.products',
-            },
-          },
-          {
-            path: ROUTES.productVariants,
-            element: (
-              <PermissionGuard required={PERMISSIONS.productsView}>
-                {withSuspense(<ProductVariantsPage />)}
-              </PermissionGuard>
-            ),
-            handle: {
-              breadcrumbKey: 'النكهات',
             },
           },
           {
