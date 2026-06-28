@@ -4,6 +4,14 @@ export interface ProductImage {
   isMain: boolean;
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string;
+  imagePath?: string | null;
+  sortOrder: number;
+  isDefault: boolean;
+}
+
 export interface ProductCategorySummary {
   id: string;
   name: string;
@@ -16,6 +24,7 @@ export interface Product {
   description?: string;
   price: number;
   images: ProductImage[];
+  variants: ProductVariant[];
   categories: ProductCategorySummary[];
   isFavourite: boolean;
   isInCart: boolean;
@@ -28,6 +37,16 @@ export interface ProductsFilter {
   code?: string;
 }
 
+export interface ProductVariantInput {
+  id?: string;
+  name: string;
+  imageFile?: File;
+  imagePath?: string | null;
+  imageId?: string;
+  sortOrder?: number;
+  isDefault?: boolean;
+}
+
 export interface CreateProductInput {
   name: string;
   code: string;
@@ -37,6 +56,7 @@ export interface CreateProductInput {
   categoryIds?: string[];
   categoryId?: string;
   categoryName?: string;
+  variants?: ProductVariantInput[];
 }
 
 export interface UpdateProductInput {
@@ -49,4 +69,6 @@ export interface UpdateProductInput {
   categoryIds?: string[];
   categoryId?: string;
   categoryName?: string;
+  variants?: ProductVariantInput[];
+  clearVariants?: boolean;
 }
