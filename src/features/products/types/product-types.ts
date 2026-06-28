@@ -21,6 +21,9 @@ export interface Product {
   id: string;
   name: string;
   code: string;
+  brand?: string;
+  type?: string;
+  weight?: number;
   description?: string;
   price: number;
   images: ProductImage[];
@@ -50,6 +53,9 @@ export interface ProductVariantInput {
 export interface CreateProductInput {
   name: string;
   code: string;
+  brand?: string;
+  type?: string;
+  weight?: number;
   description?: string;
   price: number;
   imageFile?: File;
@@ -63,6 +69,9 @@ export interface UpdateProductInput {
   id: string;
   name?: string;
   code?: string;
+  brand?: string;
+  type?: string;
+  weight?: number;
   description?: string;
   price?: number;
   imageFile?: File;
