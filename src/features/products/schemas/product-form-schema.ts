@@ -15,6 +15,9 @@ export const productVariantSchema = z.object({
 export const createProductSchema = z.object({
   name: z.string().trim().min(2),
   code: z.string().trim().min(2),
+  brand: z.string().trim().optional(),
+  type: z.string().trim().optional(),
+  weight: z.number().nonnegative().optional(),
   description: z.string().trim().optional(),
   price: z.number().positive(),
   imageFile: optionalFileSchema,
