@@ -3,6 +3,8 @@ import { createProductSchema, updateProductSchema } from '@/features/products/sc
 import type {
   CreateProductInput,
   Product,
+  ProductVariant,
+  ProductVariantInput,
   ProductsFilter,
   UpdateProductInput,
 } from '@/features/products/types/product-types';
@@ -18,6 +20,19 @@ interface ProductImageApiResponse {
   imagePath?: string;
   IsMain?: boolean;
   isMain?: boolean;
+}
+
+interface ProductVariantApiResponse {
+  Id?: string;
+  id?: string;
+  Name?: string;
+  name?: string;
+  ImagePath?: string | null;
+  imagePath?: string | null;
+  SortOrder?: number;
+  sortOrder?: number;
+  IsDefault?: boolean;
+  isDefault?: boolean;
 }
 
 interface ProductCategoryApiResponse {
@@ -40,6 +55,8 @@ interface ProductApiResponse {
   price?: number;
   Images?: ProductImageApiResponse[];
   images?: ProductImageApiResponse[];
+  Variants?: ProductVariantApiResponse[];
+  variants?: ProductVariantApiResponse[];
   Categories?: ProductCategoryApiResponse[];
   categories?: ProductCategoryApiResponse[];
   IsFavourite?: boolean;
@@ -68,6 +85,7 @@ let productsDb: Product[] = [
         isMain: true,
       },
     ],
+    variants: [],
     categories: [
       {
         id: 'cat-1',
@@ -91,6 +109,7 @@ let productsDb: Product[] = [
         isMain: true,
       },
     ],
+    variants: [],
     categories: [
       {
         id: 'cat-1',
@@ -112,6 +131,22 @@ let productsDb: Product[] = [
         id: 'img-3',
         imagePath: 'storage/products/chips.jpg',
         isMain: true,
+      },
+    ],
+    variants: [
+      {
+        id: 'vrn-1',
+        name: 'حار',
+        imagePath: 'storage/products/chips-hot.jpg',
+        sortOrder: 0,
+        isDefault: true,
+      },
+      {
+        id: 'vrn-2',
+        name: 'جبنة',
+        imagePath: 'storage/products/chips-cheese.jpg',
+        sortOrder: 1,
+        isDefault: false,
       },
     ],
     categories: [
@@ -137,6 +172,7 @@ let productsDb: Product[] = [
         isMain: true,
       },
     ],
+    variants: [],
     categories: [
       {
         id: 'cat-3',
@@ -149,8 +185,14 @@ let productsDb: Product[] = [
   },
 ];
 
+const normalizeOptionalText = (value?: string | null): string | undefined => {
+  const normalizedValue = value?.trim();
+  return normalizedValue ? normalizedValue : undefined;
+};
+
 const mapProductResponse = (product: ProductApiResponse): Product => {
   const images = product.Images ?? product.images ?? [];
+  const variants = product.Variants ?? product.variants ?? [];
   const categories = product.Categories ?? product.categories ?? [];
 
   return {
@@ -164,6 +206,15 @@ const mapProductResponse = (product: ProductApiResponse): Product => {
       imagePath: image.ImagePath ?? image.imagePath ?? '',
       isMain: image.IsMain ?? image.isMain ?? false,
     })),
+    variants: variants
+      .map((variant, index) => ({
+        id: variant.Id ?? variant.id ?? '',
+        name: variant.Name ?? variant.name ?? '',
+        imagePath: variant.ImagePath ?? variant.imagePath ?? null,
+        sortOrder: variant.SortOrder ?? variant.sortOrder ?? index,
+        isDefault: variant.IsDefault ?? variant.isDefault ?? false,
+      }))
+      .sort((firstVariant, secondVariant) => firstVariant.sortOrder - secondVariant.sortOrder),
     categories: categories.map((category) => ({
       id: category.Id ?? category.id ?? '',
       name: category.Name ?? category.name ?? '',
@@ -178,6 +229,7 @@ const cloneProduct = (product: Product): Product => {
   return {
     ...product,
     images: product.images.map((image) => ({ ...image })),
+    variants: product.variants.map((variant) => ({ ...variant })),
     categories: product.categories.map((category) => ({ ...category })),
   };
 };
@@ -190,9 +242,8 @@ const buildProductImageId = (): string => {
   return `img-${Math.floor(Math.random() * 9000) + 1000}`;
 };
 
-const normalizeOptionalText = (value?: string): string | undefined => {
-  const normalizedValue = value?.trim();
-  return normalizedValue ? normalizedValue : undefined;
+const buildProductVariantId = (): string => {
+  return `vrn-${Math.floor(Math.random() * 9000) + 1000}`;
 };
 
 const normalizeCategoryIds = (payload: {
@@ -210,6 +261,103 @@ const normalizeCategoryIds = (payload: {
   }
 
   return Array.from(new Set([...normalizedCategoryIds, normalizedCategoryId]));
+};
+
+const normalizeVariantInputs = (variants?: ProductVariantInput[]): ProductVariantInput[] => {
+  const normalizedVariants = (variants ?? [])
+    .map((variant, index) => {
+      const name = normalizeOptionalText(variant.name);
+
+      if (!name) {
+        return null;
+      }
+
+      return {
+        ...variant,
+        name,
+        imagePath: normalizeOptionalText(variant.imagePath) ?? null,
+        imageId: normalizeOptionalText(variant.imageId),
+        sortOrder: variant.sortOrder ?? index,
+        isDefault: Boolean(variant.isDefault),
+      } satisfies ProductVariantInput;
+    })
+    .filter((variant): variant is ProductVariantInput => variant != null);
+
+  if (normalizedVariants.length === 0) {
+    return [];
+  }
+
+  const defaultVariantIndex = normalizedVariants.findIndex((variant) => variant.isDefault);
+
+  return normalizedVariants.map((variant, index) => ({
+    ...variant,
+    isDefault: defaultVariantIndex >= 0 ? index === defaultVariantIndex : index === 0,
+  }));
+};
+
+const buildMockVariants = (variants?: ProductVariantInput[]): ProductVariant[] => {
+  return normalizeVariantInputs(variants).map((variant, index) => ({
+    id: variant.id ?? buildProductVariantId(),
+    name: variant.name.trim(),
+    imagePath: variant.imageFile
+      ? URL.createObjectURL(variant.imageFile)
+      : normalizeOptionalText(variant.imagePath) ?? null,
+    sortOrder: variant.sortOrder ?? index,
+    isDefault: Boolean(variant.isDefault),
+  }));
+};
+
+const appendVariantsToFormData = (
+  formData: FormData,
+  variants?: ProductVariantInput[],
+  options: { clearVariants?: boolean } = {}
+): void => {
+  const normalizedVariants = normalizeVariantInputs(variants);
+  const shouldClearVariants = Boolean(options.clearVariants);
+
+  if (normalizedVariants.length === 0 && !shouldClearVariants) {
+    return;
+  }
+
+  const variantImageFiles: File[] = [];
+  const variantsJson = normalizedVariants.map((variant, index) => {
+    const variantPayload: Record<string, unknown> = {
+      name: variant.name.trim(),
+      sortOrder: variant.sortOrder ?? index,
+      isDefault: Boolean(variant.isDefault),
+    };
+
+    if (!shouldClearVariants && variant.id) {
+      variantPayload.id = variant.id;
+    }
+
+    if (variant.imageFile) {
+      variantPayload.imageIndex = variantImageFiles.length;
+      variantImageFiles.push(variant.imageFile);
+    } else {
+      const imagePath = normalizeOptionalText(variant.imagePath);
+      const imageId = normalizeOptionalText(variant.imageId);
+
+      if (imagePath) {
+        variantPayload.imagePath = imagePath;
+      }
+
+      if (imageId) {
+        variantPayload.imageId = imageId;
+      }
+    }
+
+    return variantPayload;
+  });
+
+  formData.append('VariantsJson', JSON.stringify(variantsJson));
+  variantImageFiles.forEach((variantImageFile) => {
+    formData.append('VariantImages', variantImageFile);
+  });
+
+  if (shouldClearVariants) {
+    formData.append('ClearVariants', 'true');
+  }
 };
 
 const buildCategoryLookup = (): Map<string, string> => {
@@ -241,7 +389,8 @@ const applyFilters = (products: Product[], filters: ProductsFilter): Product[] =
       !normalizedSearch ||
       product.name.toLowerCase().includes(normalizedSearch) ||
       product.code.toLowerCase().includes(normalizedSearch) ||
-      (product.description ?? '').toLowerCase().includes(normalizedSearch);
+      (product.description ?? '').toLowerCase().includes(normalizedSearch) ||
+      product.variants.some((variant) => variant.name.toLowerCase().includes(normalizedSearch));
     const matchesCode = !normalizedCode || product.code.toLowerCase().includes(normalizedCode);
 
     const matchesCategory =
@@ -311,6 +460,7 @@ export const productsApi = {
               },
             ]
           : [],
+        variants: buildMockVariants(parsed.variants),
         categories:
           normalizedCategoryId && nextCategoryName
             ? [
@@ -345,6 +495,8 @@ export const productsApi = {
     if (parsed.imageFile) {
       formData.append('Image', parsed.imageFile);
     }
+
+    appendVariantsToFormData(formData, parsed.variants);
 
     await apiClient.post('/api/Products', formData);
   },
@@ -381,6 +533,7 @@ export const productsApi = {
         const nextProduct: Product = {
           ...product,
           images: product.images.map((image) => ({ ...image })),
+          variants: product.variants.map((variant) => ({ ...variant })),
           categories: product.categories.map((category) => ({ ...category })),
         };
 
@@ -410,6 +563,10 @@ export const productsApi = {
           ];
         }
 
+        if (parsed.variants != null || parsed.clearVariants) {
+          nextProduct.variants = buildMockVariants(parsed.variants);
+        }
+
         if (shouldUpdateCategories) {
           nextProduct.categories =
             normalizedCategoryId && nextCategoryName
@@ -432,7 +589,9 @@ export const productsApi = {
       return;
     }
 
-    if (parsed.imageFile) {
+    const shouldUseMultipart = Boolean(parsed.imageFile || parsed.variants != null || parsed.clearVariants);
+
+    if (shouldUseMultipart) {
       const formData = new FormData();
 
       if (parsed.name != null) {
@@ -452,12 +611,22 @@ export const productsApi = {
       }
 
       if (shouldUpdateCategories) {
-        normalizedCategoryIds.forEach((categoryId) => {
-          formData.append('CategoryIds', categoryId);
-        });
+        if (normalizedCategoryIds.length > 0) {
+          normalizedCategoryIds.forEach((categoryId) => {
+            formData.append('CategoryIds', categoryId);
+          });
+        } else {
+          formData.append('ClearCategories', 'true');
+        }
       }
 
-      formData.append('Image', parsed.imageFile);
+      if (parsed.imageFile) {
+        formData.append('Image', parsed.imageFile);
+      }
+
+      appendVariantsToFormData(formData, parsed.variants, {
+        clearVariants: Boolean(parsed.clearVariants || parsed.variants != null),
+      });
 
       await apiClient.put(`/api/Products/${parsed.id}/with-image`, formData);
       return;
