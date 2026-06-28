@@ -49,6 +49,12 @@ interface ProductApiResponse {
   name?: string;
   Code?: string;
   code?: string;
+  Brand?: string;
+  brand?: string;
+  Type?: string;
+  type?: string;
+  Weight?: number;
+  weight?: number;
   Description?: string;
   description?: string;
   Price?: number;
@@ -76,6 +82,9 @@ let productsDb: Product[] = [
     id: 'prd-1',
     name: 'عصير تفاح',
     code: 'AJ-001',
+    brand: 'Wasel',
+    type: 'Juice',
+    weight: 250,
     description: 'عصير تفاح طبيعي',
     price: 12.5,
     images: [
@@ -100,6 +109,9 @@ let productsDb: Product[] = [
     id: 'prd-2',
     name: 'عصير برتقال',
     code: 'OJ-002',
+    brand: 'Wasel',
+    type: 'Juice',
+    weight: 250,
     description: 'عصير برتقال طازج',
     price: 13,
     images: [
@@ -124,6 +136,9 @@ let productsDb: Product[] = [
     id: 'prd-3',
     name: 'شيبس بطاطا',
     code: 'PC-003',
+    brand: 'Arabica',
+    type: 'Chips',
+    weight: 50,
     description: 'شيبس بطاطا مقرمش',
     price: 8,
     images: [
@@ -163,6 +178,9 @@ let productsDb: Product[] = [
     id: 'prd-4',
     name: 'حليب طازج',
     code: 'FM-004',
+    brand: 'Wasel Dairy',
+    type: 'Milk',
+    weight: 1000,
     description: 'حليب طازج عالي الجودة',
     price: 9.75,
     images: [
@@ -199,6 +217,9 @@ const mapProductResponse = (product: ProductApiResponse): Product => {
     id: product.Id ?? product.id ?? '',
     name: product.Name ?? product.name ?? '',
     code: product.Code ?? product.code ?? '',
+    brand: normalizeOptionalText(product.Brand ?? product.brand),
+    type: normalizeOptionalText(product.Type ?? product.type),
+    weight: product.Weight ?? product.weight,
     description: product.Description ?? product.description,
     price: product.Price ?? product.price ?? 0,
     images: images.map((image) => ({
@@ -327,7 +348,7 @@ const appendVariantsToFormData = (
       isDefault: Boolean(variant.isDefault),
     };
 
-    if (!shouldClearVariants && variant.id) {
+    if (variant.id) {
       variantPayload.id = variant.id;
     }
 
@@ -389,6 +410,8 @@ const applyFilters = (products: Product[], filters: ProductsFilter): Product[] =
       !normalizedSearch ||
       product.name.toLowerCase().includes(normalizedSearch) ||
       product.code.toLowerCase().includes(normalizedSearch) ||
+      (product.brand ?? '').toLowerCase().includes(normalizedSearch) ||
+      (product.type ?? '').toLowerCase().includes(normalizedSearch) ||
       (product.description ?? '').toLowerCase().includes(normalizedSearch) ||
       product.variants.some((variant) => variant.name.toLowerCase().includes(normalizedSearch));
     const matchesCode = !normalizedCode || product.code.toLowerCase().includes(normalizedCode);
@@ -399,6 +422,14 @@ const applyFilters = (products: Product[], filters: ProductsFilter): Product[] =
 
     return matchesSearch && matchesCode && matchesCategory;
   });
+};
+
+const appendOptionalTextField = (formData: FormData, key: string, value?: string): void => {
+  const normalizedValue = normalizeOptionalText(value);
+
+  if (normalizedValue) {
+    formData.append(key, normalizedValue);
+  }
 };
 
 export const productsApi = {
@@ -430,6 +461,8 @@ export const productsApi = {
 
   async createProduct(payload: CreateProductInput): Promise<void> {
     const parsed = createProductSchema.parse(payload);
+    const normalizedBrand = normalizeOptionalText(parsed.brand);
+    const normalizedType = normalizeOptionalText(parsed.type);
     const normalizedDescription = normalizeOptionalText(parsed.description);
     const normalizedCategoryIds = normalizeCategoryIds(parsed);
     const normalizedCategoryId = normalizedCategoryIds[0];
@@ -449,6 +482,9 @@ export const productsApi = {
         id: buildProductId(),
         name: parsed.name.trim(),
         code: parsed.code.trim(),
+        brand: normalizedBrand,
+        type: normalizedType,
+        weight: parsed.weight,
         description: normalizedDescription,
         price: parsed.price,
         images: parsed.imageFile
@@ -482,6 +518,13 @@ export const productsApi = {
     const formData = new FormData();
     formData.append('Name', parsed.name.trim());
     formData.append('Code', parsed.code.trim());
+    appendOptionalTextField(formData, 'Brand', parsed.brand);
+    appendOptionalTextField(formData, 'Type', parsed.type);
+
+    if (parsed.weight != null) {
+      formData.append('Weight', String(parsed.weight));
+    }
+
     formData.append('Price', String(parsed.price));
 
     if (parsed.description != null) {
@@ -503,10 +546,15 @@ export const productsApi = {
 
   async updateProduct(payload: UpdateProductInput): Promise<void> {
     const parsed = updateProductSchema.parse(payload);
+    const hasBrand = Object.prototype.hasOwnProperty.call(parsed, 'brand');
+    const hasType = Object.prototype.hasOwnProperty.call(parsed, 'type');
+    const hasWeight = Object.prototype.hasOwnProperty.call(parsed, 'weight');
     const hasDescription = Object.prototype.hasOwnProperty.call(parsed, 'description');
     const hasCategoryId = Object.prototype.hasOwnProperty.call(parsed, 'categoryId');
     const hasCategoryIds = Object.prototype.hasOwnProperty.call(parsed, 'categoryIds');
     const shouldUpdateCategories = hasCategoryId || hasCategoryIds;
+    const normalizedBrand = normalizeOptionalText(parsed.brand);
+    const normalizedType = normalizeOptionalText(parsed.type);
     const normalizedDescription = normalizeOptionalText(parsed.description);
     const normalizedCategoryIds = normalizeCategoryIds(parsed);
     const normalizedCategoryId = normalizedCategoryIds[0];
@@ -543,6 +591,18 @@ export const productsApi = {
 
         if (parsed.code != null) {
           nextProduct.code = parsed.code.trim();
+        }
+
+        if (hasBrand) {
+          nextProduct.brand = normalizedBrand;
+        }
+
+        if (hasType) {
+          nextProduct.type = normalizedType;
+        }
+
+        if (hasWeight) {
+          nextProduct.weight = parsed.weight;
         }
 
         if (parsed.price != null) {
@@ -602,6 +662,18 @@ export const productsApi = {
         formData.append('Code', parsed.code.trim());
       }
 
+      if (hasBrand) {
+        formData.append('Brand', normalizedBrand ?? '');
+      }
+
+      if (hasType) {
+        formData.append('Type', normalizedType ?? '');
+      }
+
+      if (hasWeight && parsed.weight != null) {
+        formData.append('Weight', String(parsed.weight));
+      }
+
       if (parsed.price != null) {
         formData.append('Price', String(parsed.price));
       }
@@ -640,6 +712,18 @@ export const productsApi = {
 
     if (parsed.code != null) {
       requestPayload.code = parsed.code.trim();
+    }
+
+    if (hasBrand) {
+      requestPayload.brand = normalizedBrand ?? '';
+    }
+
+    if (hasType) {
+      requestPayload.type = normalizedType ?? '';
+    }
+
+    if (hasWeight) {
+      requestPayload.weight = parsed.weight;
     }
 
     if (parsed.price != null) {
