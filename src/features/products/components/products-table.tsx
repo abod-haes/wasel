@@ -97,6 +97,29 @@ export function ProductsTable({
         ),
       },
       {
+        key: 'variants',
+        header: 'النكهات',
+        renderCell: (product: Product) => {
+          if (product.variants.length === 0) {
+            return <span className="text-sm text-muted-foreground">-</span>;
+          }
+
+          const visibleVariants = product.variants.slice(0, 3);
+          const hiddenVariantsCount = product.variants.length - visibleVariants.length;
+
+          return (
+            <div className="flex max-w-56 flex-wrap gap-1">
+              {visibleVariants.map((variant) => (
+                <Badge key={variant.id || variant.name} variant={variant.isDefault ? 'default' : 'secondary'}>
+                  {variant.name}
+                </Badge>
+              ))}
+              {hiddenVariantsCount > 0 ? <Badge variant="outline">+{hiddenVariantsCount}</Badge> : null}
+            </div>
+          );
+        },
+      },
+      {
         key: 'price',
         header: t('products.table.price'),
         renderCell: (product: Product) => <span className="font-medium">{formatPrice(product.price)}</span>,
