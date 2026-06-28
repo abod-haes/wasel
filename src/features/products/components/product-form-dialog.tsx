@@ -45,6 +45,9 @@ interface VariantFormValues {
 interface FormValues {
   name: string;
   code: string;
+  brand: string;
+  type: string;
+  weight: string;
   description: string;
   price: string;
   imageFile?: File;
@@ -94,9 +97,24 @@ const mapProductVariantsToRows = (product?: Product): VariantFormValues[] => {
   );
 };
 
+const parseOptionalNumber = (value: string): number | undefined => {
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
+    return undefined;
+  }
+
+  const parsedValue = Number(normalizedValue);
+
+  return Number.isFinite(parsedValue) ? parsedValue : undefined;
+};
+
 const defaultFormValues: FormValues = {
   name: '',
   code: '',
+  brand: '',
+  type: '',
+  weight: '',
   description: '',
   price: '',
   imageFile: undefined,
@@ -129,6 +147,9 @@ export function ProductFormDialog({
       setFormValues({
         name: defaultProduct.name,
         code: defaultProduct.code,
+        brand: defaultProduct.brand ?? '',
+        type: defaultProduct.type ?? '',
+        weight: defaultProduct.weight != null ? String(defaultProduct.weight) : '',
         description: defaultProduct.description ?? '',
         price: String(defaultProduct.price),
         imageFile: undefined,
@@ -207,6 +228,9 @@ export function ProductFormDialog({
     const parsed = createProductSchema.safeParse({
       name: formValues.name,
       code: formValues.code,
+      brand: formValues.brand,
+      type: formValues.type,
+      weight: parseOptionalNumber(formValues.weight),
       description: formValues.description,
       price: Number(formValues.price),
       imageFile: formValues.imageFile,
@@ -221,6 +245,9 @@ export function ProductFormDialog({
       setErrors({
         name: fieldErrors.name?.[0],
         code: fieldErrors.code?.[0],
+        brand: fieldErrors.brand?.[0],
+        type: fieldErrors.type?.[0],
+        weight: fieldErrors.weight?.[0],
         description: fieldErrors.description?.[0],
         price: fieldErrors.price?.[0],
         imageFile: fieldErrors.imageFile?.[0],
@@ -269,6 +296,51 @@ export function ProductFormDialog({
                   setFormValues((previous) => ({
                     ...previous,
                     code: event.target.value,
+                  }))
+                }
+              />
+            </FormField>
+
+            <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
+              <Input
+                id="product-brand"
+                value={formValues.brand}
+                placeholder="مثال: Arabica"
+                onChange={(event) =>
+                  setFormValues((previous) => ({
+                    ...previous,
+                    brand: event.target.value,
+                  }))
+                }
+              />
+            </FormField>
+
+            <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
+              <Input
+                id="product-type"
+                value={formValues.type}
+                placeholder="مثال: Chips"
+                onChange={(event) =>
+                  setFormValues((previous) => ({
+                    ...previous,
+                    type: event.target.value,
+                  }))
+                }
+              />
+            </FormField>
+
+            <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
+              <Input
+                id="product-weight"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formValues.weight}
+                placeholder="مثال: 50"
+                onChange={(event) =>
+                  setFormValues((previous) => ({
+                    ...previous,
+                    weight: event.target.value,
                   }))
                 }
               />
