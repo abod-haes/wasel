@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
 import { ROUTES } from '@/constants/routes';
@@ -9,7 +9,6 @@ import { useProductQuery, useUpdateProductMutation } from '@/features/products/h
 import type { CreateProductInput } from '@/features/products/types/product-types';
 
 export default function ProductEditPage(): React.JSX.Element {
-  const navigate = useNavigate();
   const { productId } = useParams<{ productId: string }>();
   const productQuery = useProductQuery(productId);
   const categoriesQuery = useCategoryOptionsQuery();
