@@ -13,6 +13,8 @@ import UnauthorizedPage from '@/pages/unauthorized-page';
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'));
 const UsersPage = lazy(() => import('@/features/users/pages/users-page'));
 const ProductsPage = lazy(() => import('@/features/products/pages/products-page'));
+const ProductCreatePage = lazy(() => import('@/features/products/pages/product-create-page'));
+const ProductEditPage = lazy(() => import('@/features/products/pages/product-edit-page'));
 const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
@@ -78,6 +80,28 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.products',
+            },
+          },
+          {
+            path: ROUTES.productCreate,
+            element: (
+              <PermissionGuard required={PERMISSIONS.productsView}>
+                {withSuspense(<ProductCreatePage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'products.createProduct',
+            },
+          },
+          {
+            path: ROUTES.productEdit,
+            element: (
+              <PermissionGuard required={PERMISSIONS.productsView}>
+                {withSuspense(<ProductEditPage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'products.editProduct',
             },
           },
           {
