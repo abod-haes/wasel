@@ -105,7 +105,7 @@ const buildInitialValues = (variant?: DisplayVariant, nextSortOrder = 0): Varian
     id: variant.id,
     name: variant.name,
     imagePath: variant.imagePath ?? '',
-    imageFile: undefined,
+    imageFile: variant.imageFile,
     sortOrder: String(variant.sortOrder),
     isDefault: variant.isDefault,
   };
