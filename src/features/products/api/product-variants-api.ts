@@ -99,7 +99,9 @@ export const productVariantsApi = {
     }
 
     const { data } = await apiClient.get<ProductVariantApiResponse[]>(`/api/Products/${productId}/variants`);
-    return (data ?? []).map(mapProductVariantResponse).sort((firstVariant, secondVariant) => firstVariant.sortOrder - secondVariant.sortOrder);
+    return (data ?? [])
+      .map(mapProductVariantResponse)
+      .sort((firstVariant, secondVariant) => firstVariant.sortOrder - secondVariant.sortOrder);
   },
 
   async createProductVariant(payload: ProductVariantMutationPayload): Promise<ProductVariant> {
@@ -121,7 +123,7 @@ export const productVariantsApi = {
       };
       const nextVariants = normalizeVariantList([...currentVariants, createdVariant]);
       mockVariantsDb.set(payload.productId, nextVariants);
-      return createdVariant;
+      return nextVariants.find((variant) => variant.id === createdVariant.id) ?? createdVariant;
     }
 
     const { data } = await apiClient.post<ProductVariantApiResponse>(
@@ -160,8 +162,14 @@ export const productVariantsApi = {
           : variant
       );
       const nextVariants = normalizeVariantList(updatedVariants);
+      const updatedVariant = nextVariants.find((variant) => variant.id === payload.variantId);
+
+      if (!updatedVariant) {
+        throw new Error('Variant not found.');
+      }
+
       mockVariantsDb.set(payload.productId, nextVariants);
-      return nextVariants.find((variant) => variant.id === payload.variantId) ?? updatedVariants[0];
+      return updatedVariant;
     }
 
     const { data } = await apiClient.put<ProductVariantApiResponse>(
