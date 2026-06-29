@@ -27,7 +27,7 @@ import {
   useProductVariantsQuery,
   useUpdateProductVariantMutation,
 } from '@/features/products/hooks/use-products-query';
-import type { ProductVariant, ProductVariantInput } from '@/features/products/types/product-types';
+import type { ProductVariantInput } from '@/features/products/types/product-types';
 import { resolveMediaPath } from '@/lib/utils';
 
 export interface PendingProductVariant extends ProductVariantInput {
