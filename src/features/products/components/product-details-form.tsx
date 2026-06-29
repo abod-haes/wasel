@@ -72,7 +72,7 @@ export function ProductDetailsForm({
   mode,
   product,
   categories,
-  variants = [],
+  variants,
   isSubmitting = false,
   onSubmit,
 }: ProductDetailsFormProps): React.JSX.Element {
@@ -108,8 +108,7 @@ export function ProductDetailsForm({
 
     const normalizedCategoryId = values.categoryId === 'none' ? undefined : values.categoryId;
     const selectedCategory = categories.find((category) => category.id === normalizedCategoryId);
-
-    const parsed = createProductSchema.safeParse({
+    const valuesToParse = {
       name: values.name,
       code: values.code,
       brand: values.brand,
@@ -120,8 +119,10 @@ export function ProductDetailsForm({
       imageFile: values.imageFile,
       categoryId: normalizedCategoryId,
       categoryName: selectedCategory?.name,
-      variants,
-    });
+      ...(variants != null ? { variants } : {}),
+    };
+
+    const parsed = createProductSchema.safeParse(valuesToParse);
 
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
