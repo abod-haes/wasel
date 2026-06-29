@@ -1,21 +1,19 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
 import { ProductFilters } from '@/features/products/components/product-filters';
-import { ProductFormDialog } from '@/features/products/components/product-form-dialog';
 import { ProductsTable } from '@/features/products/components/products-table';
 import {
-  useCreateProductMutation,
   useDeleteProductMutation,
   useProductsQuery,
-  useUpdateProductMutation,
 } from '@/features/products/hooks/use-products-query';
 import type {
-  CreateProductInput,
   Product,
   ProductsFilter,
 } from '@/features/products/types/product-types';
@@ -26,64 +24,25 @@ const defaultFilters: ProductsFilter = {
   categoryId: 'all',
 };
 
+const buildProductEditRoute = (productId: string): string => {
+  return ROUTES.productEdit.replace(':productId', productId);
+};
+
 export default function ProductsPage(): React.JSX.Element {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState<ProductsFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
 
   const productsQuery = useProductsQuery(filters, pagination);
   const categoriesQuery = useCategoryOptionsQuery();
-  const createProductMutation = useCreateProductMutation();
-  const updateProductMutation = useUpdateProductMutation();
   const deleteProductMutation = useDeleteProductMutation();
 
   if (productsQuery.isError) {
     return <ErrorState onRetry={() => void productsQuery.refetch()} />;
   }
-
-  const openCreateDialog = (): void => {
-    setDialogMode('create');
-    setSelectedProduct(undefined);
-    setIsFormOpen(true);
-  };
-
-  const openEditDialog = (product: Product): void => {
-    setDialogMode('edit');
-    setSelectedProduct(product);
-    setIsFormOpen(true);
-  };
-
-  const submitProduct = (payload: CreateProductInput): void => {
-    if (dialogMode === 'create') {
-      createProductMutation.mutate(payload, {
-        onSuccess: () => {
-          setIsFormOpen(false);
-        },
-      });
-      return;
-    }
-
-    if (!selectedProduct) {
-      return;
-    }
-
-    updateProductMutation.mutate(
-      {
-        id: selectedProduct.id,
-        ...payload,
-      },
-      {
-        onSuccess: () => {
-          setIsFormOpen(false);
-        },
-      }
-    );
-  };
 
   const confirmDelete = (): void => {
     if (!deleteProduct) {
@@ -97,16 +56,13 @@ export default function ProductsPage(): React.JSX.Element {
     });
   };
 
-  const isSubmitting = createProductMutation.isPending || updateProductMutation.isPending;
-  const isMutating = isSubmitting || deleteProductMutation.isPending;
-
   return (
     <PageContainer>
       <SectionHeader
         titleKey="products.title"
         descriptionKey="products.description"
         actions={
-          <Button onClick={openCreateDialog} className="gap-2">
+          <Button onClick={() => navigate(ROUTES.productCreate)} className="gap-2">
             <Plus className="h-4 w-4" />
             {t('products.createProduct')}
           </Button>
@@ -129,22 +85,12 @@ export default function ProductsPage(): React.JSX.Element {
       <ProductsTable
         products={productsQuery.data?.items ?? []}
         isLoading={productsQuery.isLoading || productsQuery.isFetching}
-        isMutating={isMutating}
-        onEditProduct={openEditDialog}
+        isMutating={deleteProductMutation.isPending}
+        onEditProduct={(product) => navigate(buildProductEditRoute(product.id))}
         onDeleteProduct={setDeleteProduct}
         pagination={productsQuery.data}
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
-      />
-
-      <ProductFormDialog
-        open={isFormOpen}
-        mode={dialogMode}
-        defaultProduct={selectedProduct}
-        categories={categoriesQuery.data ?? []}
-        onOpenChange={setIsFormOpen}
-        onSubmit={submitProduct}
-        isSubmitting={isSubmitting}
       />
 
       <ConfirmDialog
