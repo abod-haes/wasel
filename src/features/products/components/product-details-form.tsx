@@ -22,12 +22,13 @@ import {
 import { ROUTES } from '@/constants/routes';
 import type { CategoryOption } from '@/features/categories/types/category-types';
 import { createProductSchema } from '@/features/products/schemas/product-form-schema';
-import type { CreateProductInput, Product } from '@/features/products/types/product-types';
+import type { CreateProductInput, Product, ProductVariantInput } from '@/features/products/types/product-types';
 
 interface ProductDetailsFormProps {
   mode: 'create' | 'edit';
   product?: Product;
   categories: CategoryOption[];
+  variants?: ProductVariantInput[];
   isSubmitting?: boolean;
   onSubmit: (payload: CreateProductInput) => void;
 }
@@ -71,6 +72,7 @@ export function ProductDetailsForm({
   mode,
   product,
   categories,
+  variants = [],
   isSubmitting = false,
   onSubmit,
 }: ProductDetailsFormProps): React.JSX.Element {
@@ -118,7 +120,7 @@ export function ProductDetailsForm({
       imageFile: values.imageFile,
       categoryId: normalizedCategoryId,
       categoryName: selectedCategory?.name,
-      variants: [],
+      variants,
     });
 
     if (!parsed.success) {
@@ -142,14 +144,14 @@ export function ProductDetailsForm({
   };
 
   return (
-    <form onSubmit={submitHandler}>
+    <form id="product-details-form" onSubmit={submitHandler}>
       <Card>
         <CardHeader>
           <CardTitle>{mode === 'create' ? 'بيانات المنتج الجديد' : 'بيانات المنتج'}</CardTitle>
           <CardDescription>
             {mode === 'create'
-              ? 'أدخل معلومات المنتج الأساسية أولاً. بعد الحفظ يمكنك إدارة النكهات من صفحة التعديل.'
-              : 'عدّل معلومات المنتج الأساسية من هنا. النكهات لها قسم مستقل أسفل الصفحة.'}
+              ? 'أدخل معلومات المنتج الأساسية وأضف النكهات من القسم التالي قبل الحفظ.'
+              : 'عدّل معلومات المنتج الأساسية من هنا، وأدر النكهات من القسم التالي.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -261,7 +263,7 @@ export function ProductDetailsForm({
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             <Save className="h-4 w-4" />
-            {mode === 'create' ? 'حفظ المنتج والمتابعة' : 'حفظ التعديلات'}
+            {mode === 'create' ? 'حفظ المنتج' : 'حفظ التعديلات'}
           </Button>
         </CardFooter>
       </Card>
