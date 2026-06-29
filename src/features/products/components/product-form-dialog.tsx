@@ -197,6 +197,11 @@ export function ProductFormDialog({
     }));
   };
 
+  const addVariantRowAndOpenTab = (): void => {
+    addVariantRow();
+    setActiveTab('variants');
+  };
+
   const removeVariantRow = (localId: string): void => {
     setFormValues((previous) => ({
       ...previous,
@@ -452,6 +457,22 @@ export function ProductFormDialog({
                   }
                 />
               </FormField>
+
+              <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border/70 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">نكهات المنتج</h3>
+                  <p className="text-xs text-muted-foreground">
+                    إذا كان للمنتج أكثر من طعم أو نكهة، أضفها قبل حفظ المنتج من هنا.
+                  </p>
+                  {formValues.variants.length > 0 ? (
+                    <p className="mt-1 text-xs text-muted-foreground">تمت إضافة {formValues.variants.length} نكهة لهذا المنتج.</p>
+                  ) : null}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addVariantRowAndOpenTab} disabled={isSubmitting}>
+                  <Plus className="h-4 w-4" />
+                  إضافة نكهة لهذا المنتج
+                </Button>
+              </div>
             </div>
           ) : (
             <section className="space-y-3 rounded-lg border border-border/70 bg-muted/20 p-4">
