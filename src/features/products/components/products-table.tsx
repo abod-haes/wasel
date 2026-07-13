@@ -119,7 +119,6 @@ export function ProductsTable({
                 </div>
                 <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
                   <span>الكود: {product.code || '-'}</span>
-                  {product.brand ? <span>• البراند: {product.brand}</span> : null}
                   {product.type ? <span>• النوع: {product.type}</span> : null}
                 </div>
                 {product.description ? (
@@ -129,6 +128,16 @@ export function ProductsTable({
             </div>
           );
         },
+      },
+      {
+        key: 'brand',
+        header: 'البراند',
+        renderCell: (product: Product) =>
+          product.brand ? (
+            <span className="font-medium text-foreground">{product.brand}</span>
+          ) : (
+            <span className="text-sm text-muted-foreground">-</span>
+          ),
       },
       {
         key: 'categories',
