@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { DataTable } from '@/components/shared';
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
-import type { Product } from '@/features/products/types/product-types';
+import type { Product, ProductVariant } from '@/features/products/types/product-types';
 import { resolveMediaPath } from '@/lib/utils';
 import type { PaginatedData } from '@/types/api';
 
@@ -36,6 +36,36 @@ const formatWeight = (value?: number): string => {
   }).format(value);
 };
 
+const renderVariantBadge = (variant: ProductVariant): React.JSX.Element => {
+  const variantImage = variant.imagePath ? resolveMediaPath(variant.imagePath) : undefined;
+
+  return (
+    <Tooltip key={variant.id || variant.name}>
+      <TooltipTrigger asChild>
+        <span className="inline-flex cursor-default items-center gap-1 rounded-full border bg-background px-2 py-1 text-xs text-foreground">
+          {variantImage ? (
+            <img src={variantImage} alt={variant.name} className="h-4 w-4 rounded-full object-cover" loading="lazy" />
+          ) : null}
+          <span>{variant.name}</span>
+          {variant.isDefault ? <span className="text-[10px] text-primary">افتراضي</span> : null}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="rounded-xl border-border/70 bg-card p-2 shadow-lg">
+        <div className="space-y-2 text-sm">
+          {variantImage ? (
+            <img src={variantImage} alt={variant.name} className="h-28 w-40 rounded-lg object-cover" loading="lazy" />
+          ) : null}
+          <div>
+            <p className="font-medium">{variant.name}</p>
+            <p className="text-xs text-muted-foreground">الترتيب: {variant.sortOrder}</p>
+            {variant.isDefault ? <p className="text-xs text-primary">النكهة الافتراضية</p> : null}
+          </div>
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
 export function ProductsTable({
   products,
   isLoading = false,
@@ -51,48 +81,50 @@ export function ProductsTable({
   const columns = useMemo(
     () => [
       {
-        key: 'name',
-        header: t('common.name'),
+        key: 'product',
+        header: 'المنتج',
         renderCell: (product: Product) => {
           const mainImage = product.images.find((image) => image.isMain) ?? product.images[0];
-          const metadata = [product.code, product.brand, product.type].filter(Boolean).join(' • ');
+          const productImage = mainImage?.imagePath ? resolveMediaPath(mainImage.imagePath) : undefined;
 
           return (
-            <div className="flex items-center gap-3">
-              {mainImage ? (
+            <div className="flex min-w-72 items-center gap-3">
+              {productImage ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      className="h-10 w-10 cursor-zoom-in overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                      className="h-14 w-14 cursor-zoom-in overflow-hidden rounded-xl border bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
                       <img
-                        src={resolveMediaPath(mainImage.imagePath)}
+                        src={productImage}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-200 hover:scale-110"
                         loading="lazy"
                       />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="top"
-                    align="start"
-                    className="w-52 rounded-xl border-border/70 bg-card p-2 shadow-lg"
-                  >
-                    <img
-                      src={resolveMediaPath(mainImage.imagePath)}
-                      alt={product.name}
-                      className="h-40 w-full rounded-lg object-cover"
-                      loading="lazy"
-                    />
+                  <TooltipContent side="top" align="start" className="w-60 rounded-xl border-border/70 bg-card p-2 shadow-lg">
+                    <img src={productImage} alt={product.name} className="h-44 w-full rounded-lg object-cover" loading="lazy" />
                   </TooltipContent>
                 </Tooltip>
               ) : (
-                <div className="h-10 w-10 rounded-lg bg-muted" />
+                <div className="h-14 w-14 rounded-xl border border-dashed bg-muted" />
               )}
-              <div>
-                <p className="font-medium">{product.name}</p>
-                <p className="text-xs text-muted-foreground">{metadata || product.code}</p>
+
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold text-foreground">{product.name}</p>
+                  {product.isFavourite ? <Badge variant="warning">مفضل</Badge> : null}
+                </div>
+                <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
+                  <span>الكود: {product.code || '-'}</span>
+                  {product.brand ? <span>• البراند: {product.brand}</span> : null}
+                  {product.type ? <span>• النوع: {product.type}</span> : null}
+                </div>
+                {product.description ? (
+                  <p className="line-clamp-1 max-w-sm text-xs text-muted-foreground">{product.description}</p>
+                ) : null}
               </div>
             </div>
           );
@@ -100,31 +132,34 @@ export function ProductsTable({
       },
       {
         key: 'categories',
-        header: t('products.table.categories'),
-        renderCell: (product: Product) => (
-          <span className="text-sm text-muted-foreground">
-            {product.categories.map((category) => category.name).join(', ') || t('products.noCategory')}
-          </span>
-        ),
+        header: 'التصنيفات',
+        renderCell: (product: Product) =>
+          product.categories.length > 0 ? (
+            <div className="flex max-w-56 flex-wrap gap-1">
+              {product.categories.map((category) => (
+                <Badge key={category.id || category.name} variant="secondary">
+                  {category.name}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <span className="text-sm text-muted-foreground">{t('products.noCategory')}</span>
+          ),
       },
       {
         key: 'variants',
         header: 'النكهات',
         renderCell: (product: Product) => {
           if (product.variants.length === 0) {
-            return <span className="text-sm text-muted-foreground">-</span>;
+            return <span className="text-sm text-muted-foreground">لا يوجد</span>;
           }
 
-          const visibleVariants = product.variants.slice(0, 3);
+          const visibleVariants = product.variants.slice(0, 4);
           const hiddenVariantsCount = product.variants.length - visibleVariants.length;
 
           return (
-            <div className="flex max-w-56 flex-wrap gap-1">
-              {visibleVariants.map((variant) => (
-                <Badge key={variant.id || variant.name} variant={variant.isDefault ? 'default' : 'secondary'}>
-                  {variant.name}
-                </Badge>
-              ))}
+            <div className="flex max-w-72 flex-wrap gap-1">
+              {visibleVariants.map(renderVariantBadge)}
               {hiddenVariantsCount > 0 ? <Badge variant="outline">+{hiddenVariantsCount}</Badge> : null}
             </div>
           );
@@ -141,20 +176,14 @@ export function ProductsTable({
         renderCell: (product: Product) => <span className="font-medium">{formatPrice(product.price)}</span>,
       },
       {
-        key: 'inCart',
-        header: t('products.table.inCart'),
+        key: 'cart',
+        header: 'السلة',
         renderCell: (product: Product) =>
           product.isInCart ? (
-            <Badge variant="success">{t('products.table.cartQty', { count: product.cartQuantity })}</Badge>
+            <Badge variant="success">بالسلة: {product.cartQuantity}</Badge>
           ) : (
-            <Badge variant="outline">{t('products.notInCart')}</Badge>
+            <Badge variant="outline">خارج السلة</Badge>
           ),
-      },
-      {
-        key: 'favourite',
-        header: t('products.table.favourite'),
-        renderCell: (product: Product) =>
-          product.isFavourite ? <Badge variant="warning">{t('products.favourite')}</Badge> : <span>-</span>,
       },
       {
         key: 'actions',
