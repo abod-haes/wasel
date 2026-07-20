@@ -31,6 +31,7 @@ interface ProductDetailsFormProps {
   variants?: ProductVariantInput[];
   isSubmitting?: boolean;
   onSubmit: (payload: CreateProductInput) => void;
+  onBack?: () => void;
 }
 
 interface ProductDetailsValues {
@@ -75,6 +76,7 @@ export function ProductDetailsForm({
   variants,
   isSubmitting = false,
   onSubmit,
+  onBack,
 }: ProductDetailsFormProps): React.JSX.Element {
   const navigate = useNavigate();
   const [values, setValues] = useState<ProductDetailsValues>(defaultValues);
@@ -258,7 +260,12 @@ export function ProductDetailsForm({
           </FormField>
         </CardContent>
         <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={() => navigate(ROUTES.products)} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => (onBack ? onBack() : navigate(ROUTES.products))}
+            disabled={isSubmitting}
+          >
             <ArrowRight className="h-4 w-4" />
             رجوع للمنتجات
           </Button>
