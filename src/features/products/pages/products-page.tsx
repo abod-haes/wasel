@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
@@ -13,16 +13,18 @@ import {
   useDeleteProductMutation,
   useProductsQuery,
 } from '@/features/products/hooks/use-products-query';
+import {
+  appendProductListSearchParams,
+  createProductListSearchParams,
+  defaultProductFilters,
+  defaultProductPagination,
+  readProductListUrlState,
+} from '@/features/products/lib/product-list-url';
 import type {
   Product,
   ProductsFilter,
 } from '@/features/products/types/product-types';
 import type { PaginationParams } from '@/types/api';
-
-const defaultFilters: ProductsFilter = {
-  search: '',
-  categoryId: 'all',
-};
 
 const buildProductEditRoute = (productId: string): string => {
   return ROUTES.productEdit.replace(':productId', productId);
@@ -31,14 +33,18 @@ const buildProductEditRoute = (productId: string): string => {
 export default function ProductsPage(): React.JSX.Element {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [filters, setFilters] = useState<ProductsFilter>(defaultFilters);
-  const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
+  const { filters, pagination } = readProductListUrlState(searchParams);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
 
   const productsQuery = useProductsQuery(filters, pagination);
   const categoriesQuery = useCategoryOptionsQuery();
   const deleteProductMutation = useDeleteProductMutation();
+
+  const updateListUrl = (nextFilters: ProductsFilter, nextPagination: PaginationParams): void => {
+    setSearchParams(createProductListSearchParams(nextFilters, nextPagination), { replace: true });
+  };
 
   if (productsQuery.isError) {
     return <ErrorState onRetry={() => void productsQuery.refetch()} />;
@@ -73,12 +79,10 @@ export default function ProductsPage(): React.JSX.Element {
         filters={filters}
         categories={categoriesQuery.data ?? []}
         onChange={(nextFilters) => {
-          setFilters(nextFilters);
-          setPagination((current) => ({ ...current, page: 1 }));
+          updateListUrl(nextFilters, { ...pagination, page: defaultProductPagination.page });
         }}
         onReset={() => {
-          setFilters(defaultFilters);
-          setPagination((current) => ({ ...current, page: 1 }));
+          updateListUrl(defaultProductFilters, defaultProductPagination);
         }}
       />
 
@@ -86,11 +90,15 @@ export default function ProductsPage(): React.JSX.Element {
         products={productsQuery.data?.items ?? []}
         isLoading={productsQuery.isLoading || productsQuery.isFetching}
         isMutating={deleteProductMutation.isPending}
-        onEditProduct={(product) => navigate(buildProductEditRoute(product.id))}
+        onEditProduct={(product) =>
+          navigate(appendProductListSearchParams(buildProductEditRoute(product.id), searchParams))
+        }
         onDeleteProduct={setDeleteProduct}
         pagination={productsQuery.data}
-        onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
-        onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
+        onPageChange={(page) => updateListUrl(filters, { ...pagination, page })}
+        onPageSizeChange={(pageSize) =>
+          updateListUrl(filters, { page: defaultProductPagination.page, pageSize })
+        }
       />
 
       <ConfirmDialog
