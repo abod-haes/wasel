@@ -47,7 +47,7 @@ export default function ProductEditPage(): React.JSX.Element {
       },
       {
         onSuccess: () => {
-          navigate(productsListRoute);
+          navigate(productsListRoute, { replace: true });
         },
       }
     );
@@ -65,7 +65,7 @@ export default function ProductEditPage(): React.JSX.Element {
         product={product}
         categories={categoriesQuery.data ?? []}
         onSubmit={submitProduct}
-        onBack={() => navigate(productsListRoute)}
+        onBack={() => navigate(productsListRoute, { replace: true })}
         isSubmitting={updateProductMutation.isPending}
       />
 
