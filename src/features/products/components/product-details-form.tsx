@@ -48,7 +48,16 @@ interface ProductDetailsValues {
 }
 
 const defaultValues: ProductDetailsValues = {
-  name: '', code: '', brand: '', type: '', weight: '', weightUnit: 'none', description: '', price: '', imageFile: undefined, categoryIds: [],
+  name: '',
+  code: '',
+  brand: '',
+  type: '',
+  weight: '',
+  weightUnit: 'none',
+  description: '',
+  price: '',
+  imageFile: undefined,
+  categoryIds: [],
 };
 
 const parseOptionalNumber = (value: string): number | undefined => {
@@ -58,7 +67,15 @@ const parseOptionalNumber = (value: string): number | undefined => {
   return Number.isFinite(parsedValue) ? parsedValue : undefined;
 };
 
-export function ProductDetailsForm({ mode, product, categories, variants, isSubmitting = false, onSubmit, onBack }: ProductDetailsFormProps): React.JSX.Element {
+export function ProductDetailsForm({
+  mode,
+  product,
+  categories,
+  variants,
+  isSubmitting = false,
+  onSubmit,
+  onBack,
+}: ProductDetailsFormProps): React.JSX.Element {
   const navigate = useNavigate();
   const [values, setValues] = useState<ProductDetailsValues>(defaultValues);
   const [errors, setErrors] = useState<Partial<Record<keyof ProductDetailsValues, string>>>({});
@@ -82,6 +99,7 @@ export function ProductDetailsForm({ mode, product, categories, variants, isSubm
       setCategorySearch('');
       return;
     }
+
     if (mode === 'create') {
       setValues(defaultValues);
       setErrors({});
@@ -97,6 +115,7 @@ export function ProductDetailsForm({ mode, product, categories, variants, isSubm
 
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
+
     const parsed = createProductSchema.safeParse({
       name: values.name,
       code: values.code,
@@ -105,7 +124,7 @@ export function ProductDetailsForm({ mode, product, categories, variants, isSubm
       weight: parseOptionalNumber(values.weight),
       weightUnit: values.weightUnit === 'none' ? undefined : values.weightUnit,
       description: values.description,
-      price: Number(values.price),
+      price: values.price.trim() === '' ? Number.NaN : Number(values.price),
       imageFile: values.imageFile,
       categoryIds: values.categoryIds,
       ...(variants != null ? { variants } : {}),
@@ -114,12 +133,20 @@ export function ProductDetailsForm({ mode, product, categories, variants, isSubm
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
       setErrors({
-        name: fieldErrors.name?.[0], code: fieldErrors.code?.[0], brand: fieldErrors.brand?.[0], type: fieldErrors.type?.[0],
-        weight: fieldErrors.weight?.[0], weightUnit: fieldErrors.weightUnit?.[0], description: fieldErrors.description?.[0],
-        price: fieldErrors.price?.[0], imageFile: fieldErrors.imageFile?.[0], categoryIds: fieldErrors.categoryIds?.[0],
+        name: fieldErrors.name?.[0],
+        code: fieldErrors.code?.[0],
+        brand: fieldErrors.brand?.[0],
+        type: fieldErrors.type?.[0],
+        weight: fieldErrors.weight?.[0],
+        weightUnit: fieldErrors.weightUnit?.[0],
+        description: fieldErrors.description?.[0],
+        price: fieldErrors.price?.[0],
+        imageFile: fieldErrors.imageFile?.[0],
+        categoryIds: fieldErrors.categoryIds?.[0],
       });
       return;
     }
+
     setErrors({});
     onSubmit(parsed.data);
   };
@@ -140,38 +167,71 @@ export function ProductDetailsForm({ mode, product, categories, variants, isSubm
       <Card>
         <CardHeader>
           <CardTitle>{mode === 'create' ? 'بيانات المنتج الجديد' : 'بيانات المنتج'}</CardTitle>
-          <CardDescription>{mode === 'create' ? 'أدخل معلومات المنتج الأساسية، اربطه بتصنيف أو أكثر، وأضف النكهات قبل الحفظ.' : 'عدّل بيانات المنتج والتصنيفات، وأدر الصور والنكهات من الأقسام التالية.'}</CardDescription>
+          <CardDescription>
+            {mode === 'create'
+              ? 'أدخل معلومات المنتج الأساسية، اربطه بتصنيف أو أكثر، وأضف النكهات قبل الحفظ.'
+              : 'عدّل بيانات المنتج والتصنيفات، وأدر الصور والنكهات من الأقسام التالية.'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <FormField labelKey="common.name" htmlFor="product-name" required error={errors.name}><Input id="product-name" value={values.name} placeholder="أدخل اسم المنتج" onChange={(event) => setValues((previous) => ({ ...previous, name: event.target.value }))} /></FormField>
-            <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}><Input id="product-code" value={values.code} placeholder="أدخل كود المنتج" onChange={(event) => setValues((previous) => ({ ...previous, code: event.target.value }))} /></FormField>
-            <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}><Input id="product-brand" value={values.brand} placeholder="مثال: Arabica" onChange={(event) => setValues((previous) => ({ ...previous, brand: event.target.value }))} /></FormField>
-            <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}><Input id="product-type" value={values.type} placeholder="مثال: Chips" onChange={(event) => setValues((previous) => ({ ...previous, type: event.target.value }))} /></FormField>
+            <FormField labelKey="common.name" htmlFor="product-name" required error={errors.name}>
+              <Input id="product-name" value={values.name} placeholder="أدخل اسم المنتج" onChange={(event) => setValues((previous) => ({ ...previous, name: event.target.value }))} />
+            </FormField>
+            <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}>
+              <Input id="product-code" value={values.code} placeholder="أدخل كود المنتج" onChange={(event) => setValues((previous) => ({ ...previous, code: event.target.value }))} />
+            </FormField>
+            <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
+              <Input id="product-brand" value={values.brand} placeholder="مثال: Arabica" onChange={(event) => setValues((previous) => ({ ...previous, brand: event.target.value }))} />
+            </FormField>
+            <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
+              <Input id="product-type" value={values.type} placeholder="مثال: Chips" onChange={(event) => setValues((previous) => ({ ...previous, type: event.target.value }))} />
+            </FormField>
             <div className="grid grid-cols-[1fr_120px] gap-2">
-              <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}><Input id="product-weight" type="number" min="0" step="0.01" value={values.weight} placeholder="مثال: 50" onChange={(event) => setValues((previous) => ({ ...previous, weight: event.target.value }))} /></FormField>
+              <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
+                <Input id="product-weight" type="number" min="0" step="0.01" value={values.weight} placeholder="مثال: 50" onChange={(event) => setValues((previous) => ({ ...previous, weight: event.target.value }))} />
+              </FormField>
               <FormField labelKey="الوحدة" error={errors.weightUnit}>
                 <Select value={values.weightUnit} onValueChange={(weightUnit) => setValues((previous) => ({ ...previous, weightUnit: weightUnit as ProductDetailsValues['weightUnit'] }))}>
                   <SelectTrigger><SelectValue placeholder="الوحدة" /></SelectTrigger>
-                  <SelectContent><SelectItem value="none">بدون</SelectItem><SelectItem value="g">g</SelectItem><SelectItem value="Kg">Kg</SelectItem><SelectItem value="L">L</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="none">بدون</SelectItem>
+                    <SelectItem value="g">g</SelectItem>
+                    <SelectItem value="Kg">Kg</SelectItem>
+                    <SelectItem value="L">L</SelectItem>
+                  </SelectContent>
                 </Select>
               </FormField>
             </div>
-            <FormField labelKey="products.table.price" htmlFor="product-price" required error={errors.price}><Input id="product-price" type="number" min="0" step="0.01" value={values.price} placeholder="أدخل سعر المنتج" onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))} /></FormField>
+            <FormField labelKey="products.table.price" htmlFor="product-price" required error={errors.price}>
+              <Input id="product-price" type="number" min="0" step="0.01" value={values.price} placeholder="أدخل سعر المنتج" onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))} />
+            </FormField>
           </div>
 
           <div className="space-y-3 rounded-xl border p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold">تصنيفات المنتج</p><p className="text-xs text-muted-foreground">يمكن ربط المنتج بأكثر من تصنيف.</p></div><span className="text-xs text-muted-foreground">محدد: {values.categoryIds.length}</span></div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div><p className="text-sm font-semibold">تصنيفات المنتج</p><p className="text-xs text-muted-foreground">يمكن ربط المنتج بأكثر من تصنيف.</p></div>
+              <span className="text-xs text-muted-foreground">محدد: {values.categoryIds.length}</span>
+            </div>
             <Input value={categorySearch} placeholder="ابحث عن تصنيف" onChange={(event) => setCategorySearch(event.target.value)} />
             <div className="max-h-52 space-y-1 overflow-y-auto rounded-lg border p-2">
-              {filteredCategories.length === 0 ? <p className="p-3 text-center text-sm text-muted-foreground">لا توجد تصنيفات</p> : filteredCategories.map((category) => (
-                <label key={category.id} className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/60"><input type="checkbox" checked={values.categoryIds.includes(category.id)} disabled={isSubmitting} onChange={() => toggleCategory(category.id)} /><span className="text-sm">{'— '.repeat(category.level ?? 0)}{category.name}</span></label>
-              ))}
+              {filteredCategories.length === 0 ? (
+                <p className="p-3 text-center text-sm text-muted-foreground">لا توجد تصنيفات</p>
+              ) : (
+                filteredCategories.map((category) => (
+                  <label key={category.id} className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/60">
+                    <input type="checkbox" checked={values.categoryIds.includes(category.id)} disabled={isSubmitting} onChange={() => toggleCategory(category.id)} />
+                    <span className="text-sm">{'— '.repeat(category.level ?? 0)}{category.name}</span>
+                  </label>
+                ))
+              )}
             </div>
             {errors.categoryIds ? <p className="text-xs text-destructive">{errors.categoryIds}</p> : null}
           </div>
 
-          <FormField labelKey="products.form.description" htmlFor="product-description" error={errors.description}><Textarea id="product-description" rows={4} value={values.description} placeholder="اكتب وصفاً مختصراً للمنتج" onChange={(event) => setValues((previous) => ({ ...previous, description: event.target.value }))} /></FormField>
+          <FormField labelKey="products.form.description" htmlFor="product-description" error={errors.description}>
+            <Textarea id="product-description" rows={4} value={values.description} placeholder="اكتب وصفاً مختصراً للمنتج" onChange={(event) => setValues((previous) => ({ ...previous, description: event.target.value }))} />
+          </FormField>
           <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
             <ImageUploader id="product-image" value={values.imageFile} currentImagePath={mode === 'edit' ? mainImage?.imagePath : undefined} disabled={isSubmitting} accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" onChange={(imageFile) => setValues((previous) => ({ ...previous, imageFile }))} />
           </FormField>
