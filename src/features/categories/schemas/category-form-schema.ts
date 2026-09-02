@@ -1,12 +1,15 @@
 import { z } from 'zod';
 
 export const createCategorySchema = z.object({
-  name: z.string().trim().min(2),
-  description: z.string().trim().optional(),
+  name: z.string().trim().min(2).max(128),
+  description: z.string().trim().max(1024).optional(),
   imageFile: z.instanceof(File).optional(),
+  parentCategoryId: z.string().trim().min(1).optional(),
+  productIds: z.array(z.string().trim().min(1)).optional(),
+  removeImage: z.boolean().optional(),
 });
 
-export const updateCategorySchema = createCategorySchema.partial().extend({
+export const updateCategorySchema = createCategorySchema.extend({
   id: z.string().min(1),
 });
 
