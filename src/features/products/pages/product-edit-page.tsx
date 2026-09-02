@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
 import { ProductDetailsForm } from '@/features/products/components/product-details-form';
+import { ProductImagesManager } from '@/features/products/components/product-images-manager';
 import { ProductVariantsManager } from '@/features/products/components/product-variants-manager';
 import { useProductQuery, useUpdateProductMutation } from '@/features/products/hooks/use-products-query';
 import { buildProductsListRoute } from '@/features/products/lib/product-list-url';
@@ -17,49 +18,24 @@ export default function ProductEditPage(): React.JSX.Element {
   const categoriesQuery = useCategoryOptionsQuery();
   const updateProductMutation = useUpdateProductMutation();
 
-  if (!productId) {
-    return <Navigate to={productsListRoute} replace />;
-  }
-
-  if (productQuery.isLoading || categoriesQuery.isLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (productQuery.isError) {
-    return <ErrorState onRetry={() => void productQuery.refetch()} />;
-  }
-
-  if (categoriesQuery.isError) {
-    return <ErrorState onRetry={() => void categoriesQuery.refetch()} />;
-  }
+  if (!productId) return <Navigate to={productsListRoute} replace />;
+  if (productQuery.isLoading || categoriesQuery.isLoading) return <LoadingScreen />;
+  if (productQuery.isError) return <ErrorState onRetry={() => void productQuery.refetch()} />;
+  if (categoriesQuery.isError) return <ErrorState onRetry={() => void categoriesQuery.refetch()} />;
 
   const product = productQuery.data;
-
-  if (!product) {
-    return <Navigate to={productsListRoute} replace />;
-  }
+  if (!product) return <Navigate to={productsListRoute} replace />;
 
   const submitProduct = (payload: CreateProductInput): void => {
     updateProductMutation.mutate(
-      {
-        id: productId,
-        ...payload,
-      },
-      {
-        onSuccess: () => {
-          navigate(productsListRoute, { replace: true });
-        },
-      }
+      { id: productId, ...payload },
+      { onSuccess: () => navigate(productsListRoute, { replace: true }) }
     );
   };
 
   return (
     <PageContainer>
-      <SectionHeader
-        titleKey="تعديل المنتج"
-        descriptionKey="صفحة مستقلة لتعديل بيانات المنتج وإدارة النكهات بشكل واضح."
-      />
-
+      <SectionHeader titleKey="تعديل المنتج" descriptionKey="تعديل بيانات المنتج والتصنيفات والصور والنكهات من مكان واحد." />
       <ProductDetailsForm
         mode="edit"
         product={product}
@@ -68,7 +44,7 @@ export default function ProductEditPage(): React.JSX.Element {
         onBack={() => navigate(productsListRoute, { replace: true })}
         isSubmitting={updateProductMutation.isPending}
       />
-
+      <ProductImagesManager product={product} />
       <ProductVariantsManager productId={productId} />
     </PageContainer>
   );
