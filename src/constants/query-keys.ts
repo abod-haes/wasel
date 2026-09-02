@@ -13,11 +13,13 @@ export const queryKeys = {
     list: (filters: unknown) => ['products', 'list', filters] as const,
     detail: (productId: string) => ['products', 'detail', productId] as const,
     variants: (productId: string) => ['products', 'variants', productId] as const,
+    brief: () => ['products', 'brief'] as const,
   },
   categories: {
     root: ['categories'] as const,
     list: (filters: unknown) => ['categories', 'list', filters] as const,
     options: () => ['categories', 'options'] as const,
+    tree: () => ['categories', 'tree'] as const,
   },
   orders: {
     root: ['orders'] as const,
