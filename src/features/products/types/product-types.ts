@@ -1,3 +1,5 @@
+export type ProductWeightUnit = 'g' | 'Kg' | 'L';
+
 export interface ProductImage {
   id: string;
   imagePath: string;
@@ -24,6 +26,7 @@ export interface Product {
   brand?: string;
   type?: string;
   weight?: number;
+  weightUnit?: ProductWeightUnit;
   description?: string;
   price: number;
   images: ProductImage[];
@@ -37,6 +40,7 @@ export interface Product {
 export interface ProductsFilter {
   search: string;
   categoryId: string | 'all';
+  categoryIds?: string[];
   code?: string;
 }
 
@@ -50,12 +54,23 @@ export interface ProductVariantInput {
   isDefault?: boolean;
 }
 
+export interface ProductBrief {
+  id: string;
+  name: string;
+  parCode?: string;
+  brand?: string;
+  type?: string;
+  weight?: number;
+  weightUnit?: ProductWeightUnit;
+}
+
 export interface CreateProductInput {
   name: string;
   code: string;
   brand?: string;
   type?: string;
   weight?: number;
+  weightUnit?: ProductWeightUnit;
   description?: string;
   price: number;
   imageFile?: File;
@@ -65,19 +80,8 @@ export interface CreateProductInput {
   variants?: ProductVariantInput[];
 }
 
-export interface UpdateProductInput {
+export interface UpdateProductInput extends Partial<CreateProductInput> {
   id: string;
-  name?: string;
-  code?: string;
-  brand?: string;
-  type?: string;
-  weight?: number;
-  description?: string;
-  price?: number;
-  imageFile?: File;
-  categoryIds?: string[];
-  categoryId?: string;
-  categoryName?: string;
-  variants?: ProductVariantInput[];
+  clearCategories?: boolean;
   clearVariants?: boolean;
 }

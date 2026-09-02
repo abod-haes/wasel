@@ -9,24 +9,19 @@ import { CategoriesTable } from '@/features/categories/components/categories-tab
 import { CategoryFilters } from '@/features/categories/components/category-filters';
 import {
   useCategoriesQuery,
+  useCategoryOptionsQuery,
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
   useUpdateCategoryMutation,
 } from '@/features/categories/hooks/use-categories-query';
-import type {
-  CategoriesFilter,
-  Category,
-  CreateCategoryInput,
-} from '@/features/categories/types/category-types';
+import type { CategoriesFilter, Category, CreateCategoryInput } from '@/features/categories/types/category-types';
+import { useProductsBriefQuery } from '@/features/products/hooks/use-products-query';
 import type { PaginationParams } from '@/types/api';
 
-const defaultFilters: CategoriesFilter = {
-  search: '',
-};
+const defaultFilters: CategoriesFilter = { search: '' };
 
 export default function CategoriesPage(): React.JSX.Element {
   const { t } = useTranslation();
-
   const [filters, setFilters] = useState<CategoriesFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
@@ -35,13 +30,13 @@ export default function CategoriesPage(): React.JSX.Element {
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
 
   const categoriesQuery = useCategoriesQuery(filters, pagination);
+  const categoryOptionsQuery = useCategoryOptionsQuery();
+  const productsBriefQuery = useProductsBriefQuery();
   const createCategoryMutation = useCreateCategoryMutation();
   const updateCategoryMutation = useUpdateCategoryMutation();
   const deleteCategoryMutation = useDeleteCategoryMutation();
 
-  if (categoriesQuery.isError) {
-    return <ErrorState onRetry={() => void categoriesQuery.refetch()} />;
-  }
+  if (categoriesQuery.isError) return <ErrorState onRetry={() => void categoriesQuery.refetch()} />;
 
   const openCreateDialog = (): void => {
     setDialogMode('create');
@@ -57,71 +52,36 @@ export default function CategoriesPage(): React.JSX.Element {
 
   const submitCategory = (payload: CreateCategoryInput): void => {
     if (dialogMode === 'create') {
-      createCategoryMutation.mutate(payload, {
-        onSuccess: () => {
-          setIsFormOpen(false);
-        },
-      });
+      createCategoryMutation.mutate(payload, { onSuccess: () => setIsFormOpen(false) });
       return;
     }
-
-    if (!selectedCategory) {
-      return;
-    }
-
-    updateCategoryMutation.mutate(
-      {
-        id: selectedCategory.id,
-        ...payload,
-      },
-      {
-        onSuccess: () => {
-          setIsFormOpen(false);
-        },
-      }
-    );
+    if (!selectedCategory) return;
+    updateCategoryMutation.mutate({ id: selectedCategory.id, ...payload }, { onSuccess: () => setIsFormOpen(false) });
   };
 
   const confirmDelete = (): void => {
-    if (!deleteCategory) {
-      return;
-    }
-
-    deleteCategoryMutation.mutate(deleteCategory.id, {
-      onSuccess: () => {
-        setDeleteCategory(null);
-      },
-    });
+    if (!deleteCategory) return;
+    deleteCategoryMutation.mutate(deleteCategory.id, { onSuccess: () => setDeleteCategory(null) });
   };
+
+  const allCategoryOptions = categoryOptionsQuery.data ?? [];
+  const selectedOption = selectedCategory ? allCategoryOptions.find((category) => category.id === selectedCategory.id) : undefined;
+  const blockedParentIds = new Set([...(selectedCategory ? [selectedCategory.id] : []), ...(selectedOption?.descendantIds ?? [])]);
+  const parentOptions = allCategoryOptions.filter((category) => !blockedParentIds.has(category.id));
 
   const isSubmitting = createCategoryMutation.isPending || updateCategoryMutation.isPending;
   const isMutating = isSubmitting || deleteCategoryMutation.isPending;
 
   return (
     <PageContainer>
-      <SectionHeader
-        titleKey="categories.title"
-        descriptionKey="categories.description"
-        actions={
-          <Button onClick={openCreateDialog} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t('categories.createCategory')}
-          </Button>
-        }
-      />
-
+      <SectionHeader titleKey="categories.title" descriptionKey="categories.description" actions={
+        <Button onClick={openCreateDialog} className="gap-2"><Plus className="h-4 w-4" />{t('categories.createCategory')}</Button>
+      } />
       <CategoryFilters
         filters={filters}
-        onChange={(nextFilters) => {
-          setFilters(nextFilters);
-          setPagination((current) => ({ ...current, page: 1 }));
-        }}
-        onReset={() => {
-          setFilters(defaultFilters);
-          setPagination((current) => ({ ...current, page: 1 }));
-        }}
+        onChange={(nextFilters) => { setFilters(nextFilters); setPagination((current) => ({ ...current, page: 1 })); }}
+        onReset={() => { setFilters(defaultFilters); setPagination((current) => ({ ...current, page: 1 })); }}
       />
-
       <CategoriesTable
         categories={categoriesQuery.data?.items ?? []}
         isLoading={categoriesQuery.isLoading || categoriesQuery.isFetching}
@@ -132,23 +92,19 @@ export default function CategoriesPage(): React.JSX.Element {
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
-
       <CategoryFormDialog
         open={isFormOpen}
         mode={dialogMode}
         defaultCategory={selectedCategory}
+        parentOptions={parentOptions}
+        products={productsBriefQuery.data ?? []}
         onOpenChange={setIsFormOpen}
         onSubmit={submitCategory}
-        isSubmitting={isSubmitting}
+        isSubmitting={isSubmitting || categoryOptionsQuery.isLoading || productsBriefQuery.isLoading}
       />
-
       <ConfirmDialog
         open={Boolean(deleteCategory)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setDeleteCategory(null);
-          }
-        }}
+        onOpenChange={(open) => { if (!open) setDeleteCategory(null); }}
         onConfirm={confirmDelete}
         titleKey="categories.confirmDelete.title"
         descriptionKey="categories.confirmDelete.description"

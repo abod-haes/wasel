@@ -41,29 +41,12 @@ export function CategoriesTable({
             {category.imagePath ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    className="h-10 w-10 cursor-zoom-in overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  >
-                    <img
-                      src={resolveMediaPath(category.imagePath)}
-                      alt={category.name}
-                      className="h-full w-full object-cover transition-transform duration-200 hover:scale-110"
-                      loading="lazy"
-                    />
+                  <button type="button" className="h-10 w-10 cursor-zoom-in overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+                    <img src={resolveMediaPath(category.imagePath)} alt={category.name} className="h-full w-full object-cover transition-transform duration-200 hover:scale-110" loading="lazy" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="start"
-                  className="w-52 rounded-xl border-border/70 bg-card p-2 shadow-lg"
-                >
-                  <img
-                    src={resolveMediaPath(category.imagePath)}
-                    alt={category.name}
-                    className="h-40 w-full rounded-lg object-cover"
-                    loading="lazy"
-                  />
+                <TooltipContent side="top" align="start" className="w-52 rounded-xl border-border/70 bg-card p-2 shadow-lg">
+                  <img src={resolveMediaPath(category.imagePath)} alt={category.name} className="h-40 w-full rounded-lg object-cover" loading="lazy" />
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -77,11 +60,21 @@ export function CategoriesTable({
         ),
       },
       {
+        key: 'parent',
+        header: 'التصنيف الأب',
+        renderCell: (category: Category) => (
+          category.parentCategory ? <Badge variant="outline">{category.parentCategory.name}</Badge> : <span className="text-sm text-muted-foreground">رئيسي</span>
+        ),
+      },
+      {
+        key: 'children',
+        header: 'الفروع',
+        renderCell: (category: Category) => <Badge variant="secondary">{category.children?.length ?? 0}</Badge>,
+      },
+      {
         key: 'productsCount',
         header: t('categories.table.productsCount'),
-        renderCell: (category: Category) => (
-          <Badge variant="secondary">{category.products.length}</Badge>
-        ),
+        renderCell: (category: Category) => <Badge variant="secondary">{category.products.length}</Badge>,
       },
       {
         key: 'sampleProducts',
@@ -99,20 +92,10 @@ export function CategoriesTable({
         headerClassName: 'text-end',
         renderCell: (category: Category) => (
           <div className="flex justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEditCategory(category)}
-              disabled={isMutating}
-            >
+            <Button variant="ghost" size="icon" onClick={() => onEditCategory(category)} disabled={isMutating}>
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDeleteCategory(category)}
-              disabled={isMutating}
-            >
+            <Button variant="ghost" size="icon" onClick={() => onDeleteCategory(category)} disabled={isMutating}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

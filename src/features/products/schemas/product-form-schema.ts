@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
-const optionalFileSchema = z.instanceof(File).optional();
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
+
+const optionalFileSchema = z
+  .instanceof(File)
+  .refine((file) => file.size <= MAX_IMAGE_SIZE, 'Image must be 10 MB or smaller')
+  .refine((file) => ALLOWED_IMAGE_TYPES.has(file.type), 'Only PNG, JPG, JPEG, and WEBP images are allowed')
+  .optional();
 
 export const productVariantSchema = z.object({
   id: z.string().trim().min(1).optional(),
@@ -13,13 +20,14 @@ export const productVariantSchema = z.object({
 });
 
 export const createProductSchema = z.object({
-  name: z.string().trim().min(2),
-  code: z.string().trim().min(2),
-  brand: z.string().trim().optional(),
-  type: z.string().trim().optional(),
+  name: z.string().trim().min(2).max(128),
+  code: z.string().trim().min(1).max(64),
+  brand: z.string().trim().max(128).optional(),
+  type: z.string().trim().max(128).optional(),
   weight: z.number().nonnegative().optional(),
-  description: z.string().trim().optional(),
-  price: z.number().positive(),
+  weightUnit: z.enum(['g', 'Kg', 'L']).optional(),
+  description: z.string().trim().max(1024).optional(),
+  price: z.number().nonnegative(),
   imageFile: optionalFileSchema,
   categoryIds: z.array(z.string().trim().min(1)).optional(),
   categoryId: z.string().trim().optional(),
@@ -29,6 +37,7 @@ export const createProductSchema = z.object({
 
 export const updateProductSchema = createProductSchema.partial().extend({
   id: z.string().trim().min(1),
+  clearCategories: z.boolean().optional(),
   clearVariants: z.boolean().optional(),
 });
 
