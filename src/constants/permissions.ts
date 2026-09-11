@@ -5,6 +5,7 @@ export const PERMISSIONS = {
   usersEdit: 'users:edit',
   productsView: 'products:view',
   categoriesView: 'categories:view',
+  adsView: 'ads:view',
   ordersView: 'orders:view',
   ordersManage: 'orders:manage',
   notificationsView: 'notifications:view',

@@ -7,6 +7,7 @@ export const ROUTES = {
   productCreate: '/products/create',
   productEdit: '/products/:productId/edit',
   categories: '/categories',
+  ads: '/ads',
   orders: '/orders',
   notifications: '/notifications',
   settings: '/settings',

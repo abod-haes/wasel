@@ -3,9 +3,9 @@ import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { AppLayout } from '@/app/layouts/app-layout';
 import { PermissionGuard, ProtectedRoute } from '@/app/router/route-guards';
+import { LoadingScreen } from '@/components/shared';
 import { PERMISSIONS } from '@/constants/permissions';
 import { ROUTES } from '@/constants/routes';
-import { LoadingScreen } from '@/components/shared';
 import LoginPage from '@/pages/login-page';
 import NotFoundPage from '@/pages/not-found-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
@@ -16,6 +16,7 @@ const ProductsPage = lazy(() => import('@/features/products/pages/products-page'
 const ProductCreatePage = lazy(() => import('@/features/products/pages/product-create-page'));
 const ProductEditPage = lazy(() => import('@/features/products/pages/product-edit-page'));
 const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
+const AdsPage = lazy(() => import('@/features/ads/pages/ads-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
 const SettingsPage = lazy(() => import('@/features/settings/pages/settings-page'));
@@ -113,6 +114,17 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.categories',
+            },
+          },
+          {
+            path: ROUTES.ads,
+            element: (
+              <PermissionGuard required={PERMISSIONS.adsView}>
+                {withSuspense(<AdsPage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'nav.ads',
             },
           },
           {
