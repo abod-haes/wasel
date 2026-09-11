@@ -1,4 +1,14 @@
-import { Bell, ClipboardList, LayoutDashboard, Package, Settings, SlidersHorizontal, Tags, Users } from 'lucide-react';
+import {
+  Bell,
+  ClipboardList,
+  LayoutDashboard,
+  Megaphone,
+  Package,
+  Settings,
+  SlidersHorizontal,
+  Tags,
+  Users,
+} from 'lucide-react';
 
 import { PERMISSIONS } from '@/constants/permissions';
 import { ROUTES } from '@/constants/routes';
@@ -32,6 +42,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     to: ROUTES.categories,
     icon: Tags,
     permission: PERMISSIONS.categoriesView,
+  },
+  {
+    key: 'ads',
+    labelKey: 'nav.ads',
+    to: ROUTES.ads,
+    icon: Megaphone,
+    permission: PERMISSIONS.adsView,
   },
   {
     key: 'orders',

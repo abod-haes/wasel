@@ -4,12 +4,20 @@ import { initReactI18next } from 'react-i18next';
 import { DEFAULT_LANGUAGE } from '@/constants/app';
 import arCommon from '@/i18n/locales/ar/common.json';
 
+const arTranslation = {
+  ...arCommon,
+  nav: {
+    ...arCommon.nav,
+    ads: 'الإعلانات',
+  },
+};
+
 void i18n
   .use(initReactI18next)
   .init({
     resources: {
       ar: {
-        translation: arCommon,
+        translation: arTranslation,
       },
     },
     lng: DEFAULT_LANGUAGE,

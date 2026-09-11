@@ -21,6 +21,11 @@ export const queryKeys = {
     options: () => ['categories', 'options'] as const,
     tree: () => ['categories', 'tree'] as const,
   },
+  ads: {
+    root: ['ads'] as const,
+    list: () => ['ads', 'list'] as const,
+    detail: (adId: string) => ['ads', 'detail', adId] as const,
+  },
   orders: {
     root: ['orders'] as const,
     list: (filters: unknown) => ['orders', 'list', filters] as const,
