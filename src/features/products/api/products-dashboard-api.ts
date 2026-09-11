@@ -6,6 +6,8 @@ import type {
   CreateProductInput,
   Product,
   ProductBrief,
+  ProductCurrency,
+  ProductPriceInfo,
   ProductVariantInput,
   ProductWeightUnit,
   ProductsFilter,
@@ -18,10 +20,18 @@ import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/type
 interface ProductImageApiResponse { id?: string; Id?: string; imagePath?: string; ImagePath?: string; isMain?: boolean; IsMain?: boolean; }
 interface ProductVariantApiResponse { id?: string; Id?: string; name?: string; Name?: string; imagePath?: string | null; ImagePath?: string | null; sortOrder?: number; SortOrder?: number; isDefault?: boolean; IsDefault?: boolean; }
 interface ProductCategoryApiResponse { id?: string; Id?: string; name?: string; Name?: string; }
+interface ProductPriceInfoApiResponse {
+  basePrice?: number; BasePrice?: number; baseCurrency?: string; BaseCurrency?: string;
+  priceUsd?: number; PriceUsd?: number; priceSyp?: number; PriceSyp?: number; priceTry?: number; PriceTry?: number;
+  displayCurrency?: string; DisplayCurrency?: string; displayPrice?: number; DisplayPrice?: number;
+}
 interface ProductApiResponse {
   id?: string; Id?: string; name?: string; Name?: string; code?: string; Code?: string; brand?: string; Brand?: string;
   type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit;
-  description?: string; Description?: string; price?: number; Price?: number; images?: ProductImageApiResponse[]; Images?: ProductImageApiResponse[];
+  description?: string; Description?: string; price?: number; Price?: number; basePrice?: number; BasePrice?: number;
+  baseCurrency?: string; BaseCurrency?: string; priceCurrency?: string; PriceCurrency?: string;
+  prices?: ProductPriceInfoApiResponse; Prices?: ProductPriceInfoApiResponse;
+  images?: ProductImageApiResponse[]; Images?: ProductImageApiResponse[];
   variants?: ProductVariantApiResponse[]; Variants?: ProductVariantApiResponse[]; categories?: ProductCategoryApiResponse[]; Categories?: ProductCategoryApiResponse[];
   isFavourite?: boolean; IsFavourite?: boolean; isInCart?: boolean; IsInCart?: boolean; cartQuantity?: number; CartQuantity?: number;
 }
@@ -33,15 +43,76 @@ const normalizeOptionalText = (value?: string | null): string | undefined => {
   return normalized ? normalized : undefined;
 };
 
+const normalizeCurrency = (value?: string | null): ProductCurrency | undefined => {
+  const normalized = value?.toUpperCase();
+  return normalized === 'USD' || normalized === 'SYP' || normalized === 'TRY' ? normalized : undefined;
+};
+
+const mapPriceInfo = (
+  source: ProductPriceInfoApiResponse | undefined,
+  fallback: { basePrice: number; displayPrice: number; displayCurrency: ProductCurrency }
+): ProductPriceInfo | undefined => {
+  if (!source) return undefined;
+
+  const basePrice = source.basePrice ?? source.BasePrice ?? fallback.basePrice;
+  const displayCurrency = normalizeCurrency(source.displayCurrency ?? source.DisplayCurrency) ?? fallback.displayCurrency;
+  const displayPrice = source.displayPrice ?? source.DisplayPrice ?? fallback.displayPrice;
+
+  return {
+    basePrice,
+    baseCurrency: 'USD',
+    priceUsd: source.priceUsd ?? source.PriceUsd ?? basePrice,
+    priceSyp:
+      source.priceSyp ??
+      source.PriceSyp ??
+      (displayCurrency === 'SYP' ? displayPrice : 0),
+    priceTry:
+      source.priceTry ??
+      source.PriceTry ??
+      (displayCurrency === 'TRY' ? displayPrice : 0),
+    displayCurrency,
+    displayPrice,
+  };
+};
+
 const mapProduct = (product: ProductApiResponse): Product => {
   const images = product.images ?? product.Images ?? [];
   const variants = product.variants ?? product.Variants ?? [];
   const categories = product.categories ?? product.Categories ?? [];
+  const rawPrices = product.prices ?? product.Prices;
+  const responsePrice = product.price ?? product.Price;
+  const basePrice =
+    product.basePrice ??
+    product.BasePrice ??
+    rawPrices?.basePrice ??
+    rawPrices?.BasePrice ??
+    responsePrice ??
+    0;
+  const priceCurrency =
+    normalizeCurrency(product.priceCurrency ?? product.PriceCurrency) ??
+    normalizeCurrency(rawPrices?.displayCurrency ?? rawPrices?.DisplayCurrency) ??
+    'USD';
+  const displayPrice =
+    responsePrice ??
+    rawPrices?.displayPrice ??
+    rawPrices?.DisplayPrice ??
+    (priceCurrency === 'USD' ? basePrice : 0);
+  const prices = mapPriceInfo(rawPrices, {
+    basePrice,
+    displayPrice,
+    displayCurrency: priceCurrency,
+  });
+
   return {
     id: product.id ?? product.Id ?? '', name: product.name ?? product.Name ?? '', code: product.code ?? product.Code ?? '',
     brand: normalizeOptionalText(product.brand ?? product.Brand), type: normalizeOptionalText(product.type ?? product.Type),
     weight: product.weight ?? product.Weight, weightUnit: product.weightUnit ?? product.WeightUnit,
-    description: normalizeOptionalText(product.description ?? product.Description), price: product.price ?? product.Price ?? 0,
+    description: normalizeOptionalText(product.description ?? product.Description),
+    price: displayPrice,
+    basePrice,
+    baseCurrency: 'USD',
+    priceCurrency,
+    prices,
     images: images.map((image) => ({ id: image.id ?? image.Id ?? '', imagePath: image.imagePath ?? image.ImagePath ?? '', isMain: image.isMain ?? image.IsMain ?? false })),
     variants: variants.map((variant, index) => ({
       id: variant.id ?? variant.Id ?? '', name: variant.name ?? variant.Name ?? '', imagePath: variant.imagePath ?? variant.ImagePath ?? null,

@@ -67,6 +67,13 @@ const parseOptionalNumber = (value: string): number | undefined => {
   return Number.isFinite(parsedValue) ? parsedValue : undefined;
 };
 
+const formatPricePreview = (value: number): string => {
+  return new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
 export function ProductDetailsForm({
   mode,
   product,
@@ -91,7 +98,7 @@ export function ProductDetailsForm({
         weight: product.weight != null ? String(product.weight) : '',
         weightUnit: product.weightUnit ?? 'none',
         description: product.description ?? '',
-        price: String(product.price),
+        price: String(product.basePrice ?? product.prices?.basePrice ?? product.price),
         imageFile: undefined,
         categoryIds: product.categories.map((category) => category.id),
       });
@@ -169,8 +176,8 @@ export function ProductDetailsForm({
           <CardTitle>{mode === 'create' ? 'بيانات المنتج الجديد' : 'بيانات المنتج'}</CardTitle>
           <CardDescription>
             {mode === 'create'
-              ? 'أدخل معلومات المنتج الأساسية، اربطه بتصنيف أو أكثر، وأضف النكهات قبل الحفظ.'
-              : 'عدّل بيانات المنتج والتصنيفات، وأدر الصور والنكهات من الأقسام التالية.'}
+              ? 'أدخل معلومات المنتج الأساسية. السعر الأساسي يُدخل بالدولار USD، والباك إند يحسب أسعار العرض بباقي العملات.'
+              : 'عدّل بيانات المنتج والتصنيفات. حقل السعر هو السعر الأساسي المخزن بالدولار USD وليس سعر العرض المحوّل.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -203,10 +210,27 @@ export function ProductDetailsForm({
                 </Select>
               </FormField>
             </div>
-            <FormField labelKey="products.table.price" htmlFor="product-price" required error={errors.price}>
-              <Input id="product-price" type="number" min="0" step="0.01" value={values.price} placeholder="أدخل سعر المنتج" onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))} />
+            <FormField labelKey="السعر الأساسي (USD)" htmlFor="product-price" required error={errors.price}>
+              <div className="space-y-1.5">
+                <Input id="product-price" type="number" min="0" step="0.01" value={values.price} placeholder="أدخل السعر بالدولار" onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))} />
+                <p className="text-xs text-muted-foreground">يتم إرسال هذا الحقل إلى Price كقيمة USD فقط.</p>
+              </div>
             </FormField>
           </div>
+
+          {mode === 'edit' && product?.prices ? (
+            <div className="rounded-xl border bg-muted/30 p-4">
+              <p className="text-sm font-semibold">الأسعار المحسوبة من آخر قراءة</p>
+              <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                <span>{formatPricePreview(product.prices.priceUsd)} USD</span>
+                <span>{formatPricePreview(product.prices.priceSyp)} SYP</span>
+                <span>{formatPricePreview(product.prices.priceTry)} TRY</span>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                عملة العرض الحالية: {product.prices.displayCurrency} — {formatPricePreview(product.prices.displayPrice)} {product.prices.displayCurrency}
+              </p>
+            </div>
+          ) : null}
 
           <div className="space-y-3 rounded-xl border p-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
