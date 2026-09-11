@@ -32,5 +32,6 @@ export const queryKeys = {
   settings: {
     root: ['settings'] as const,
     profile: () => ['settings', 'profile'] as const,
+    currency: () => ['settings', 'currency'] as const,
   },
 } as const;

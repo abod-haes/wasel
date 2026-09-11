@@ -1,4 +1,5 @@
 export type ProductWeightUnit = 'g' | 'Kg' | 'L';
+export type ProductCurrency = 'USD' | 'SYP' | 'TRY';
 
 export interface ProductImage {
   id: string;
@@ -19,6 +20,16 @@ export interface ProductCategorySummary {
   name: string;
 }
 
+export interface ProductPriceInfo {
+  basePrice: number;
+  baseCurrency: 'USD';
+  priceUsd: number;
+  priceSyp: number;
+  priceTry: number;
+  displayCurrency: ProductCurrency;
+  displayPrice: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -29,6 +40,10 @@ export interface Product {
   weightUnit?: ProductWeightUnit;
   description?: string;
   price: number;
+  basePrice?: number;
+  baseCurrency?: 'USD';
+  priceCurrency?: ProductCurrency;
+  prices?: ProductPriceInfo;
   images: ProductImage[];
   variants: ProductVariant[];
   categories: ProductCategorySummary[];
