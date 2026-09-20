@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Save } from 'lucide-react';
+import { ArrowRight, RefreshCw, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { FormField, ImageUploader } from '@/components/shared';
@@ -66,6 +66,8 @@ const parseOptionalNumber = (value: string): number | undefined => {
   const parsedValue = Number(normalizedValue);
   return Number.isFinite(parsedValue) ? parsedValue : undefined;
 };
+
+const generateSixDigitCode = (): string => String(Math.floor(100000 + Math.random() * 900000));
 
 const formatPricePreview = (value: number): string => {
   return new Intl.NumberFormat(undefined, {
@@ -186,7 +188,29 @@ export function ProductDetailsForm({
               <Input id="product-name" value={values.name} placeholder="أدخل اسم المنتج" onChange={(event) => setValues((previous) => ({ ...previous, name: event.target.value }))} />
             </FormField>
             <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}>
-              <Input id="product-code" value={values.code} placeholder="أدخل كود المنتج" onChange={(event) => setValues((previous) => ({ ...previous, code: event.target.value }))} />
+              <div className="flex gap-2">
+                <Input
+                  id="product-code"
+                  value={values.code}
+                  placeholder="أدخل كود المنتج"
+                  onChange={(event) => setValues((previous) => ({ ...previous, code: event.target.value }))}
+                />
+                {mode === 'create' ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="shrink-0 gap-2"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      setValues((previous) => ({ ...previous, code: generateSixDigitCode() }));
+                      setErrors((previous) => ({ ...previous, code: undefined }));
+                    }}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    توليد كود
+                  </Button>
+                ) : null}
+              </div>
             </FormField>
             <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
               <Input id="product-brand" value={values.brand} placeholder="مثال: Arabica" onChange={(event) => setValues((previous) => ({ ...previous, brand: event.target.value }))} />
