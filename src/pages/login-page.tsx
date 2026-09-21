@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { FormField } from '@/components/shared';
+import { FormField, WaselBrandLogo } from '@/components/shared';
 import { ROUTES } from '@/constants/routes';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@/components/ui';
 import { getErrorMessage } from '@/services/api/api-error';
@@ -96,13 +96,18 @@ export default function LoginPage(): React.JSX.Element {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t('auth.loginTitle')}</CardTitle>
-          <CardDescription>{t('auth.loginDescription')}</CardDescription>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-surface p-4 dark:bg-background">
+      <div className="pointer-events-none absolute -start-24 -top-24 h-72 w-72 rounded-full bg-brand-green/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -end-20 h-72 w-72 rounded-full bg-brand-red/10 blur-3xl" />
+
+      <Card className="relative w-full max-w-md overflow-hidden rounded-wasel-lg border-brand-border/90 bg-card/95 shadow-floating dark:border-border">
+        <div className="h-1.5 w-full bg-gradient-to-l from-brand-green via-brand-green to-brand-red" />
+        <CardHeader className="items-center px-7 pb-3 pt-7 text-center">
+          <WaselBrandLogo className="mb-2 h-16 w-48" />
+          <CardTitle className="text-2xl">{t('auth.loginTitle')}</CardTitle>
+          <CardDescription className="max-w-sm">{t('auth.loginDescription')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-7 pb-7">
           <form className="space-y-4" onSubmit={submitLogin}>
             <FormField
               labelKey="auth.phoneNumberLabel"
@@ -134,7 +139,7 @@ export default function LoginPage(): React.JSX.Element {
 
                 <button
                   type="button"
-                  className="absolute end-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                   aria-label={isPasswordVisible ? t('auth.hidePassword') : t('auth.showPassword')}
                   aria-pressed={isPasswordVisible}
                   onClick={() => setIsPasswordVisible((current) => !current)}
@@ -144,7 +149,11 @@ export default function LoginPage(): React.JSX.Element {
               </div>
             </FormField>
 
-            {errors.submit ? <p className="text-sm text-destructive">{errors.submit}</p> : null}
+            {errors.submit ? (
+              <p className="rounded-xl bg-brand-red-soft px-3 py-2 text-sm text-brand-red-dark dark:bg-destructive/10 dark:text-destructive">
+                {errors.submit}
+              </p>
+            ) : null}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? t('auth.loggingIn') : t('auth.loginAction')}
