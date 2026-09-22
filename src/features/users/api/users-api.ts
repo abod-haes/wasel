@@ -80,21 +80,21 @@ type UsersPaginatedResponse = Partial<ApiPaginatedResult<UserApiResponse>> & {
 };
 
 const MOCK_ROLE_CATALOG: Record<UserRole, UserRoleAssignment> = {
-  admin: {
-    id: 'role-admin',
-    name: 'Admin',
-    key: 'admin',
-  },
-  editor: {
-    id: 'role-editor',
-    name: 'Editor',
-    key: 'editor',
-  },
-  viewer: {
-    id: 'role-viewer',
-    name: 'Viewer',
-    key: 'viewer',
-  },
+  admin: { id: 'role-admin', name: 'Admin', key: 'admin' },
+  editor: { id: 'role-editor', name: 'Editor', key: 'editor' },
+  viewer: { id: 'role-viewer', name: 'Viewer', key: 'viewer' },
+  market: { id: 'role-market', name: 'Market', key: 'market' },
+  delivery: { id: 'role-delivery', name: 'DeliveryPerson', key: 'delivery' },
+  customer: { id: 'role-customer', name: 'Customer', key: 'customer' },
+};
+
+const ROLE_NAME_BY_KEY: Record<UserRole, string> = {
+  admin: 'Admin',
+  editor: 'Editor',
+  viewer: 'Viewer',
+  market: 'Market',
+  delivery: 'DeliveryPerson',
+  customer: 'Customer',
 };
 
 const cloneUserRole = (role: UserRoleAssignment): UserRoleAssignment => ({ ...role });
@@ -230,27 +230,18 @@ const resolveNullableIsoDate = (value?: string): string | null => {
 const resolveUserRoleKey = (roleName: string): UserRole => {
   const normalizedRoleName = roleName.toLowerCase();
 
-  if (normalizedRoleName.includes('admin')) {
-    return 'admin';
-  }
-
-  if (normalizedRoleName.includes('editor') || normalizedRoleName.includes('manager')) {
-    return 'editor';
-  }
+  if (normalizedRoleName.includes('admin')) return 'admin';
+  if (normalizedRoleName.includes('market')) return 'market';
+  if (normalizedRoleName.includes('delivery')) return 'delivery';
+  if (normalizedRoleName.includes('customer')) return 'customer';
+  if (normalizedRoleName.includes('editor') || normalizedRoleName.includes('manager')) return 'editor';
 
   return 'viewer';
 };
 
 const resolvePrimaryRole = (roles: UserRoleAssignment[]): UserRole => {
-  if (roles.some((role) => role.key === 'admin')) {
-    return 'admin';
-  }
-
-  if (roles.some((role) => role.key === 'editor')) {
-    return 'editor';
-  }
-
-  return 'viewer';
+  const priority: UserRole[] = ['admin', 'market', 'delivery', 'customer', 'editor', 'viewer'];
+  return priority.find((roleKey) => roles.some((role) => role.key === roleKey)) ?? 'viewer';
 };
 
 const resolveNumber = (...values: Array<number | undefined>): number | null => {
@@ -461,6 +452,20 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
 };
 
 export const usersApi = {
+  async getRoles(): Promise<UserRoleAssignment[]> {
+    if (env.enableMockApi) {
+      await delay(120);
+      return Object.values(MOCK_ROLE_CATALOG).map(cloneUserRole);
+    }
+
+    const { data } = await apiClient.get<UserRoleApiResponse[] | { items?: UserRoleApiResponse[]; Items?: UserRoleApiResponse[] }>('/api/Roles');
+    const roles = Array.isArray(data) ? data : data.items ?? data.Items ?? [];
+
+    return roles
+      .map(mapRoleResponse)
+      .filter((role): role is UserRoleAssignment => role !== null);
+  },
+
   async getUsers(filters: UsersFilter, pagination: PaginationParams): Promise<PaginatedData<User>> {
     if (env.enableMockApi) {
       await delay(450);
@@ -474,7 +479,7 @@ export const usersApi = {
         pageSize: pagination.pageSize,
         includeRoles: true,
         search: filters.search || undefined,
-        role: filters.role === 'all' ? undefined : filters.role,
+        roleName: filters.role === 'all' ? undefined : ROLE_NAME_BY_KEY[filters.role],
         status: filters.status === 'all' ? undefined : filters.status,
       },
     });
