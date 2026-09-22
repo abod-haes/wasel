@@ -49,8 +49,14 @@ interface ProductApiResponse {
   name?: string;
   Code?: string;
   code?: string;
+  BrandId?: string;
+  brandId?: string;
   Brand?: string;
   brand?: string;
+  MarketUserId?: string;
+  marketUserId?: string;
+  MarketName?: string;
+  marketName?: string;
   Type?: string;
   type?: string;
   Weight?: number;
@@ -217,7 +223,10 @@ const mapProductResponse = (product: ProductApiResponse): Product => {
     id: product.Id ?? product.id ?? '',
     name: product.Name ?? product.name ?? '',
     code: product.Code ?? product.code ?? '',
+    brandId: normalizeOptionalText(product.BrandId ?? product.brandId),
     brand: normalizeOptionalText(product.Brand ?? product.brand),
+    marketUserId: normalizeOptionalText(product.MarketUserId ?? product.marketUserId),
+    marketName: normalizeOptionalText(product.MarketName ?? product.marketName),
     type: normalizeOptionalText(product.Type ?? product.type),
     weight: product.Weight ?? product.weight,
     description: product.Description ?? product.description,
@@ -419,8 +428,20 @@ const applyFilters = (products: Product[], filters: ProductsFilter): Product[] =
     const matchesCategory =
       filters.categoryId === 'all' ||
       product.categories.some((category) => category.id === filters.categoryId);
+    const matchesBrand =
+      !filters.brandId ||
+      filters.brandId === 'all' ||
+      product.brandId === filters.brandId;
+    const matchesMarket =
+      !filters.marketUserId ||
+      filters.marketUserId === 'all' ||
+      product.marketUserId === filters.marketUserId;
+    const normalizedMarketName = filters.marketName?.trim().toLowerCase() ?? '';
+    const matchesMarketName =
+      !normalizedMarketName ||
+      (product.marketName ?? '').toLowerCase().includes(normalizedMarketName);
 
-    return matchesSearch && matchesCode && matchesCategory;
+    return matchesSearch && matchesCode && matchesCategory && matchesBrand && matchesMarket && matchesMarketName;
   });
 };
 
@@ -448,6 +469,9 @@ export const productsApi = {
         search: filters.search || undefined,
         code: filters.code?.trim() || undefined,
         categoryIds: filters.categoryId === 'all' ? undefined : [filters.categoryId],
+        brandId: filters.brandId && filters.brandId !== 'all' ? filters.brandId : undefined,
+        marketUserId: filters.marketUserId && filters.marketUserId !== 'all' ? filters.marketUserId : undefined,
+        marketName: filters.marketName?.trim() || undefined,
       },
     });
 
@@ -482,7 +506,9 @@ export const productsApi = {
         id: buildProductId(),
         name: parsed.name.trim(),
         code: parsed.code.trim(),
+        brandId: parsed.brandId,
         brand: normalizedBrand,
+        marketUserId: parsed.marketUserId,
         type: normalizedType,
         weight: parsed.weight,
         description: normalizedDescription,
@@ -518,7 +544,9 @@ export const productsApi = {
     const formData = new FormData();
     formData.append('Name', parsed.name.trim());
     formData.append('Code', parsed.code.trim());
-    appendOptionalTextField(formData, 'Brand', parsed.brand);
+    if (parsed.brandId) formData.append('BrandId', parsed.brandId);
+    else appendOptionalTextField(formData, 'Brand', parsed.brand);
+    formData.append('MarketUserId', parsed.marketUserId);
     appendOptionalTextField(formData, 'Type', parsed.type);
 
     if (parsed.weight != null) {
@@ -546,7 +574,9 @@ export const productsApi = {
 
   async updateProduct(payload: UpdateProductInput): Promise<void> {
     const parsed = updateProductSchema.parse(payload);
+    const hasBrandId = Object.prototype.hasOwnProperty.call(parsed, 'brandId');
     const hasBrand = Object.prototype.hasOwnProperty.call(parsed, 'brand');
+    const hasMarketUserId = Object.prototype.hasOwnProperty.call(parsed, 'marketUserId');
     const hasType = Object.prototype.hasOwnProperty.call(parsed, 'type');
     const hasWeight = Object.prototype.hasOwnProperty.call(parsed, 'weight');
     const hasDescription = Object.prototype.hasOwnProperty.call(parsed, 'description');
@@ -593,8 +623,17 @@ export const productsApi = {
           nextProduct.code = parsed.code.trim();
         }
 
-        if (hasBrand) {
+        if (parsed.clearBrand) {
+          nextProduct.brandId = undefined;
+          nextProduct.brand = undefined;
+        } else if (hasBrandId) {
+          nextProduct.brandId = parsed.brandId;
+        } else if (hasBrand) {
           nextProduct.brand = normalizedBrand;
+        }
+
+        if (hasMarketUserId) {
+          nextProduct.marketUserId = parsed.marketUserId;
         }
 
         if (hasType) {
@@ -662,8 +701,16 @@ export const productsApi = {
         formData.append('Code', parsed.code.trim());
       }
 
-      if (hasBrand) {
+      if (parsed.clearBrand) {
+        formData.append('ClearBrand', 'true');
+      } else if (hasBrandId && parsed.brandId) {
+        formData.append('BrandId', parsed.brandId);
+      } else if (hasBrand) {
         formData.append('Brand', normalizedBrand ?? '');
+      }
+
+      if (hasMarketUserId && parsed.marketUserId) {
+        formData.append('MarketUserId', parsed.marketUserId);
       }
 
       if (hasType) {
@@ -714,8 +761,16 @@ export const productsApi = {
       requestPayload.code = parsed.code.trim();
     }
 
-    if (hasBrand) {
+    if (parsed.clearBrand) {
+      requestPayload.clearBrand = true;
+    } else if (hasBrandId) {
+      requestPayload.brandId = parsed.brandId;
+    } else if (hasBrand) {
       requestPayload.brand = normalizedBrand ?? '';
+    }
+
+    if (hasMarketUserId) {
+      requestPayload.marketUserId = parsed.marketUserId;
     }
 
     if (hasType) {
