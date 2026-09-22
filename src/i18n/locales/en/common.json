@@ -52,6 +52,7 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "products": "Products",
+    "brands": "Brands",
     "categories": "Categories",
     "orders": "Orders",
     "notifications": "Notifications",
@@ -156,7 +157,10 @@
     "role": {
       "admin": "Admin",
       "editor": "Editor",
-      "viewer": "Viewer"
+      "viewer": "Viewer",
+      "market": "Market",
+      "delivery": "Delivery",
+      "customer": "Customer"
     },
     "messages": {
       "created": "User created successfully",

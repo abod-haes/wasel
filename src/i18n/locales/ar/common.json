@@ -52,6 +52,7 @@
     "dashboard": "لوحة التحكم",
     "users": "المستخدمون",
     "products": "المنتجات",
+    "brands": "العلامات التجارية",
     "categories": "التصنيفات",
     "orders": "الطلبات",
     "notifications": "الإشعارات",
@@ -156,7 +157,10 @@
     "role": {
       "admin": "مدير",
       "editor": "محرر",
-      "viewer": "مشاهد"
+      "viewer": "مشاهد",
+      "market": "سوق",
+      "delivery": "مندوب توصيل",
+      "customer": "عميل"
     },
     "messages": {
       "created": "تم إنشاء المستخدم بنجاح",

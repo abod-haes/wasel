@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
 import { CurrencySettingsCard } from '@/features/settings/components/currency-settings-card';
+import { DeliveryPricingCard } from '@/features/settings/components/delivery-pricing-card';
 import { SettingsForm } from '@/features/settings/components/settings-form';
 import {
   useSettingsQuery,
@@ -52,6 +53,7 @@ export default function SettingsPage(): React.JSX.Element {
 
       <SettingsForm values={formValues} onChange={setFormValues} />
       <CurrencySettingsCard />
+      <DeliveryPricingCard />
     </PageContainer>
   );
 }

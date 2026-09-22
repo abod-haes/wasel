@@ -11,6 +11,13 @@ import type {
 } from '@/features/users/types/user-types';
 import type { PaginationParams } from '@/types/api';
 
+export const useRolesQuery = () => {
+  return useQuery({
+    queryKey: queryKeys.users.roles(),
+    queryFn: usersApi.getRoles,
+  });
+};
+
 export const useUsersQuery = (filters: UsersFilter, pagination: PaginationParams) => {
   return useQuery({
     queryKey: queryKeys.users.list({ filters, pagination }),

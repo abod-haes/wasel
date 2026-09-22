@@ -4,6 +4,7 @@ export const ROUTES = {
   dashboard: '/dashboard',
   users: '/users',
   products: '/products',
+  brands: '/brands',
   productCreate: '/products/create',
   productEdit: '/products/:productId/edit',
   categories: '/categories',

@@ -140,6 +140,16 @@ export function ProductsTable({
           ),
       },
       {
+        key: 'market',
+        header: 'السوق',
+        renderCell: (product: Product) =>
+          product.marketName ? (
+            <Badge variant="success">{product.marketName}</Badge>
+          ) : (
+            <span className="text-sm text-destructive">غير مربوط</span>
+          ),
+      },
+      {
         key: 'categories',
         header: 'التصنيفات',
         renderCell: (product: Product) =>

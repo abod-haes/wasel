@@ -26,7 +26,9 @@ interface ProductPriceInfoApiResponse {
   displayCurrency?: string; DisplayCurrency?: string; displayPrice?: number; DisplayPrice?: number;
 }
 interface ProductApiResponse {
-  id?: string; Id?: string; name?: string; Name?: string; code?: string; Code?: string; brand?: string; Brand?: string;
+  id?: string; Id?: string; name?: string; Name?: string; code?: string; Code?: string;
+  brandId?: string; BrandId?: string; brand?: string; Brand?: string;
+  marketUserId?: string; MarketUserId?: string; marketName?: string; MarketName?: string;
   type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit;
   description?: string; Description?: string; price?: number; Price?: number; basePrice?: number; BasePrice?: number;
   baseCurrency?: string; BaseCurrency?: string; priceCurrency?: string; PriceCurrency?: string;
@@ -35,7 +37,7 @@ interface ProductApiResponse {
   variants?: ProductVariantApiResponse[]; Variants?: ProductVariantApiResponse[]; categories?: ProductCategoryApiResponse[]; Categories?: ProductCategoryApiResponse[];
   isFavourite?: boolean; IsFavourite?: boolean; isInCart?: boolean; IsInCart?: boolean; cartQuantity?: number; CartQuantity?: number;
 }
-interface ProductBriefApiResponse { id?: string; Id?: string; name?: string; Name?: string; parCode?: string; ParCode?: string; brand?: string; Brand?: string; type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit; }
+interface ProductBriefApiResponse { id?: string; Id?: string; name?: string; Name?: string; parCode?: string; ParCode?: string; brandId?: string; BrandId?: string; brand?: string; Brand?: string; marketUserId?: string; MarketUserId?: string; marketName?: string; MarketName?: string; type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit; }
 type ProductPaginatedResponse = Partial<ApiPaginatedResult<ProductApiResponse>> & { items?: ProductApiResponse[] };
 
 const normalizeOptionalText = (value?: string | null): string | undefined => {
@@ -105,7 +107,11 @@ const mapProduct = (product: ProductApiResponse): Product => {
 
   return {
     id: product.id ?? product.Id ?? '', name: product.name ?? product.Name ?? '', code: product.code ?? product.Code ?? '',
-    brand: normalizeOptionalText(product.brand ?? product.Brand), type: normalizeOptionalText(product.type ?? product.Type),
+    brandId: normalizeOptionalText(product.brandId ?? product.BrandId),
+    brand: normalizeOptionalText(product.brand ?? product.Brand),
+    marketUserId: normalizeOptionalText(product.marketUserId ?? product.MarketUserId),
+    marketName: normalizeOptionalText(product.marketName ?? product.MarketName),
+    type: normalizeOptionalText(product.type ?? product.Type),
     weight: product.weight ?? product.Weight, weightUnit: product.weightUnit ?? product.WeightUnit,
     description: normalizeOptionalText(product.description ?? product.Description),
     price: displayPrice,
@@ -156,7 +162,9 @@ const appendCreateFields = (formData: FormData, payload: CreateProductInput): vo
   formData.append('Name', payload.name.trim());
   formData.append('Code', payload.code.trim());
   formData.append('Price', String(payload.price));
-  if (payload.brand?.trim()) formData.append('Brand', payload.brand.trim());
+  if (payload.brandId?.trim()) formData.append('BrandId', payload.brandId.trim());
+  else if (payload.brand?.trim()) formData.append('Brand', payload.brand.trim());
+  formData.append('MarketUserId', payload.marketUserId.trim());
   if (payload.type?.trim()) formData.append('Type', payload.type.trim());
   if (payload.weight != null) formData.append('Weight', String(payload.weight));
   if (payload.weightUnit) formData.append('WeightUnit', payload.weightUnit);
@@ -174,7 +182,11 @@ export const productsDashboardApi = {
     const categoryIds = filters.categoryIds?.length ? filters.categoryIds : filters.categoryId === 'all' ? undefined : [filters.categoryId];
     const { data } = await apiClient.get<ProductPaginatedResponse>('/api/Products', { params: {
       page: pagination.page, pageSize: pagination.pageSize, includeCategories: true, search: filters.search.trim() || undefined,
-      code: filters.code?.trim() || undefined, categoryIds,
+      code: filters.code?.trim() || undefined,
+      categoryIds,
+      brandId: filters.brandId && filters.brandId !== 'all' ? filters.brandId : undefined,
+      marketUserId: filters.marketUserId && filters.marketUserId !== 'all' ? filters.marketUserId : undefined,
+      marketName: filters.marketName?.trim() || undefined,
     } });
     const paginated = toPaginatedData(data, pagination);
     return { ...paginated, items: paginated.items.map(mapProduct) };
@@ -194,7 +206,11 @@ export const productsDashboardApi = {
     const { data } = await apiClient.get<ProductBriefApiResponse[]>('/api/Products/brief');
     return (data ?? []).map((product) => ({
       id: product.id ?? product.Id ?? '', name: product.name ?? product.Name ?? '', parCode: normalizeOptionalText(product.parCode ?? product.ParCode),
-      brand: normalizeOptionalText(product.brand ?? product.Brand), type: normalizeOptionalText(product.type ?? product.Type),
+      brandId: normalizeOptionalText(product.brandId ?? product.BrandId),
+      brand: normalizeOptionalText(product.brand ?? product.Brand),
+      marketUserId: normalizeOptionalText(product.marketUserId ?? product.MarketUserId),
+      marketName: normalizeOptionalText(product.marketName ?? product.MarketName),
+      type: normalizeOptionalText(product.type ?? product.Type),
       weight: product.weight ?? product.Weight, weightUnit: product.weightUnit ?? product.WeightUnit,
     }));
   },
@@ -219,7 +235,10 @@ export const productsDashboardApi = {
       if (parsed.name != null) formData.append('Name', parsed.name.trim());
       if (parsed.code != null) formData.append('Code', parsed.code.trim());
       if (parsed.price != null) formData.append('Price', String(parsed.price));
-      if (parsed.brand != null) formData.append('Brand', parsed.brand.trim());
+      if (parsed.clearBrand) formData.append('ClearBrand', 'true');
+      else if (parsed.brandId != null) formData.append('BrandId', parsed.brandId.trim());
+      else if (parsed.brand != null) formData.append('Brand', parsed.brand.trim());
+      if (parsed.marketUserId != null) formData.append('MarketUserId', parsed.marketUserId.trim());
       if (parsed.type != null) formData.append('Type', parsed.type.trim());
       if (parsed.weight != null) formData.append('Weight', String(parsed.weight));
       if (parsed.weightUnit) formData.append('WeightUnit', parsed.weightUnit);
@@ -240,7 +259,10 @@ export const productsDashboardApi = {
     if (parsed.name != null) body.name = parsed.name.trim();
     if (parsed.code != null) body.code = parsed.code.trim();
     if (parsed.price != null) body.price = parsed.price;
-    if (parsed.brand != null) body.brand = parsed.brand.trim();
+    if (parsed.clearBrand) body.clearBrand = true;
+    else if (parsed.brandId != null) body.brandId = parsed.brandId.trim();
+    else if (parsed.brand != null) body.brand = parsed.brand.trim();
+    if (parsed.marketUserId != null) body.marketUserId = parsed.marketUserId.trim();
     if (parsed.type != null) body.type = parsed.type.trim();
     if (Object.prototype.hasOwnProperty.call(parsed, 'weight')) body.weight = parsed.weight;
     if (Object.prototype.hasOwnProperty.call(parsed, 'weightUnit')) body.weightUnit = parsed.weightUnit;

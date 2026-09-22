@@ -7,6 +7,13 @@ export const queryKeys = {
     root: ['users'] as const,
     list: (filters: unknown) => ['users', 'list', filters] as const,
     detail: (userId: string) => ['users', 'detail', userId] as const,
+    roles: () => ['users', 'roles'] as const,
+    markets: () => ['users', 'markets'] as const,
+  },
+  brands: {
+    root: ['brands'] as const,
+    list: (filters: unknown) => ['brands', 'list', filters] as const,
+    options: () => ['brands', 'options'] as const,
   },
   products: {
     root: ['products'] as const,
@@ -38,5 +45,6 @@ export const queryKeys = {
     root: ['settings'] as const,
     profile: () => ['settings', 'profile'] as const,
     currency: () => ['settings', 'currency'] as const,
+    deliveryPricing: () => ['settings', 'delivery-pricing'] as const,
   },
 } as const;

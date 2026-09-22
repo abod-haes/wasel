@@ -20,14 +20,23 @@ import {
   Textarea,
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
+import type { Brand } from '@/features/brands/types/brand-types';
 import type { CategoryOption } from '@/features/categories/types/category-types';
+import type { MarketOption } from '@/features/markets/types/market-types';
 import { createProductSchema } from '@/features/products/schemas/product-form-schema';
-import type { CreateProductInput, Product, ProductVariantInput, ProductWeightUnit } from '@/features/products/types/product-types';
+import type {
+  CreateProductInput,
+  Product,
+  ProductVariantInput,
+  ProductWeightUnit,
+} from '@/features/products/types/product-types';
 
 interface ProductDetailsFormProps {
   mode: 'create' | 'edit';
   product?: Product;
   categories: CategoryOption[];
+  brands: Brand[];
+  markets: MarketOption[];
   variants?: ProductVariantInput[];
   isSubmitting?: boolean;
   onSubmit: (payload: CreateProductInput) => void;
@@ -37,7 +46,8 @@ interface ProductDetailsFormProps {
 interface ProductDetailsValues {
   name: string;
   code: string;
-  brand: string;
+  brandId: string;
+  marketUserId: string;
   type: string;
   weight: string;
   weightUnit: ProductWeightUnit | 'none';
@@ -47,10 +57,13 @@ interface ProductDetailsValues {
   categoryIds: string[];
 }
 
+const NONE_VALUE = 'none';
+
 const defaultValues: ProductDetailsValues = {
   name: '',
   code: '',
-  brand: '',
+  brandId: NONE_VALUE,
+  marketUserId: NONE_VALUE,
   type: '',
   weight: '',
   weightUnit: 'none',
@@ -69,17 +82,18 @@ const parseOptionalNumber = (value: string): number | undefined => {
 
 const generateSixDigitCode = (): string => String(Math.floor(100000 + Math.random() * 900000));
 
-const formatPricePreview = (value: number): string => {
-  return new Intl.NumberFormat(undefined, {
+const formatPricePreview = (value: number): string =>
+  new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
-};
 
 export function ProductDetailsForm({
   mode,
   product,
   categories,
+  brands,
+  markets,
   variants,
   isSubmitting = false,
   onSubmit,
@@ -95,7 +109,8 @@ export function ProductDetailsForm({
       setValues({
         name: product.name,
         code: product.code,
-        brand: product.brand ?? '',
+        brandId: product.brandId ?? NONE_VALUE,
+        marketUserId: product.marketUserId ?? NONE_VALUE,
         type: product.type ?? '',
         weight: product.weight != null ? String(product.weight) : '',
         weightUnit: product.weightUnit ?? 'none',
@@ -122,13 +137,16 @@ export function ProductDetailsForm({
     return categories.filter((category) => category.name.toLowerCase().includes(search));
   }, [categories, categorySearch]);
 
+  const selectedMarket = markets.find((market) => market.id === values.marketUserId);
+
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
     const parsed = createProductSchema.safeParse({
       name: values.name,
       code: values.code,
-      brand: values.brand,
+      brandId: values.brandId === NONE_VALUE ? undefined : values.brandId,
+      marketUserId: values.marketUserId === NONE_VALUE ? '' : values.marketUserId,
       type: values.type,
       weight: parseOptionalNumber(values.weight),
       weightUnit: values.weightUnit === 'none' ? undefined : values.weightUnit,
@@ -144,7 +162,8 @@ export function ProductDetailsForm({
       setErrors({
         name: fieldErrors.name?.[0],
         code: fieldErrors.code?.[0],
-        brand: fieldErrors.brand?.[0],
+        brandId: fieldErrors.brandId?.[0],
+        marketUserId: fieldErrors.marketUserId?.[0],
         type: fieldErrors.type?.[0],
         weight: fieldErrors.weight?.[0],
         weightUnit: fieldErrors.weightUnit?.[0],
@@ -177,16 +196,21 @@ export function ProductDetailsForm({
         <CardHeader>
           <CardTitle>{mode === 'create' ? 'بيانات المنتج الجديد' : 'بيانات المنتج'}</CardTitle>
           <CardDescription>
-            {mode === 'create'
-              ? 'أدخل معلومات المنتج الأساسية. السعر الأساسي يُدخل بالدولار USD، والباك إند يحسب أسعار العرض بباقي العملات.'
-              : 'عدّل بيانات المنتج والتصنيفات. حقل السعر هو السعر الأساسي المخزن بالدولار USD وليس سعر العرض المحوّل.'}
+            المنتج مرتبط بسوق واحد إلزاميًا، والبراند يُختار من قائمة البراندات الموحّدة.
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <FormField labelKey="common.name" htmlFor="product-name" required error={errors.name}>
-              <Input id="product-name" value={values.name} placeholder="أدخل اسم المنتج" onChange={(event) => setValues((previous) => ({ ...previous, name: event.target.value }))} />
+              <Input
+                id="product-name"
+                value={values.name}
+                placeholder="أدخل اسم المنتج"
+                onChange={(event) => setValues((previous) => ({ ...previous, name: event.target.value }))}
+              />
             </FormField>
+
             <FormField labelKey="products.form.code" htmlFor="product-code" required error={errors.code}>
               <div className="flex gap-2">
                 <Input
@@ -212,19 +236,81 @@ export function ProductDetailsForm({
                 ) : null}
               </div>
             </FormField>
-            <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
-              <Input id="product-brand" value={values.brand} placeholder="مثال: Arabica" onChange={(event) => setValues((previous) => ({ ...previous, brand: event.target.value }))} />
+
+            <FormField labelKey="العلامة التجارية" error={errors.brandId}>
+              <Select
+                value={values.brandId}
+                onValueChange={(brandId) => setValues((previous) => ({ ...previous, brandId }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر البراند" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE_VALUE}>بدون براند</SelectItem>
+                  {brands.map((brand) => (
+                    <SelectItem key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormField>
+
+            <FormField labelKey="السوق" required error={errors.marketUserId}>
+              <Select
+                value={values.marketUserId}
+                onValueChange={(marketUserId) =>
+                  setValues((previous) => ({ ...previous, marketUserId }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر السوق المسؤول عن المنتج" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
+                  {markets.map((market) => (
+                    <SelectItem key={market.id} value={market.id}>
+                      {market.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedMarket ? (
+                <p className="mt-1 text-xs text-muted-foreground">{selectedMarket.location}</p>
+              ) : null}
+            </FormField>
+
             <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
-              <Input id="product-type" value={values.type} placeholder="مثال: Chips" onChange={(event) => setValues((previous) => ({ ...previous, type: event.target.value }))} />
+              <Input
+                id="product-type"
+                value={values.type}
+                placeholder="مثال: Chips"
+                onChange={(event) => setValues((previous) => ({ ...previous, type: event.target.value }))}
+              />
             </FormField>
+
             <div className="grid grid-cols-[1fr_120px] gap-2">
               <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
-                <Input id="product-weight" type="number" min="0" step="0.01" value={values.weight} placeholder="مثال: 50" onChange={(event) => setValues((previous) => ({ ...previous, weight: event.target.value }))} />
+                <Input
+                  id="product-weight"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={values.weight}
+                  onChange={(event) => setValues((previous) => ({ ...previous, weight: event.target.value }))}
+                />
               </FormField>
               <FormField labelKey="الوحدة" error={errors.weightUnit}>
-                <Select value={values.weightUnit} onValueChange={(weightUnit) => setValues((previous) => ({ ...previous, weightUnit: weightUnit as ProductDetailsValues['weightUnit'] }))}>
-                  <SelectTrigger><SelectValue placeholder="الوحدة" /></SelectTrigger>
+                <Select
+                  value={values.weightUnit}
+                  onValueChange={(weightUnit) =>
+                    setValues((previous) => ({
+                      ...previous,
+                      weightUnit: weightUnit as ProductDetailsValues['weightUnit'],
+                    }))
+                  }
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">بدون</SelectItem>
                     <SelectItem value="g">g</SelectItem>
@@ -234,11 +320,16 @@ export function ProductDetailsForm({
                 </Select>
               </FormField>
             </div>
+
             <FormField labelKey="السعر الأساسي (USD)" htmlFor="product-price" required error={errors.price}>
-              <div className="space-y-1.5">
-                <Input id="product-price" type="number" min="0" step="0.01" value={values.price} placeholder="أدخل السعر بالدولار" onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))} />
-                <p className="text-xs text-muted-foreground">يتم إرسال هذا الحقل إلى Price كقيمة USD فقط.</p>
-              </div>
+              <Input
+                id="product-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={values.price}
+                onChange={(event) => setValues((previous) => ({ ...previous, price: event.target.value }))}
+              />
             </FormField>
           </div>
 
@@ -258,7 +349,10 @@ export function ProductDetailsForm({
 
           <div className="space-y-3 rounded-xl border p-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div><p className="text-sm font-semibold">تصنيفات المنتج</p><p className="text-xs text-muted-foreground">يمكن ربط المنتج بأكثر من تصنيف.</p></div>
+              <div>
+                <p className="text-sm font-semibold">تصنيفات المنتج</p>
+                <p className="text-xs text-muted-foreground">يمكن ربط المنتج بأكثر من تصنيف.</p>
+              </div>
               <span className="text-xs text-muted-foreground">محدد: {values.categoryIds.length}</span>
             </div>
             <Input value={categorySearch} placeholder="ابحث عن تصنيف" onChange={(event) => setCategorySearch(event.target.value)} />
@@ -268,7 +362,12 @@ export function ProductDetailsForm({
               ) : (
                 filteredCategories.map((category) => (
                   <label key={category.id} className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/60">
-                    <input type="checkbox" checked={values.categoryIds.includes(category.id)} disabled={isSubmitting} onChange={() => toggleCategory(category.id)} />
+                    <input
+                      type="checkbox"
+                      checked={values.categoryIds.includes(category.id)}
+                      disabled={isSubmitting}
+                      onChange={() => toggleCategory(category.id)}
+                    />
                     <span className="text-sm">{'— '.repeat(category.level ?? 0)}{category.name}</span>
                   </label>
                 ))
@@ -278,15 +377,40 @@ export function ProductDetailsForm({
           </div>
 
           <FormField labelKey="products.form.description" htmlFor="product-description" error={errors.description}>
-            <Textarea id="product-description" rows={4} value={values.description} placeholder="اكتب وصفاً مختصراً للمنتج" onChange={(event) => setValues((previous) => ({ ...previous, description: event.target.value }))} />
+            <Textarea
+              id="product-description"
+              rows={4}
+              value={values.description}
+              onChange={(event) => setValues((previous) => ({ ...previous, description: event.target.value }))}
+            />
           </FormField>
+
           <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
-            <ImageUploader id="product-image" value={values.imageFile} currentImagePath={mode === 'edit' ? mainImage?.imagePath : undefined} disabled={isSubmitting} accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" onChange={(imageFile) => setValues((previous) => ({ ...previous, imageFile }))} />
+            <ImageUploader
+              id="product-image"
+              value={values.imageFile}
+              currentImagePath={mode === 'edit' ? mainImage?.imagePath : undefined}
+              disabled={isSubmitting}
+              accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+              onChange={(imageFile) => setValues((previous) => ({ ...previous, imageFile }))}
+            />
           </FormField>
         </CardContent>
+
         <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={() => (onBack ? onBack() : navigate(ROUTES.products))} disabled={isSubmitting}><ArrowRight className="h-4 w-4" />رجوع للمنتجات</Button>
-          <Button type="submit" disabled={isSubmitting}><Save className="h-4 w-4" />{mode === 'create' ? 'حفظ المنتج' : 'حفظ التعديلات'}</Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => (onBack ? onBack() : navigate(ROUTES.products))}
+            disabled={isSubmitting}
+          >
+            <ArrowRight className="h-4 w-4" />
+            رجوع للمنتجات
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            <Save className="h-4 w-4" />
+            {mode === 'create' ? 'حفظ المنتج' : 'حفظ التعديلات'}
+          </Button>
         </CardFooter>
       </Card>
     </form>

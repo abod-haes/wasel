@@ -94,9 +94,27 @@ export function OrdersTable({
         renderCell: (order: Order) => <span>{order.items.length}</span>,
       },
       {
+        key: 'markets',
+        header: 'الأسواق',
+        renderCell: (order: Order) => (
+          <span className="text-sm text-muted-foreground">
+            {order.marketStops?.length ? `${order.marketStops.length} محطات` : '-'}
+          </span>
+        ),
+      },
+      {
         key: 'total',
         header: t('orders.table.totalAmount'),
-        renderCell: (order: Order) => <span className="font-medium">{formatCurrency(order.totalAmount)}</span>,
+        renderCell: (order: Order) => (
+          <div>
+            <p className="font-medium">{formatCurrency(order.fixedTotalAmount ?? order.totalAmount)}</p>
+            {order.fixedDeliveryFee != null ? (
+              <p className="text-xs text-muted-foreground">
+                توصيل: {formatCurrency(order.fixedDeliveryFee)}
+              </p>
+            ) : null}
+          </div>
+        ),
       },
       {
         key: 'actions',

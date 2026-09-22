@@ -18,7 +18,9 @@ import {
   SelectValue,
   Textarea,
 } from '@/components/ui';
+import type { Brand } from '@/features/brands/types/brand-types';
 import type { CategoryOption } from '@/features/categories/types/category-types';
+import type { MarketOption } from '@/features/markets/types/market-types';
 import { createProductSchema } from '@/features/products/schemas/product-form-schema';
 import type { CreateProductInput, Product } from '@/features/products/types/product-types';
 
@@ -28,6 +30,8 @@ interface ProductFormDialogProps {
   defaultProduct?: Product;
   isSubmitting?: boolean;
   categories: CategoryOption[];
+  brands?: Brand[];
+  markets?: MarketOption[];
   onOpenChange: (open: boolean) => void;
   onSubmit: (payload: CreateProductInput) => void;
 }
@@ -45,7 +49,8 @@ interface VariantFormValues {
 interface FormValues {
   name: string;
   code: string;
-  brand: string;
+  brandId: string;
+  marketUserId: string;
   type: string;
   weight: string;
   description: string;
@@ -114,7 +119,8 @@ const parseOptionalNumber = (value: string): number | undefined => {
 const defaultFormValues: FormValues = {
   name: '',
   code: '',
-  brand: '',
+  brandId: 'none',
+  marketUserId: 'none',
   type: '',
   weight: '',
   description: '',
@@ -130,6 +136,8 @@ export function ProductFormDialog({
   defaultProduct,
   isSubmitting = false,
   categories,
+  brands = [],
+  markets = [],
   onOpenChange,
   onSubmit,
 }: ProductFormDialogProps): React.JSX.Element {
@@ -151,7 +159,8 @@ export function ProductFormDialog({
       setFormValues({
         name: defaultProduct.name,
         code: defaultProduct.code,
-        brand: defaultProduct.brand ?? '',
+        brandId: defaultProduct.brandId ?? 'none',
+        marketUserId: defaultProduct.marketUserId ?? 'none',
         type: defaultProduct.type ?? '',
         weight: defaultProduct.weight != null ? String(defaultProduct.weight) : '',
         description: defaultProduct.description ?? '',
@@ -238,7 +247,8 @@ export function ProductFormDialog({
     const parsed = createProductSchema.safeParse({
       name: formValues.name,
       code: formValues.code,
-      brand: formValues.brand,
+      brandId: formValues.brandId === 'none' ? undefined : formValues.brandId,
+      marketUserId: formValues.marketUserId === 'none' ? '' : formValues.marketUserId,
       type: formValues.type,
       weight: parseOptionalNumber(formValues.weight),
       description: formValues.description,
@@ -254,7 +264,8 @@ export function ProductFormDialog({
       const nextErrors: Partial<Record<keyof FormValues, string>> = {
         name: fieldErrors.name?.[0],
         code: fieldErrors.code?.[0],
-        brand: fieldErrors.brand?.[0],
+        brandId: fieldErrors.brandId?.[0],
+        marketUserId: fieldErrors.marketUserId?.[0],
         type: fieldErrors.type?.[0],
         weight: fieldErrors.weight?.[0],
         description: fieldErrors.description?.[0],
@@ -341,18 +352,44 @@ export function ProductFormDialog({
                   />
                 </FormField>
 
-                <FormField labelKey="العلامة التجارية" htmlFor="product-brand" error={errors.brand}>
-                  <Input
-                    id="product-brand"
-                    value={formValues.brand}
-                    placeholder="مثال: Arabica"
-                    onChange={(event) =>
+                <FormField labelKey="العلامة التجارية" error={errors.brandId}>
+                  <Select
+                    value={formValues.brandId}
+                    onValueChange={(brandId) =>
                       setFormValues((previous) => ({
                         ...previous,
-                        brand: event.target.value,
+                        brandId,
                       }))
                     }
-                  />
+                  >
+                    <SelectTrigger><SelectValue placeholder="اختر البراند" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">بدون براند</SelectItem>
+                      {brands.map((brand) => (
+                        <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+
+                <FormField labelKey="السوق" required error={errors.marketUserId}>
+                  <Select
+                    value={formValues.marketUserId}
+                    onValueChange={(marketUserId) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        marketUserId,
+                      }))
+                    }
+                  >
+                    <SelectTrigger><SelectValue placeholder="اختر السوق" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">اختر السوق</SelectItem>
+                      {markets.map((market) => (
+                        <SelectItem key={market.id} value={market.id}>{market.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormField>
 
                 <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>

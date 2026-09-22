@@ -196,6 +196,28 @@ export function UserFormDialog({
       return;
     }
 
+    const selectedRole = roleOptions.find((role) => role.id === formValues.roleId);
+    const isMarketRole = selectedRole?.key === 'market' || selectedRole?.name.toLowerCase() === 'market';
+
+    if (isMarketRole) {
+      const marketErrors: FormErrors = {};
+
+      if (!formValues.location.trim()) {
+        marketErrors.location = 'موقع السوق مطلوب.';
+      }
+      if (parsedLatitude == null || !Number.isFinite(parsedLatitude)) {
+        marketErrors.latitude = 'خط العرض مطلوب للسوق.';
+      }
+      if (parsedLongitude == null || !Number.isFinite(parsedLongitude)) {
+        marketErrors.longitude = 'خط الطول مطلوب للسوق.';
+      }
+
+      if (Object.keys(marketErrors).length > 0) {
+        setErrors(marketErrors);
+        return;
+      }
+    }
+
     setErrors({});
     onSubmit(parsed.data);
   };
@@ -249,7 +271,7 @@ export function UserFormDialog({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <FormField labelKey="common.email" htmlFor="user-email" required error={errors.email}>
+            <FormField labelKey="common.email" htmlFor="user-email" error={errors.email}>
               <Input
                 id="user-email"
                 type="email"
@@ -330,6 +352,12 @@ export function UserFormDialog({
               </Select>
             </FormField>
           </div>
+
+          {roleOptions.find((role) => role.id === formValues.roleId)?.key === 'market' ? (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+              حساب Market يحتاج موقعًا واضحًا وخط عرض وخط طول لأن هذه الإحداثيات تُستخدم في مسار الاستلام والتوصيل.
+            </div>
+          ) : null}
 
           <div className="grid gap-4 md:grid-cols-3">
             <FormField labelKey="users.form.location" htmlFor="user-location" error={errors.location}>
