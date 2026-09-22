@@ -52,7 +52,7 @@ interface UserApiResponse {
 interface CreateUserRequest {
   firstName: string;
   lastName: string;
-  email: string;
+  email?: string | null;
   phoneNumber: string;
   password: string;
   location?: string;
@@ -65,7 +65,7 @@ interface CreateUserRequest {
 interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
-  email?: string;
+  email?: string | null;
   phoneNumber?: string;
   password?: string;
   location?: string;
@@ -376,7 +376,7 @@ const buildCreateUserRequest = (payload: CreateUserInput): CreateUserRequest => 
   const requestPayload: CreateUserRequest = {
     firstName: parsed.firstName,
     lastName: parsed.lastName,
-    email: parsed.email,
+    email: parsed.email.trim() || null,
     phoneNumber: parsed.phoneNumber,
     password: parsed.password,
     phoneNumberVerified: Boolean(parsed.phoneNumberVerified),
@@ -414,7 +414,7 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
   }
 
   if (parsed.email != null) {
-    requestPayload.email = parsed.email;
+    requestPayload.email = parsed.email.trim() || null;
   }
 
   if (parsed.phoneNumber != null) {
