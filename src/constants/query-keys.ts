@@ -8,6 +8,11 @@ export const queryKeys = {
     list: (filters: unknown) => ['users', 'list', filters] as const,
     detail: (userId: string) => ['users', 'detail', userId] as const,
   },
+  brands: {
+    root: ['brands'] as const,
+    list: (filters: unknown) => ['brands', 'list', filters] as const,
+    options: () => ['brands', 'options'] as const,
+  },
   products: {
     root: ['products'] as const,
     list: (filters: unknown) => ['products', 'list', filters] as const,
