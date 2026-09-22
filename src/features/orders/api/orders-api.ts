@@ -30,6 +30,28 @@ interface OrderApiResponse {
   id?: string;
   TotalAmount?: number;
   totalAmount?: number;
+  FixedDeliveryFee?: number;
+  fixedDeliveryFee?: number;
+  FixedTotalAmount?: number;
+  fixedTotalAmount?: number;
+  MarketStops?: Array<{
+    MarketUserId?: string; marketUserId?: string;
+    MarketName?: string; marketName?: string;
+    Location?: string; location?: string;
+    Latitude?: number; latitude?: number;
+    Longitude?: number; longitude?: number;
+    Sequence?: number; sequence?: number;
+    DistanceToNextKm?: number; distanceToNextKm?: number;
+  }>;
+  marketStops?: Array<{
+    MarketUserId?: string; marketUserId?: string;
+    MarketName?: string; marketName?: string;
+    Location?: string; location?: string;
+    Latitude?: number; latitude?: number;
+    Longitude?: number; longitude?: number;
+    Sequence?: number; sequence?: number;
+    DistanceToNextKm?: number; distanceToNextKm?: number;
+  }>;
   JourneyPrice?: number;
   journeyPrice?: number;
   PricePerKilometer?: number;
@@ -182,6 +204,19 @@ const mapOrderResponse = (order: OrderApiResponse): Order => {
   return {
     id: order.Id ?? order.id ?? '',
     totalAmount: order.TotalAmount ?? order.totalAmount ?? 0,
+    fixedDeliveryFee: order.FixedDeliveryFee ?? order.fixedDeliveryFee,
+    fixedTotalAmount: order.FixedTotalAmount ?? order.fixedTotalAmount,
+    marketStops: (order.MarketStops ?? order.marketStops ?? [])
+      .map((stop) => ({
+        marketUserId: stop.MarketUserId ?? stop.marketUserId ?? '',
+        marketName: stop.MarketName ?? stop.marketName ?? '',
+        location: stop.Location ?? stop.location ?? '',
+        latitude: stop.Latitude ?? stop.latitude ?? 0,
+        longitude: stop.Longitude ?? stop.longitude ?? 0,
+        sequence: stop.Sequence ?? stop.sequence ?? 0,
+        distanceToNextKm: stop.DistanceToNextKm ?? stop.distanceToNextKm ?? 0,
+      }))
+      .sort((first, second) => first.sequence - second.sequence),
     journeyPrice: order.JourneyPrice ?? order.journeyPrice,
     pricePerKilometer: order.PricePerKilometer ?? order.pricePerKilometer,
     distanceKm: order.DistanceKm ?? order.distanceKm,

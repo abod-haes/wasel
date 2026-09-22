@@ -22,9 +22,22 @@ export interface OrderItem {
   lineTotal: number;
 }
 
+export interface MarketStop {
+  marketUserId: string;
+  marketName: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  sequence: number;
+  distanceToNextKm: number;
+}
+
 export interface Order {
   id: string;
   totalAmount: number;
+  fixedDeliveryFee?: number;
+  fixedTotalAmount?: number;
+  marketStops?: MarketStop[];
   journeyPrice?: number;
   pricePerKilometer?: number;
   distanceKm?: number;
