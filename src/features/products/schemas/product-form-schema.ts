@@ -22,7 +22,9 @@ export const productVariantSchema = z.object({
 export const createProductSchema = z.object({
   name: z.string().trim().min(2).max(128),
   code: z.string().trim().min(1).max(64),
+  brandId: z.string().trim().min(1).optional(),
   brand: z.string().trim().max(128).optional(),
+  marketUserId: z.string().trim().min(1, 'Market is required'),
   type: z.string().trim().max(128).optional(),
   weight: z.number().nonnegative().optional(),
   weightUnit: z.enum(['g', 'Kg', 'L']).optional(),

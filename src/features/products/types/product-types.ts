@@ -34,7 +34,10 @@ export interface Product {
   id: string;
   name: string;
   code: string;
+  brandId?: string;
   brand?: string;
+  marketUserId?: string;
+  marketName?: string;
   type?: string;
   weight?: number;
   weightUnit?: ProductWeightUnit;
@@ -57,6 +60,9 @@ export interface ProductsFilter {
   categoryId: string | 'all';
   categoryIds?: string[];
   code?: string;
+  brandId?: string | 'all';
+  marketUserId?: string | 'all';
+  marketName?: string;
 }
 
 export interface ProductVariantInput {
@@ -73,7 +79,10 @@ export interface ProductBrief {
   id: string;
   name: string;
   parCode?: string;
+  brandId?: string;
   brand?: string;
+  marketUserId?: string;
+  marketName?: string;
   type?: string;
   weight?: number;
   weightUnit?: ProductWeightUnit;
@@ -82,7 +91,9 @@ export interface ProductBrief {
 export interface CreateProductInput {
   name: string;
   code: string;
+  brandId?: string;
   brand?: string;
+  marketUserId: string;
   type?: string;
   weight?: number;
   weightUnit?: ProductWeightUnit;
@@ -97,6 +108,7 @@ export interface CreateProductInput {
 
 export interface UpdateProductInput extends Partial<CreateProductInput> {
   id: string;
+  clearBrand?: boolean;
   clearCategories?: boolean;
   clearVariants?: boolean;
 }
