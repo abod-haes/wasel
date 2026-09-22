@@ -1,5 +1,6 @@
 import {
   Bell,
+  Bookmark,
   ClipboardList,
   LayoutDashboard,
   Megaphone,
@@ -34,6 +35,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     labelKey: 'nav.products',
     to: ROUTES.products,
     icon: Package,
+    permission: PERMISSIONS.productsView,
+  },
+  {
+    key: 'brands',
+    labelKey: 'nav.brands',
+    to: ROUTES.brands,
+    icon: Bookmark,
     permission: PERMISSIONS.productsView,
   },
   {
