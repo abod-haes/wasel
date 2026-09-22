@@ -10,6 +10,7 @@ import { UsersTable } from '@/features/users/components/users-table';
 import {
   useCreateUserMutation,
   useDeleteUserMutation,
+  useRolesQuery,
   useUpdateUserMutation,
   useUsersQuery,
 } from '@/features/users/hooks/use-users-query';
@@ -40,28 +41,14 @@ export default function UsersPage(): React.JSX.Element {
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
 
   const usersQuery = useUsersQuery(filters, pagination);
-  const rolesSourceQuery = useUsersQuery(defaultFilters, { page: 1, pageSize: 100 });
+  const rolesQuery = useRolesQuery();
   const createUserMutation = useCreateUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const deleteUserMutation = useDeleteUserMutation();
-  const roleOptions = useMemo<UserRoleAssignment[]>(() => {
-    const users = rolesSourceQuery.data?.items ?? [];
-    const uniqueRoleMap = new Map<string, UserRoleAssignment>();
-
-    users.forEach((user) => {
-      user.roles.forEach((role) => {
-        if (!role.id) {
-          return;
-        }
-
-        uniqueRoleMap.set(role.id, role);
-      });
-    });
-
-    return Array.from(uniqueRoleMap.values()).sort((first, second) =>
-      first.name.localeCompare(second.name)
-    );
-  }, [usersQuery.data]);
+  const roleOptions = useMemo<UserRoleAssignment[]>(
+    () => [...(rolesQuery.data ?? [])].sort((first, second) => first.name.localeCompare(second.name)),
+    [rolesQuery.data],
+  );
 
   if (usersQuery.isError) {
     return <ErrorState onRetry={() => void usersQuery.refetch()} />;
@@ -182,7 +169,7 @@ export default function UsersPage(): React.JSX.Element {
         roleOptions={roleOptions}
         onOpenChange={setIsFormOpen}
         onSubmit={submitUser}
-        isSubmitting={isSubmitting}
+        isSubmitting={isSubmitting || rolesQuery.isLoading}
       />
 
       <ConfirmDialog
