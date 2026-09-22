@@ -14,7 +14,7 @@ export const defaultProductPagination: PaginationParams = {
   pageSize: 10,
 };
 
-const productListParamKeys = ['search', 'categoryId', 'brandId', 'marketUserId', 'page', 'pageSize'] as const;
+const productListParamKeys = ['search', 'categoryId', 'brandId', 'marketUserId', 'marketName', 'page', 'pageSize'] as const;
 
 const parsePositiveInteger = (value: string | null, fallback: number): number => {
   if (!value) {
@@ -34,6 +34,7 @@ export const readProductListUrlState = (
       categoryId: searchParams.get('categoryId') || defaultProductFilters.categoryId,
       brandId: searchParams.get('brandId') || defaultProductFilters.brandId,
       marketUserId: searchParams.get('marketUserId') || defaultProductFilters.marketUserId,
+      marketName: searchParams.get('marketName') ?? '',
     },
     pagination: {
       page: parsePositiveInteger(searchParams.get('page'), defaultProductPagination.page),
@@ -62,6 +63,10 @@ export const createProductListSearchParams = (
 
   if (filters.marketUserId && filters.marketUserId !== defaultProductFilters.marketUserId) {
     searchParams.set('marketUserId', filters.marketUserId);
+  }
+
+  if (filters.marketName?.trim()) {
+    searchParams.set('marketName', filters.marketName.trim());
   }
 
   if (pagination.page !== defaultProductPagination.page) {

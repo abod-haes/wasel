@@ -26,7 +26,7 @@ export function ProductFilters({
   const { t } = useTranslation();
 
   return (
-    <div className="grid gap-3 rounded-xl border bg-card p-4 xl:grid-cols-[1fr_220px_220px_220px_auto] xl:items-end">
+    <div className="grid gap-3 rounded-xl border bg-card p-4 xl:grid-cols-[1fr_200px_200px_200px_200px_auto] xl:items-end">
       <Input
         value={filters.search}
         placeholder={t('products.searchPlaceholder')}
@@ -66,6 +66,12 @@ export function ProductFilters({
           ))}
         </SelectContent>
       </Select>
+
+      <Input
+        value={filters.marketName ?? ''}
+        placeholder="اسم السوق"
+        onChange={(event) => onChange({ ...filters, marketName: event.target.value })}
+      />
 
       <Select
         value={filters.marketUserId ?? 'all'}

@@ -39,6 +39,7 @@ export const createProductSchema = z.object({
 
 export const updateProductSchema = createProductSchema.partial().extend({
   id: z.string().trim().min(1),
+  clearBrand: z.boolean().optional(),
   clearCategories: z.boolean().optional(),
   clearVariants: z.boolean().optional(),
 });
