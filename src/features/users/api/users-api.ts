@@ -505,7 +505,7 @@ export const usersApi = {
         firstName: requestPayload.firstName,
         lastName: requestPayload.lastName,
         name: `${requestPayload.firstName} ${requestPayload.lastName}`.trim(),
-        email: requestPayload.email,
+        email: requestPayload.email ?? '',
         phoneNumber: requestPayload.phoneNumber,
         location: requestPayload.location,
         latitude: requestPayload.latitude ?? null,
