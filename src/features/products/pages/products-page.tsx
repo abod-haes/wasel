@@ -5,8 +5,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
+import { useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
 import { ROUTES } from '@/constants/routes';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
+import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
 import { ProductFilters } from '@/features/products/components/product-filters';
 import { ProductsTable } from '@/features/products/components/products-table';
 import { useDeleteProductMutation, useImportProductsMutation, useProductsQuery } from '@/features/products/hooks/use-products-query';
@@ -31,6 +33,8 @@ export default function ProductsPage(): React.JSX.Element {
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
 
   const categoriesQuery = useCategoryOptionsQuery();
+  const brandsQuery = useBrandOptionsQuery();
+  const marketsQuery = useMarketOptionsQuery();
   const selectedCategory = filters.categoryId === 'all' ? undefined : categoriesQuery.data?.find((category) => category.id === filters.categoryId);
   const effectiveFilters: ProductsFilter = {
     ...filters,
@@ -45,7 +49,18 @@ export default function ProductsPage(): React.JSX.Element {
     setSearchParams(createProductListSearchParams(nextFilters, nextPagination), { replace: true });
   };
 
-  if (productsQuery.isError) return <ErrorState onRetry={() => void productsQuery.refetch()} />;
+  if (productsQuery.isError || categoriesQuery.isError || brandsQuery.isError || marketsQuery.isError) {
+    return (
+      <ErrorState
+        onRetry={() => {
+          void productsQuery.refetch();
+          void categoriesQuery.refetch();
+          void brandsQuery.refetch();
+          void marketsQuery.refetch();
+        }}
+      />
+    );
+  }
 
   const confirmDelete = (): void => {
     if (!deleteProduct) return;
@@ -74,9 +89,16 @@ export default function ProductsPage(): React.JSX.Element {
           </div>
         }
       />
+      <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+        استيراد Excel أصبح Market-scoped: الملف لازم يحتوي عمود <strong className="text-foreground">Market</strong> أو
+        <strong className="text-foreground"> السوق / المتجر</strong>، ويتم استبدال كتالوج الأسواق المذكورة فقط.
+      </div>
+
       <ProductFilters
         filters={filters}
         categories={categoriesQuery.data ?? []}
+        brands={brandsQuery.data ?? []}
+        markets={marketsQuery.data ?? []}
         onChange={(nextFilters) => updateListUrl(nextFilters, { ...pagination, page: defaultProductPagination.page })}
         onReset={() => updateListUrl(defaultProductFilters, defaultProductPagination)}
       />
