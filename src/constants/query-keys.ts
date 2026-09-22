@@ -45,5 +45,6 @@ export const queryKeys = {
     root: ['settings'] as const,
     profile: () => ['settings', 'profile'] as const,
     currency: () => ['settings', 'currency'] as const,
+    deliveryPricing: () => ['settings', 'delivery-pricing'] as const,
   },
 } as const;
