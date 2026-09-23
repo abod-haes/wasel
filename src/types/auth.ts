@@ -41,6 +41,7 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   name: string;
+  roles: string[];
   countryCallingCode: string;
   phoneNumber: string;
   phoneNumberVerified: boolean;
