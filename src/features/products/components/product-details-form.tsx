@@ -37,6 +37,8 @@ interface ProductDetailsFormProps {
   categories: CategoryOption[];
   brands: Brand[];
   markets: MarketOption[];
+  fixedMarketUserId?: string;
+  fixedMarketName?: string;
   variants?: ProductVariantInput[];
   isSubmitting?: boolean;
   onSubmit: (payload: CreateProductInput) => void;
@@ -94,6 +96,8 @@ export function ProductDetailsForm({
   categories,
   brands,
   markets,
+  fixedMarketUserId,
+  fixedMarketName,
   variants,
   isSubmitting = false,
   onSubmit,
@@ -110,7 +114,7 @@ export function ProductDetailsForm({
         name: product.name,
         code: product.code,
         brandId: product.brandId ?? NONE_VALUE,
-        marketUserId: product.marketUserId ?? NONE_VALUE,
+        marketUserId: fixedMarketUserId ?? product.marketUserId ?? NONE_VALUE,
         type: product.type ?? '',
         weight: product.weight != null ? String(product.weight) : '',
         weightUnit: product.weightUnit ?? 'none',
@@ -125,11 +129,14 @@ export function ProductDetailsForm({
     }
 
     if (mode === 'create') {
-      setValues(defaultValues);
+      setValues({
+        ...defaultValues,
+        marketUserId: fixedMarketUserId ?? NONE_VALUE,
+      });
       setErrors({});
       setCategorySearch('');
     }
-  }, [mode, product]);
+  }, [fixedMarketUserId, mode, product]);
 
   const filteredCategories = useMemo(() => {
     const search = categorySearch.trim().toLowerCase();
@@ -146,7 +153,7 @@ export function ProductDetailsForm({
       name: values.name,
       code: values.code,
       brandId: values.brandId === NONE_VALUE ? undefined : values.brandId,
-      marketUserId: values.marketUserId === NONE_VALUE ? '' : values.marketUserId,
+      marketUserId: fixedMarketUserId ?? (values.marketUserId === NONE_VALUE ? '' : values.marketUserId),
       type: values.type,
       weight: parseOptionalNumber(values.weight),
       weightUnit: values.weightUnit === 'none' ? undefined : values.weightUnit,
@@ -257,27 +264,40 @@ export function ProductDetailsForm({
             </FormField>
 
             <FormField labelKey="السوق" required error={errors.marketUserId}>
-              <Select
-                value={values.marketUserId}
-                onValueChange={(marketUserId) =>
-                  setValues((previous) => ({ ...previous, marketUserId }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر السوق المسؤول عن المنتج" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
-                  {markets.map((market) => (
-                    <SelectItem key={market.id} value={market.id}>
-                      {market.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selectedMarket ? (
-                <p className="mt-1 text-xs text-muted-foreground">{selectedMarket.location}</p>
-              ) : null}
+              {fixedMarketUserId ? (
+                <div className="flex h-11 items-center rounded-2xl border border-primary/20 bg-primary/5 px-3.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {fixedMarketName || product?.marketName || 'متجري'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">يتم ربط المنتج بحساب المتجر الحالي تلقائيًا</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Select
+                    value={values.marketUserId}
+                    onValueChange={(marketUserId) =>
+                      setValues((previous) => ({ ...previous, marketUserId }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر السوق المسؤول عن المنتج" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
+                      {markets.map((market) => (
+                        <SelectItem key={market.id} value={market.id}>
+                          {market.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedMarket ? (
+                    <p className="mt-1 text-xs text-muted-foreground">{selectedMarket.location}</p>
+                  ) : null}
+                </>
+              )}
             </FormField>
 
             <FormField labelKey="نوع المنتج" htmlFor="product-type" error={errors.type}>
