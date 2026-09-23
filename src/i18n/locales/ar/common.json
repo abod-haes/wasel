@@ -58,7 +58,8 @@
     "settings": "الإعدادات",
     "settingsGeneral": "عام",
     "settingsPreferences": "التفضيلات",
-    "login": "تسجيل الدخول"
+    "login": "تسجيل الدخول",
+    "otpAdmin": "OTP وواتساب"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
@@ -93,7 +94,8 @@
     "errors": {
       "phoneNumberRequired": "رقم الهاتف مطلوب",
       "passwordRequired": "كلمة المرور مطلوبة"
-    }
+    },
+    "countryCallingCodeLabel": "رمز الدولة"
   },
   "dashboard": {
     "title": "نظرة عامة",
@@ -367,5 +369,135 @@
   "confirmDialog": {
     "title": "هل أنت متأكد؟",
     "description": "لا يمكن التراجع عن هذا الإجراء"
+  },
+  "otpAdmin": {
+    "title": "OTP وواتساب",
+    "description": "إدارة اتصال واتساب، مراقبة طلبات OTP، السجلات، والعملاء ومفاتيح API",
+    "refresh": "تحديث الكل",
+    "metrics": {
+      "whatsapp": "حالة واتساب",
+      "worker": "حالة Worker",
+      "socket": "اتصال واتساب",
+      "sent": "OTP المرسلة اليوم",
+      "verified": "OTP المؤكدة اليوم",
+      "failed": "فشل / غير معروف اليوم",
+      "clients": "عملاء OTP النشطون",
+      "apiKeys": "مفاتيح API النشطة"
+    },
+    "health": {
+      "up": "متصل",
+      "down": "متوقف"
+    },
+    "sessionStatus": {
+      "DISCONNECTED": "غير متصل",
+      "STARTING": "جارٍ البدء",
+      "QR_READY": "QR جاهز",
+      "CONNECTING": "جارٍ الاتصال",
+      "READY": "متصل",
+      "RECONNECTING": "إعادة اتصال",
+      "LOGGED_OUT": "تم تسجيل الخروج",
+      "ERROR": "خطأ"
+    },
+    "session": {
+      "title": "جلسة واتساب",
+      "description": "الجلسة الوحيدة المعرّفة على السيرفر لإرسال رسائل OTP",
+      "account": "الحساب المتصل",
+      "lastConnected": "آخر اتصال",
+      "scanQr": "امسح رمز QR من واتساب",
+      "qrHint": "الرمز مؤقت ويتم تحديثه تلقائيًا من آخر حالة على السيرفر.",
+      "qrAlt": "رمز ربط واتساب",
+      "start": "بدء / ربط",
+      "reconnect": "إعادة الاتصال",
+      "stop": "إيقاف",
+      "logout": "تسجيل خروج واتساب",
+      "loadError": "تعذر تحميل حالة جلسة واتساب.",
+      "logoutConfirmTitle": "تسجيل الخروج من واتساب؟",
+      "logoutConfirmDescription": "سيتم حذف بيانات المصادقة المحفوظة، وسيحتاج التشغيل التالي إلى مسح QR جديد."
+    },
+    "otp": {
+      "title": "طلبات OTP",
+      "description": "مراقبة طلبات رموز التحقق وحالات الإرسال والتأكيد",
+      "phone": "رقم الهاتف",
+      "purpose": "الغرض",
+      "attempts": "المحاولات",
+      "createdAt": "وقت الإنشاء",
+      "details": "التفاصيل",
+      "detailsTitle": "تفاصيل طلب OTP",
+      "providerId": "معرّف رسالة المزود",
+      "ipAddress": "عنوان IP",
+      "expiresAt": "تنتهي في",
+      "verifiedAt": "تم التحقق في",
+      "failureReason": "سبب الفشل",
+      "notFound": "لم يتم العثور على الطلب."
+    },
+    "otpStatus": {
+      "CREATED": "تم الإنشاء",
+      "QUEUED": "بالانتظار",
+      "SENDING": "جارٍ الإرسال",
+      "SENT": "تم الإرسال",
+      "VERIFIED": "تم التحقق",
+      "EXPIRED": "منتهي",
+      "FAILED": "فشل",
+      "BLOCKED": "محظور",
+      "UNKNOWN": "غير معروف"
+    },
+    "purposes": {
+      "login": "تسجيل الدخول",
+      "register": "إنشاء حساب",
+      "reset_password": "إعادة تعيين كلمة المرور",
+      "verify_phone": "تأكيد الهاتف",
+      "confirm_action": "تأكيد إجراء"
+    },
+    "audit": {
+      "title": "سجل العمليات",
+      "description": "سجل إجراءات الإدارة وعمليات واتساب وOTP",
+      "action": "الإجراء",
+      "actor": "المنفذ",
+      "resource": "المورد",
+      "createdAt": "الوقت"
+    },
+    "clients": {
+      "title": "عملاء OTP",
+      "description": "التطبيقات المسموح لها باستخدام خدمة OTP",
+      "create": "إضافة عميل",
+      "createTitle": "إنشاء عميل OTP",
+      "createDescription": "حدد اسم العميل ومعرفه وحدود الإرسال.",
+      "name": "اسم العميل",
+      "slug": "المعرّف slug",
+      "hourlyLimit": "الحد بالساعة",
+      "dailyLimit": "الحد اليومي",
+      "hourShort": "ساعة",
+      "dayShort": "يوم",
+      "enable": "تفعيل",
+      "disable": "تعطيل",
+      "invalid": "تحقق من الاسم و slug."
+    },
+    "apiKeys": {
+      "title": "مفاتيح OTP API",
+      "description": "إدارة مفاتيح الوصول بين الأنظمة",
+      "create": "إنشاء مفتاح",
+      "createTitle": "إنشاء مفتاح API",
+      "createDescription": "المفتاح السري سيظهر مرة واحدة فقط بعد الإنشاء.",
+      "client": "اختر العميل",
+      "name": "اسم المفتاح",
+      "revoke": "إلغاء المفتاح",
+      "revokeConfirmTitle": "إلغاء مفتاح API؟",
+      "revokeConfirmDescription": "سيتم إبطال المفتاح ولن يعود صالحًا للاستخدام.",
+      "secretTitle": "المفتاح السري الجديد",
+      "secretDescription": "انسخ المفتاح الآن. لن يتم إظهاره مرة أخرى.",
+      "copy": "نسخ المفتاح",
+      "copied": "تم نسخ المفتاح",
+      "invalid": "اختر العميل وأدخل اسم المفتاح."
+    },
+    "messages": {
+      "startQueued": "تم إرسال طلب بدء جلسة واتساب",
+      "reconnectQueued": "تم إرسال طلب إعادة الاتصال",
+      "stopQueued": "تم إرسال طلب إيقاف الجلسة",
+      "logoutQueued": "تم إرسال طلب تسجيل الخروج",
+      "clientCreated": "تم إنشاء عميل OTP",
+      "clientUpdated": "تم تحديث عميل OTP",
+      "apiKeyCreated": "تم إنشاء مفتاح API",
+      "apiKeyRevoked": "تم إلغاء مفتاح API"
+    }
   }
 }
