@@ -11,6 +11,7 @@ export const ROUTES = {
   ads: '/ads',
   orders: '/orders',
   notifications: '/notifications',
+  otpAdmin: '/otp-whatsapp',
   settings: '/settings',
   settingsPreferences: '/settings/preferences',
   unauthorized: '/unauthorized',
