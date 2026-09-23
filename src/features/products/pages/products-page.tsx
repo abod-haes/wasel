@@ -7,7 +7,7 @@ import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/compo
 import { Button } from '@/components/ui';
 import { useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
 import { ROUTES } from '@/constants/routes';
-import { isMarketRole } from '@/services/auth/auth-roles';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
 import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
@@ -34,7 +34,7 @@ export default function ProductsPage(): React.JSX.Element {
   const { filters, pagination } = readProductListUrlState(searchParams);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
   const currentUser = useAuthStore((state) => state.user);
-  const isMarket = isMarketRole(currentUser?.roles ?? []);
+  const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
 
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery();
