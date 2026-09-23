@@ -16,7 +16,7 @@ import {
 } from '@/features/settings/hooks/use-settings-query';
 
 export default function SettingsPreferencesPage(): React.JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const settingsQuery = useSettingsQuery();
   const updateSettingsMutation = useUpdateSettingsMutation();
 
@@ -64,24 +64,6 @@ export default function SettingsPreferencesPage(): React.JSX.Element {
               onCheckedChange={(checked) =>
                 updateSettingsMutation.mutate({
                   compactSidebar: checked,
-                })
-              }
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('settings.form.emailNotifications')}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{t('settings.form.emailNotifications')}</p>
-            <Switch
-              checked={settingsQuery.data.emailNotifications}
-              onCheckedChange={(checked) =>
-                updateSettingsMutation.mutate({
-                  emailNotifications: checked,
-                  language: i18n.language === 'ar' ? 'ar' : 'en',
                 })
               }
             />
