@@ -118,6 +118,17 @@
       "orderCancelled": "تم إلغاء الطلب",
       "orderUpdated": "تم تحديث حالة الطلب",
       "notificationSent": "تم إرسال إشعار"
+    },
+    "marketTitle": "لوحة المتجر",
+    "marketDescription": "إدارة منتجات متجرك ومتابعة بيانات الكتالوج",
+    "marketWelcome": "حساب متجر",
+    "marketWelcomeDescription": "تم تفعيل وضع صاحب المتجر لهذا الحساب",
+    "marketHint": "قسم المنتجات يعرض منتجات متجرك فقط، وإضافة أو تعديل المنتج تربطه بحساب متجرك تلقائيًا. قسم الطلبات جاهز للعرض المقيد بالمتجر عند دعم صلاحية Market من الباك.",
+    "marketCards": {
+      "products": "منتجات المتجر",
+      "productsWithImages": "منتجات بصور",
+      "variants": "النكهات",
+      "categories": "التصنيفات المستخدمة"
     }
   },
   "users": {
@@ -301,7 +312,9 @@
     "empty": {
       "title": "لا توجد طلبات",
       "description": "جرّب تعديل المرشحات للعثور على طلبات"
-    }
+    },
+    "marketTitle": "طلبات متجري",
+    "marketDescription": "عرض الطلبات التي تحتوي على منتجات من متجرك فقط"
   },
   "notifications": {
     "title": "الإشعارات",
