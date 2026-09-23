@@ -1,3 +1,4 @@
+import { formatFullPhoneNumber } from '@/constants/phone';
 import { env } from '@/env';
 import {
   ORDER_STATUS_VALUES,
@@ -78,6 +79,8 @@ interface OrderApiResponse {
   userFirstName?: string;
   UserLastName?: string;
   userLastName?: string;
+  UserCountryCallingCode?: string;
+  userCountryCallingCode?: string;
   UserPhoneNumber?: string;
   userPhoneNumber?: string;
   DeliveryPersonId?: string;
@@ -132,7 +135,8 @@ let ordersDb: Order[] = [
     userLongitude: 36.2765,
     userFirstName: 'سارة',
     userLastName: 'خالد',
-    userPhoneNumber: '+963912345678',
+    userCountryCallingCode: '+963',
+    userPhoneNumber: '912345678',
     invoiceImagePath: 'storage/invoices/inv-1.jpg',
   },
   {
@@ -168,7 +172,8 @@ let ordersDb: Order[] = [
     userLongitude: 36.27,
     userFirstName: 'أحمد',
     userLastName: 'علي',
-    userPhoneNumber: '+963987654321',
+    userCountryCallingCode: '+963',
+    userPhoneNumber: '987654321',
     deliveryPersonId: 'drv-1',
     deliveryPersonName: 'عمر السائق',
     acceptedAt: '2026-04-09T09:15:00.000Z',
@@ -194,7 +199,8 @@ let ordersDb: Order[] = [
     userLocation: 'دمشق - الميدان',
     userFirstName: 'لينا',
     userLastName: 'جورج',
-    userPhoneNumber: '+963955111222',
+    userCountryCallingCode: '+963',
+    userPhoneNumber: '955111222',
   },
 ];
 
@@ -237,6 +243,7 @@ const mapOrderResponse = (order: OrderApiResponse): Order => {
     userLongitude: order.UserLongitude ?? order.userLongitude,
     userFirstName: order.UserFirstName ?? order.userFirstName,
     userLastName: order.UserLastName ?? order.userLastName,
+    userCountryCallingCode: order.UserCountryCallingCode ?? order.userCountryCallingCode,
     userPhoneNumber: order.UserPhoneNumber ?? order.userPhoneNumber,
     deliveryPersonId: order.DeliveryPersonId ?? order.deliveryPersonId,
     deliveryPersonName: order.DeliveryPersonName ?? order.deliveryPersonName,
@@ -266,7 +273,9 @@ const applyFilters = (orders: Order[], filters: OrdersFilter): Order[] => {
       !normalizedSearch ||
       order.id.toLowerCase().includes(normalizedSearch) ||
       customerName.includes(normalizedSearch) ||
-      (order.userPhoneNumber ?? '').toLowerCase().includes(normalizedSearch);
+      formatFullPhoneNumber(order.userCountryCallingCode, order.userPhoneNumber)
+        .toLowerCase()
+        .includes(normalizedSearch);
 
     const matchesStatus = filters.status === 'all' || order.status === filters.status;
 
