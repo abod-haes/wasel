@@ -51,6 +51,7 @@ export interface Order {
   userLongitude?: number;
   userFirstName?: string;
   userLastName?: string;
+  userCountryCallingCode?: string;
   userPhoneNumber?: string;
   deliveryPersonId?: string;
   deliveryPersonName?: string;
