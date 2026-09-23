@@ -377,7 +377,7 @@ export function UserFormDialog({
                   onChange={(event) =>
                     setFormValues((previous) => ({
                       ...previous,
-                      phoneNumber: event.target.value.replace(/\D/g, '').replace(/^0+/, ''),
+                      phoneNumber: event.target.value.replace(/\D/g, ''),
                     }))
                   }
                 />
