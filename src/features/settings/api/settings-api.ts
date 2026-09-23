@@ -1,41 +1,58 @@
-import { env } from '@/env';
 import { settingsSchema } from '@/features/settings/schemas/settings-schema';
 import type {
   UpdateWorkspaceSettingsInput,
   WorkspaceSettings,
 } from '@/features/settings/types/settings-types';
-import { apiClient } from '@/services/api/client';
-import { delay } from '@/services/mock/mock-utils';
 
-let settingsDb: WorkspaceSettings = {
+const STORAGE_KEY = 'wasel_dashboard_settings';
+
+const defaultSettings: WorkspaceSettings = {
   displayName: 'لوحة واسل',
   language: 'ar',
   compactSidebar: false,
 };
 
+const readSettings = (): WorkspaceSettings => {
+  if (typeof window === 'undefined') {
+    return defaultSettings;
+  }
+
+  const storedValue = window.localStorage.getItem(STORAGE_KEY);
+  if (!storedValue) {
+    return defaultSettings;
+  }
+
+  try {
+    return settingsSchema.parse({
+      ...defaultSettings,
+      ...(JSON.parse(storedValue) as Partial<WorkspaceSettings>),
+    });
+  } catch {
+    window.localStorage.removeItem(STORAGE_KEY);
+    return defaultSettings;
+  }
+};
+
+const writeSettings = (settings: WorkspaceSettings): WorkspaceSettings => {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  }
+
+  return settings;
+};
+
 export const settingsApi = {
   async getSettings(): Promise<WorkspaceSettings> {
-    if (env.enableMockApi) {
-      await delay(320);
-      return settingsDb;
-    }
-
-    const { data } = await apiClient.get<WorkspaceSettings>('/api/Settings');
-    return data;
+    return readSettings();
   },
 
   async updateSettings(payload: UpdateWorkspaceSettingsInput): Promise<WorkspaceSettings> {
-    if (env.enableMockApi) {
-      await delay(480);
-      const mergedSettings = {
-        ...settingsDb,
-        ...payload,
-      };
-      settingsDb = settingsSchema.parse(mergedSettings);
-      return settingsDb;
-    }
+    const currentSettings = readSettings();
+    const nextSettings = settingsSchema.parse({
+      ...currentSettings,
+      ...payload,
+    });
 
-    const { data } = await apiClient.patch<WorkspaceSettings>('/api/Settings', payload);
-    return data;
+    return writeSettings(nextSettings);
   },
 };
