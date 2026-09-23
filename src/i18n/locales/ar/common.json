@@ -59,7 +59,8 @@
     "settingsGeneral": "عام",
     "settingsPreferences": "التفضيلات",
     "login": "تسجيل الدخول",
-    "otpAdmin": "OTP وواتساب"
+    "otpAdmin": "OTP وواتساب",
+    "settingsPricing": "التسعير وأسعار الصرف"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
@@ -354,7 +355,9 @@
     },
     "messages": {
       "saved": "تم حفظ الإعدادات"
-    }
+    },
+    "pricingTitle": "التسعير وأسعار الصرف",
+    "pricingDescription": "إدارة سعر صرف العملات وتسعير التوصيل من مكان واحد"
   },
   "pages": {
     "unauthorized": {
