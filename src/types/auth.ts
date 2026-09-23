@@ -12,8 +12,6 @@ export interface LoginApiUserResponse {
   firstName?: string;
   LastName?: string;
   lastName?: string;
-  Email?: string;
-  email?: string;
   PhoneNumber?: string;
   phoneNumber?: string;
   PhoneNumberVerified?: boolean;
@@ -40,7 +38,6 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   name: string;
-  email: string;
   phoneNumber: string;
   phoneNumberVerified: boolean;
   phoneNumberVerifiedAt: string | null;
