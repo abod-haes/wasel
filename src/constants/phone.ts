@@ -20,7 +20,7 @@ export const normalizeCountryCallingCode = (value: string): string => {
 };
 
 export const normalizeNationalPhoneNumber = (value: string): string => {
-  return value.replace(/\D/g, '').replace(/^0+/, '');
+  return value.replace(/\D/g, '');
 };
 
 export const formatFullPhoneNumber = (
