@@ -20,6 +20,7 @@ const CategoriesPage = lazy(() => import('@/features/categories/pages/categories
 const AdsPage = lazy(() => import('@/features/ads/pages/ads-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
+const OtpAdminPage = lazy(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazy(() => import('@/features/settings/pages/settings-page'));
 const SettingsPreferencesPage = lazy(
   () => import('@/features/settings/pages/settings-preferences-page')
@@ -159,6 +160,17 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.notifications',
+            },
+          },
+          {
+            path: ROUTES.otpAdmin,
+            element: (
+              <PermissionGuard required={PERMISSIONS.otpAdminView}>
+                {withSuspense(<OtpAdminPage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'nav.otpAdmin',
             },
           },
           {
