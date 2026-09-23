@@ -4,10 +4,8 @@ export type ProductDisplayCurrency = 'USD' | 'SYP' | 'TRY';
 
 export interface WorkspaceSettings {
   displayName: string;
-  email: string;
   language: LanguageCode;
   compactSidebar: boolean;
-  emailNotifications: boolean;
 }
 
 export interface CurrencySettings {
