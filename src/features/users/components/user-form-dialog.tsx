@@ -41,7 +41,6 @@ interface UserFormDialogProps {
 interface FormValues {
   firstName: string;
   lastName: string;
-  email: string;
   phoneNumber: string;
   password: string;
   location: string;
@@ -54,7 +53,6 @@ interface FormValues {
 interface FormErrors {
   firstName?: string;
   lastName?: string;
-  email?: string;
   phoneNumber?: string;
   password?: string;
   location?: string;
@@ -140,7 +138,6 @@ const generateStrongPassword = (length = 14): string => {
 const buildDefaultFormValues = (roleId = EMPTY_ROLE_VALUE): FormValues => ({
   firstName: '',
   lastName: '',
-  email: '',
   phoneNumber: '',
   password: '',
   location: '',
@@ -191,7 +188,6 @@ export function UserFormDialog({
       setFormValues({
         firstName: defaultUser.firstName,
         lastName: defaultUser.lastName,
-        email: defaultUser.email,
         phoneNumber: parsedPhoneNumber.localNumber,
         password: '',
         location: defaultUser.location ?? '',
@@ -272,7 +268,6 @@ export function UserFormDialog({
     const candidatePayload = {
       firstName: formValues.firstName,
       lastName: formValues.lastName,
-      email: formValues.email,
       phoneNumber: normalizedPhoneNumber,
       password: normalizedPassword || undefined,
       location: formValues.location,
@@ -296,7 +291,6 @@ export function UserFormDialog({
       setErrors({
         firstName: fieldErrors.firstName?.[0],
         lastName: fieldErrors.lastName?.[0],
-        email: fieldErrors.email?.[0],
         phoneNumber: fieldErrors.phoneNumber?.[0],
         password: fieldErrors.password?.[0],
         location: fieldErrors.location?.[0],
@@ -382,21 +376,6 @@ export function UserFormDialog({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <FormField labelKey="common.email" htmlFor="user-email" error={errors.email}>
-              <Input
-                id="user-email"
-                type="email"
-                value={formValues.email}
-                placeholder={t('users.form.emailPlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    email: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
             <FormField
               labelKey="users.form.phoneNumber"
               htmlFor="user-phone-number"
