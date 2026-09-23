@@ -369,7 +369,8 @@ export function UserFormDialog({
 
                 <Input
                   id="user-phone-number"
-                  inputMode="tel"
+                  type="text"
+                  inputMode="numeric"
                   dir="ltr"
                   className="min-w-0 text-left"
                   value={formValues.phoneNumber}
