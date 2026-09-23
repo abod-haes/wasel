@@ -15,7 +15,6 @@ export interface User {
   firstName: string;
   lastName: string;
   name: string;
-  email: string;
   phoneNumber: string;
   location?: string;
   latitude: number | null;
@@ -38,7 +37,6 @@ export interface UsersFilter {
 export interface UserFormInput {
   firstName: string;
   lastName: string;
-  email: string;
   phoneNumber: string;
   password?: string;
   location?: string;
@@ -56,7 +54,6 @@ export interface UpdateUserInput {
   id: string;
   firstName?: string;
   lastName?: string;
-  email?: string;
   phoneNumber?: string;
   password?: string;
   location?: string;
