@@ -60,7 +60,10 @@
     "settingsPreferences": "Preferences",
     "login": "Login",
     "otpAdmin": "OTP & WhatsApp",
-    "settingsPricing": "Pricing & Exchange Rates"
+    "settingsPricing": "Pricing & Exchange Rates",
+    "storeDashboard": "Store Dashboard",
+    "myProducts": "My Products",
+    "myOrders": "My Orders"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
