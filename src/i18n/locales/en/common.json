@@ -118,6 +118,17 @@
       "orderCancelled": "Order was cancelled",
       "orderUpdated": "Order status updated",
       "notificationSent": "Sent a notification"
+    },
+    "marketTitle": "Store Dashboard",
+    "marketDescription": "Manage your store products and catalog data",
+    "marketWelcome": "Store account",
+    "marketWelcomeDescription": "Store-owner mode is enabled for this account",
+    "marketHint": "Products are scoped to your store, and new or edited products are automatically assigned to your account. The orders view is prepared for store-scoped access once the backend authorizes the Market role.",
+    "marketCards": {
+      "products": "Store products",
+      "productsWithImages": "Products with images",
+      "variants": "Variants",
+      "categories": "Used categories"
     }
   },
   "users": {
@@ -301,7 +312,9 @@
     "empty": {
       "title": "No orders found",
       "description": "Try changing filters to find matching orders"
-    }
+    },
+    "marketTitle": "My Store Orders",
+    "marketDescription": "View only orders that contain products from your store"
   },
   "notifications": {
     "title": "Notifications",
