@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DataTable } from '@/components/shared';
+import { formatFullPhoneNumber } from '@/constants/phone';
 import { Badge, Button } from '@/components/ui';
 import {
   ORDER_STATUS_VALUES,
@@ -71,7 +72,9 @@ export function OrdersTable({
           return (
             <div>
               <p className="font-medium">{customerName || t('orders.unknownCustomer')}</p>
-              <p className="text-xs text-muted-foreground">{order.userPhoneNumber || '-'}</p>
+              <p className="text-xs text-muted-foreground" dir="ltr">
+                {formatFullPhoneNumber(order.userCountryCallingCode, order.userPhoneNumber) || '-'}
+              </p>
             </div>
           );
         },
