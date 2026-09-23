@@ -147,7 +147,13 @@
       "passwordEditHint": "اتركها فارغة للإبقاء على كلمة المرور الحالية.",
       "locationPlaceholder": "أدخل الموقع",
       "latitudePlaceholder": "مثال: 33.5138",
-      "longitudePlaceholder": "مثال: 36.2765"
+      "longitudePlaceholder": "مثال: 36.2765",
+      "phoneCountryCode": "رمز الدولة",
+      "countryCodePlaceholder": "الرمز",
+      "generatePassword": "توليد",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "openGoogleMaps": "فتح الموقع في Google Maps"
     },
     "status": {
       "active": "نشط",
