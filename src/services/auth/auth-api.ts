@@ -47,7 +47,6 @@ const mapApiUser = (apiUser: LoginApiUserResponse): AuthUser => {
     firstName,
     lastName,
     name,
-    email: resolveString(apiUser.Email, apiUser.email),
     phoneNumber,
     phoneNumberVerified: Boolean(apiUser.PhoneNumberVerified ?? apiUser.phoneNumberVerified),
     phoneNumberVerifiedAt:
@@ -91,7 +90,6 @@ const buildMockSession = (credentials: LoginPayload): AuthSession => {
       firstName: '',
       lastName: '',
       name: normalizedPhoneNumber,
-      email: '',
       phoneNumber: normalizedPhoneNumber,
       phoneNumberVerified: true,
       phoneNumberVerifiedAt: now.toISOString(),
