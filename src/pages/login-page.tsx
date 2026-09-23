@@ -152,7 +152,7 @@ export default function LoginPage(): React.JSX.Element {
 
                 <Input
                   id="phone-number"
-                  type="tel"
+                  type="text"
                   inputMode="numeric"
                   dir="ltr"
                   className="min-w-0 text-left"
