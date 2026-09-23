@@ -22,6 +22,7 @@ const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
 const OtpAdminPage = lazy(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazy(() => import('@/features/settings/pages/settings-page'));
+const PricingSettingsPage = lazy(() => import('@/features/settings/pages/pricing-settings-page'));
 const SettingsPreferencesPage = lazy(
   () => import('@/features/settings/pages/settings-preferences-page')
 );
@@ -182,6 +183,17 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.settingsGeneral',
+            },
+          },
+          {
+            path: ROUTES.settingsPricing,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsView}>
+                {withSuspense(<PricingSettingsPage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'nav.settingsPricing',
             },
           },
           {
