@@ -58,7 +58,8 @@
     "settings": "Settings",
     "settingsGeneral": "General",
     "settingsPreferences": "Preferences",
-    "login": "Login"
+    "login": "Login",
+    "otpAdmin": "OTP & WhatsApp"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
@@ -93,7 +94,8 @@
     "errors": {
       "phoneNumberRequired": "Phone number is required",
       "passwordRequired": "Password is required"
-    }
+    },
+    "countryCallingCodeLabel": "Country code"
   },
   "dashboard": {
     "title": "Overview",
@@ -367,5 +369,135 @@
   "confirmDialog": {
     "title": "Are you sure?",
     "description": "This action cannot be undone"
+  },
+  "otpAdmin": {
+    "title": "OTP & WhatsApp",
+    "description": "Manage WhatsApp connectivity, OTP requests, audit logs, clients, and API keys",
+    "refresh": "Refresh all",
+    "metrics": {
+      "whatsapp": "WhatsApp status",
+      "worker": "Worker status",
+      "socket": "WhatsApp socket",
+      "sent": "OTP sent today",
+      "verified": "OTP verified today",
+      "failed": "Failed / unknown today",
+      "clients": "Active OTP clients",
+      "apiKeys": "Active API keys"
+    },
+    "health": {
+      "up": "Up",
+      "down": "Down"
+    },
+    "sessionStatus": {
+      "DISCONNECTED": "Disconnected",
+      "STARTING": "Starting",
+      "QR_READY": "QR ready",
+      "CONNECTING": "Connecting",
+      "READY": "Ready",
+      "RECONNECTING": "Reconnecting",
+      "LOGGED_OUT": "Logged out",
+      "ERROR": "Error"
+    },
+    "session": {
+      "title": "WhatsApp session",
+      "description": "The single server-configured WhatsApp session used for OTP delivery",
+      "account": "Connected account",
+      "lastConnected": "Last connected",
+      "scanQr": "Scan this QR code from WhatsApp",
+      "qrHint": "The QR is temporary and refreshes automatically from the latest server status.",
+      "qrAlt": "WhatsApp pairing QR code",
+      "start": "Start / Pair",
+      "reconnect": "Reconnect",
+      "stop": "Stop",
+      "logout": "WhatsApp logout",
+      "loadError": "Could not load WhatsApp session status.",
+      "logoutConfirmTitle": "Log out of WhatsApp?",
+      "logoutConfirmDescription": "Stored authentication will be cleared and the next start will require a new QR pairing."
+    },
+    "otp": {
+      "title": "OTP requests",
+      "description": "Monitor verification requests, send status, and verification state",
+      "phone": "Phone",
+      "purpose": "Purpose",
+      "attempts": "Attempts",
+      "createdAt": "Created at",
+      "details": "Details",
+      "detailsTitle": "OTP request details",
+      "providerId": "Provider message ID",
+      "ipAddress": "IP address",
+      "expiresAt": "Expires at",
+      "verifiedAt": "Verified at",
+      "failureReason": "Failure reason",
+      "notFound": "Request not found."
+    },
+    "otpStatus": {
+      "CREATED": "Created",
+      "QUEUED": "Queued",
+      "SENDING": "Sending",
+      "SENT": "Sent",
+      "VERIFIED": "Verified",
+      "EXPIRED": "Expired",
+      "FAILED": "Failed",
+      "BLOCKED": "Blocked",
+      "UNKNOWN": "Unknown"
+    },
+    "purposes": {
+      "login": "Login",
+      "register": "Register",
+      "reset_password": "Reset password",
+      "verify_phone": "Verify phone",
+      "confirm_action": "Confirm action"
+    },
+    "audit": {
+      "title": "Audit logs",
+      "description": "Administrative activity for OTP and WhatsApp operations",
+      "action": "Action",
+      "actor": "Actor",
+      "resource": "Resource",
+      "createdAt": "Created at"
+    },
+    "clients": {
+      "title": "OTP clients",
+      "description": "Applications allowed to use the OTP service",
+      "create": "Create client",
+      "createTitle": "Create OTP client",
+      "createDescription": "Set the client identity and OTP rate limits.",
+      "name": "Client name",
+      "slug": "Slug",
+      "hourlyLimit": "Hourly limit",
+      "dailyLimit": "Daily limit",
+      "hourShort": "hour",
+      "dayShort": "day",
+      "enable": "Enable",
+      "disable": "Disable",
+      "invalid": "Check the client name and slug."
+    },
+    "apiKeys": {
+      "title": "OTP API keys",
+      "description": "Manage service-to-service access keys",
+      "create": "Create key",
+      "createTitle": "Create API key",
+      "createDescription": "The raw secret is shown only once after creation.",
+      "client": "Select client",
+      "name": "Key name",
+      "revoke": "Revoke",
+      "revokeConfirmTitle": "Revoke API key?",
+      "revokeConfirmDescription": "The key will be invalidated and can no longer be used.",
+      "secretTitle": "New API key secret",
+      "secretDescription": "Copy this secret now. It will not be shown again.",
+      "copy": "Copy key",
+      "copied": "API key copied",
+      "invalid": "Select a client and enter a key name."
+    },
+    "messages": {
+      "startQueued": "WhatsApp start request queued",
+      "reconnectQueued": "WhatsApp reconnect request queued",
+      "stopQueued": "WhatsApp stop request queued",
+      "logoutQueued": "WhatsApp logout request queued",
+      "clientCreated": "OTP client created",
+      "clientUpdated": "OTP client updated",
+      "apiKeyCreated": "API key created",
+      "apiKeyRevoked": "API key revoked"
+    }
   }
 }
