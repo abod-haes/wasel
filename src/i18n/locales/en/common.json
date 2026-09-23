@@ -9,7 +9,6 @@
     "update": "Update",
     "search": "Search",
     "name": "Name",
-    "email": "Email",
     "role": "Role",
     "status": "Status",
     "actions": "Actions",
@@ -124,7 +123,7 @@
     "createUser": "Create User",
     "editUser": "Edit User",
     "deleteUser": "Delete User",
-    "searchPlaceholder": "Search by name or email",
+    "searchPlaceholder": "Search by name or phone number",
     "table": {
       "lastLogin": "Last Login"
     },
@@ -141,7 +140,6 @@
       "noRole": "No role",
       "firstNamePlaceholder": "Enter first name",
       "lastNamePlaceholder": "Enter last name",
-      "emailPlaceholder": "Enter work email",
       "phoneNumberPlaceholder": "Enter phone number",
       "passwordPlaceholder": "Enter password",
       "passwordEditHint": "Leave blank to keep the current password.",
@@ -350,9 +348,7 @@
     "preferencesDescription": "Adjust interface behavior",
     "form": {
       "displayName": "Display Name",
-      "email": "Contact Email",
-      "compactSidebar": "Compact sidebar",
-      "emailNotifications": "Email notifications"
+      "compactSidebar": "Compact sidebar"
     },
     "messages": {
       "saved": "Settings saved"
