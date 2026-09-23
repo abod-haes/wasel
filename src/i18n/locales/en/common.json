@@ -59,7 +59,8 @@
     "settingsGeneral": "General",
     "settingsPreferences": "Preferences",
     "login": "Login",
-    "otpAdmin": "OTP & WhatsApp"
+    "otpAdmin": "OTP & WhatsApp",
+    "settingsPricing": "Pricing & Exchange Rates"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
@@ -354,7 +355,9 @@
     },
     "messages": {
       "saved": "Settings saved"
-    }
+    },
+    "pricingTitle": "Pricing & Exchange Rates",
+    "pricingDescription": "Manage currency exchange rates and delivery pricing in one place"
   },
   "pages": {
     "unauthorized": {
