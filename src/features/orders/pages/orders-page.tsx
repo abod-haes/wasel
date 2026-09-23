@@ -1,6 +1,8 @@
+import axios from 'axios';
 import { useState } from 'react';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
+import { Card, CardContent } from '@/components/ui';
 import { OrderFilters } from '@/features/orders/components/order-filters';
 import { OrdersTable } from '@/features/orders/components/orders-table';
 import {
@@ -10,6 +12,8 @@ import {
 } from '@/features/orders/hooks/use-orders-query';
 import { type Order, type OrdersFilter } from '@/features/orders/types/order-types';
 import type { PaginationParams } from '@/types/api';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 
 const defaultFilters: OrdersFilter = {
   search: '',
@@ -17,6 +21,8 @@ const defaultFilters: OrdersFilter = {
 };
 
 export default function OrdersPage(): React.JSX.Element {
+  const currentUser = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
   const [filters, setFilters] = useState<OrdersFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [acceptOrder, setAcceptOrder] = useState<Order | null>(null);
@@ -27,6 +33,24 @@ export default function OrdersPage(): React.JSX.Element {
   const rejectOrderMutation = useRejectOrderMutation();
 
   if (ordersQuery.isError) {
+    const isForbidden = axios.isAxiosError(ordersQuery.error) && ordersQuery.error.response?.status === 403;
+
+    if (isMarket && isForbidden) {
+      return (
+        <PageContainer>
+          <SectionHeader titleKey="orders.marketTitle" descriptionKey="orders.marketDescription" />
+          <Card className="border-amber-500/25 bg-amber-500/5">
+            <CardContent className="space-y-2 p-5">
+              <p className="font-semibold">واجهة طلبات المتجر جاهزة، لكن الباك الحالي يمنع دور Market من قراءة قائمة الطلبات.</p>
+              <p className="text-sm text-muted-foreground">
+                يلزم السماح لدور Market بقراءة الطلبات التابعة لـ marketUserId الحالي من السيرفر. لن نعرض طلبات متاجر أخرى كحل مؤقت.
+              </p>
+            </CardContent>
+          </Card>
+        </PageContainer>
+      );
+    }
+
     return <ErrorState onRetry={() => void ordersQuery.refetch()} />;
   }
 
@@ -56,7 +80,10 @@ export default function OrdersPage(): React.JSX.Element {
 
   return (
     <PageContainer>
-      <SectionHeader titleKey="orders.title" descriptionKey="orders.description" />
+      <SectionHeader
+        titleKey={isMarket ? 'orders.marketTitle' : 'orders.title'}
+        descriptionKey={isMarket ? 'orders.marketDescription' : 'orders.description'}
+      />
 
       <OrderFilters
         filters={filters}
@@ -76,12 +103,14 @@ export default function OrdersPage(): React.JSX.Element {
         onAccept={setAcceptOrder}
         onReject={setRejectOrder}
         isMutating={acceptOrderMutation.isPending || rejectOrderMutation.isPending}
+        canManage={!isMarket}
         pagination={ordersQuery.data}
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
       />
 
-      <ConfirmDialog
+      {!isMarket ? (
+        <ConfirmDialog
         open={Boolean(acceptOrder)}
         onOpenChange={(open) => {
           if (!open) {
@@ -94,8 +123,10 @@ export default function OrdersPage(): React.JSX.Element {
         confirmLabelKey="orders.accept"
         isLoading={acceptOrderMutation.isPending}
       />
+      ) : null}
 
-      <ConfirmDialog
+      {!isMarket ? (
+        <ConfirmDialog
         open={Boolean(rejectOrder)}
         onOpenChange={(open) => {
           if (!open) {
@@ -108,6 +139,7 @@ export default function OrdersPage(): React.JSX.Element {
         confirmLabelKey="orders.reject"
         isLoading={rejectOrderMutation.isPending}
       />
+      ) : null}
     </PageContainer>
   );
 }
