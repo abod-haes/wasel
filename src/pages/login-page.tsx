@@ -159,7 +159,7 @@ export default function LoginPage(): React.JSX.Element {
                   value={credentials.phoneNumber}
                   autoComplete="tel-national"
                   onChange={(event) =>
-                    setFieldValue('phoneNumber', event.target.value.replace(/\D/g, '').replace(/^0+/, ''))
+                    setFieldValue('phoneNumber', event.target.value.replace(/\D/g, ''))
                   }
                   placeholder={t('auth.phoneNumberPlaceholder')}
                 />
