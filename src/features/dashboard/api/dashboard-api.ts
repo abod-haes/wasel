@@ -31,6 +31,17 @@ interface OrderApiResponse {
   userLastName?: string;
 }
 
+interface ProductApiResponse {
+  Id?: string;
+  id?: string;
+  Images?: unknown[];
+  images?: unknown[];
+  Variants?: unknown[];
+  variants?: unknown[];
+  Categories?: Array<{ Id?: string; id?: string }>;
+  categories?: Array<{ Id?: string; id?: string }>;
+}
+
 interface NotificationApiResponse {
   Id?: string;
   id?: string;
@@ -96,6 +107,66 @@ const buildDashboardActivityId = (prefix: string): string => {
 };
 
 export const dashboardApi = {
+  async getMarketSummary(marketUserId: string): Promise<DashboardSummary> {
+    const { data } = await apiClient.get<PaginatedApiResponse<ProductApiResponse>>('/api/Products', {
+      params: {
+        page: 1,
+        pageSize: 100,
+        includeCategories: true,
+        marketUserId,
+      },
+    });
+
+    const products = getPaginatedItems(data);
+    const categoryIds = new Set<string>();
+    let variantsCount = 0;
+    let productsWithImages = 0;
+
+    products.forEach((product) => {
+      const images = product.Images ?? product.images ?? [];
+      const variants = product.Variants ?? product.variants ?? [];
+      const categories = product.Categories ?? product.categories ?? [];
+
+      if (images.length > 0) productsWithImages += 1;
+      variantsCount += variants.length;
+
+      categories.forEach((category) => {
+        const categoryId = category.Id ?? category.id;
+        if (categoryId) categoryIds.add(categoryId);
+      });
+    });
+
+    return {
+      kpis: [
+        {
+          id: 'market-products',
+          labelKey: 'dashboard.marketCards.products',
+          value: getPaginatedTotalCount(data),
+          delta: 0,
+        },
+        {
+          id: 'market-products-images',
+          labelKey: 'dashboard.marketCards.productsWithImages',
+          value: productsWithImages,
+          delta: 0,
+        },
+        {
+          id: 'market-variants',
+          labelKey: 'dashboard.marketCards.variants',
+          value: variantsCount,
+          delta: 0,
+        },
+        {
+          id: 'market-categories',
+          labelKey: 'dashboard.marketCards.categories',
+          value: categoryIds.size,
+          delta: 0,
+        },
+      ],
+      activity: [],
+    };
+  },
+
   async getSummary(): Promise<DashboardSummary> {
     const [usersResponse, ordersResponse, notificationsResponse] = await Promise.all([
       apiClient.get<PaginatedApiResponse<UserApiResponse>>('/api/Users', {
