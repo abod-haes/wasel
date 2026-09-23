@@ -27,8 +27,6 @@ interface UserApiResponse {
   firstName?: string;
   LastName?: string;
   lastName?: string;
-  Email?: string;
-  email?: string;
   PhoneNumber?: string;
   phoneNumber?: string;
   Location?: string;
