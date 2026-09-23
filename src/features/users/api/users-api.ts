@@ -1,3 +1,4 @@
+import { DEFAULT_COUNTRY_CALLING_CODE, formatFullPhoneNumber, normalizeCountryCallingCode, normalizeNationalPhoneNumber } from '@/constants/phone';
 import { env } from '@/env';
 import { createUserSchema, updateUserSchema } from '@/features/users/schemas/user-form-schema';
 import type {
@@ -27,6 +28,8 @@ interface UserApiResponse {
   firstName?: string;
   LastName?: string;
   lastName?: string;
+  CountryCallingCode?: string;
+  countryCallingCode?: string;
   PhoneNumber?: string;
   phoneNumber?: string;
   Location?: string;
@@ -50,6 +53,7 @@ interface UserApiResponse {
 interface CreateUserRequest {
   firstName: string;
   lastName: string;
+  countryCallingCode: string;
   phoneNumber: string;
   password: string;
   location?: string;
@@ -62,6 +66,7 @@ interface CreateUserRequest {
 interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
+  countryCallingCode?: string;
   phoneNumber?: string;
   password?: string;
   location?: string;
@@ -99,6 +104,7 @@ const createMockUser = (
   id: string,
   firstName: string,
   lastName: string,
+  countryCallingCode: string,
   phoneNumber: string,
   roleKey: UserRole,
   phoneNumberVerified: boolean,
@@ -112,6 +118,7 @@ const createMockUser = (
     firstName,
     lastName,
     name: `${firstName} ${lastName}`.trim(),
+    countryCallingCode,
     phoneNumber,
     location: undefined,
     latitude: null,
@@ -131,7 +138,8 @@ let usersDb: User[] = [
     'u-1001',
     'سارة',
     'ووكر',
-    '+963944000001',
+    '+963',
+    '944000001',
     'admin',
     true,
     '2026-01-12T08:00:00.000Z',
@@ -141,7 +149,8 @@ let usersDb: User[] = [
     'u-1002',
     'عمر',
     'حداد',
-    '+963944000002',
+    '+963',
+    '944000002',
     'editor',
     true,
     '2026-02-01T09:00:00.000Z',
@@ -151,7 +160,8 @@ let usersDb: User[] = [
     'u-1003',
     'لينا',
     'جورج',
-    '+963944000003',
+    '+963',
+    '944000003',
     'viewer',
     false,
     '2026-03-05T10:00:00.000Z',
@@ -161,7 +171,8 @@ let usersDb: User[] = [
     'u-1004',
     'يزن',
     'صالح',
-    '+963944000004',
+    '+963',
+    '944000004',
     'viewer',
     false,
     '2026-01-28T09:30:00.000Z',
@@ -181,7 +192,7 @@ const applyFilters = (users: User[], filters: UsersFilter): User[] => {
     const matchesSearch =
       searchValue.length === 0 ||
       user.name.toLowerCase().includes(searchValue) ||
-      user.phoneNumber.toLowerCase().includes(searchValue);
+      formatFullPhoneNumber(user.countryCallingCode, user.phoneNumber).toLowerCase().includes(searchValue);
 
     const matchesRole = filters.role === 'all' || user.role === filters.role;
     const matchesStatus = filters.status === 'all' || user.status === filters.status;
@@ -276,7 +287,12 @@ const mapRoleResponse = (role: UserRoleApiResponse): UserRoleAssignment | null =
 const mapUserResponse = (user: UserApiResponse): User => {
   const firstName = resolveOptionalString(user.FirstName, user.firstName) ?? '';
   const lastName = resolveOptionalString(user.LastName, user.lastName) ?? '';
-  const phoneNumber = resolveOptionalString(user.PhoneNumber, user.phoneNumber) ?? '';
+  const countryCallingCode = normalizeCountryCallingCode(
+    resolveOptionalString(user.CountryCallingCode, user.countryCallingCode) ?? DEFAULT_COUNTRY_CALLING_CODE
+  );
+  const phoneNumber = normalizeNationalPhoneNumber(
+    resolveOptionalString(user.PhoneNumber, user.phoneNumber) ?? ''
+  );
   const fullName = `${firstName} ${lastName}`.trim();
   const mappedRoles =
     (user.Roles ?? user.roles ?? [])
@@ -297,7 +313,8 @@ const mapUserResponse = (user: UserApiResponse): User => {
     id: resolveOptionalString(user.Id, user.id, phoneNumber, fullName) ?? '',
     firstName,
     lastName,
-    name: fullName || phoneNumber || 'User',
+    name: fullName || formatFullPhoneNumber(countryCallingCode, phoneNumber) || 'User',
+    countryCallingCode,
     phoneNumber,
     location: resolveOptionalString(user.Location, user.location),
     latitude: resolveNumber(user.Latitude, user.latitude),
@@ -363,6 +380,7 @@ const buildCreateUserRequest = (payload: CreateUserInput): CreateUserRequest => 
   const requestPayload: CreateUserRequest = {
     firstName: parsed.firstName,
     lastName: parsed.lastName,
+    countryCallingCode: parsed.countryCallingCode,
     phoneNumber: parsed.phoneNumber,
     password: parsed.password,
     phoneNumberVerified: Boolean(parsed.phoneNumberVerified),
@@ -397,6 +415,10 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
 
   if (parsed.lastName != null) {
     requestPayload.lastName = parsed.lastName;
+  }
+
+  if (parsed.countryCallingCode != null) {
+    requestPayload.countryCallingCode = parsed.countryCallingCode;
   }
 
   if (parsed.phoneNumber != null) {
@@ -487,6 +509,7 @@ export const usersApi = {
         firstName: requestPayload.firstName,
         lastName: requestPayload.lastName,
         name: `${requestPayload.firstName} ${requestPayload.lastName}`.trim(),
+        countryCallingCode: requestPayload.countryCallingCode,
         phoneNumber: requestPayload.phoneNumber,
         location: requestPayload.location,
         latitude: requestPayload.latitude ?? null,
@@ -535,6 +558,10 @@ export const usersApi = {
           nextUser.lastName = requestPayload.lastName;
         }
 
+        if (requestPayload.countryCallingCode != null) {
+          nextUser.countryCallingCode = requestPayload.countryCallingCode;
+        }
+
         if (requestPayload.phoneNumber != null) {
           nextUser.phoneNumber = requestPayload.phoneNumber;
         }
@@ -562,7 +589,9 @@ export const usersApi = {
           nextUser.roles = mapRoleIdsToAssignments(requestPayload.roleIds);
         }
 
-        nextUser.name = `${nextUser.firstName} ${nextUser.lastName}`.trim() || nextUser.phoneNumber;
+        nextUser.name =
+          `${nextUser.firstName} ${nextUser.lastName}`.trim() ||
+          formatFullPhoneNumber(nextUser.countryCallingCode, nextUser.phoneNumber);
         nextUser.role = resolvePrimaryRole(nextUser.roles);
         nextUser.status = nextUser.phoneNumberVerified ? 'active' : 'invited';
         nextUser.lastLogin = resolveIsoDate(nextUser.phoneNumberVerifiedAt ?? nextUser.createdAt);
