@@ -1,4 +1,5 @@
 import {
+  BadgeDollarSign,
   Bell,
   Bookmark,
   ClipboardList,
@@ -91,6 +92,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         labelKey: 'nav.settingsGeneral',
         to: ROUTES.settings,
         icon: Settings,
+        permission: PERMISSIONS.settingsView,
+      },
+      {
+        key: 'settings-pricing',
+        labelKey: 'nav.settingsPricing',
+        to: ROUTES.settingsPricing,
+        icon: BadgeDollarSign,
         permission: PERMISSIONS.settingsView,
       },
       {
