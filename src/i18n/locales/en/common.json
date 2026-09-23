@@ -147,7 +147,13 @@
       "passwordEditHint": "Leave blank to keep the current password.",
       "locationPlaceholder": "Enter location",
       "latitudePlaceholder": "e.g. 33.5138",
-      "longitudePlaceholder": "e.g. 36.2765"
+      "longitudePlaceholder": "e.g. 36.2765",
+      "phoneCountryCode": "Country code",
+      "countryCodePlaceholder": "Code",
+      "generatePassword": "Generate",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "openGoogleMaps": "Open location in Google Maps"
     },
     "status": {
       "active": "Active",
