@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff, MapPin, Sparkles } from 'lucide-react';
 
 import { FormField } from '@/components/shared/FormField';
 import {
@@ -63,6 +64,78 @@ interface FormErrors {
 }
 
 const EMPTY_ROLE_VALUE = 'none';
+const DEFAULT_COUNTRY_CODE = '+963';
+
+const PHONE_COUNTRY_CODES = [
+  { value: '+963', label: '🇸🇾 +963' },
+  { value: '+965', label: '🇰🇼 +965' },
+  { value: '+966', label: '🇸🇦 +966' },
+  { value: '+971', label: '🇦🇪 +971' },
+  { value: '+974', label: '🇶🇦 +974' },
+  { value: '+973', label: '🇧🇭 +973' },
+  { value: '+968', label: '🇴🇲 +968' },
+  { value: '+964', label: '🇮🇶 +964' },
+  { value: '+961', label: '🇱🇧 +961' },
+  { value: '+962', label: '🇯🇴 +962' },
+  { value: '+90', label: '🇹🇷 +90' },
+] as const;
+
+type PhoneCountryCode = (typeof PHONE_COUNTRY_CODES)[number]['value'];
+
+const splitPhoneNumber = (
+  phoneNumber: string
+): { countryCode: PhoneCountryCode; localNumber: string } => {
+  const compactPhoneNumber = phoneNumber.replace(/\s+/g, '');
+  const matchedCountry = [...PHONE_COUNTRY_CODES]
+    .sort((first, second) => second.value.length - first.value.length)
+    .find((option) => compactPhoneNumber.startsWith(option.value));
+
+  if (!matchedCountry) {
+    return {
+      countryCode: DEFAULT_COUNTRY_CODE,
+      localNumber: compactPhoneNumber.replace(/^\+/, ''),
+    };
+  }
+
+  return {
+    countryCode: matchedCountry.value,
+    localNumber: compactPhoneNumber.slice(matchedCountry.value.length),
+  };
+};
+
+const getSecureRandomIndex = (max: number): number => {
+  const value = new Uint32Array(1);
+  crypto.getRandomValues(value);
+  return value[0] % max;
+};
+
+const generateStrongPassword = (length = 14): string => {
+  const characterGroups = [
+    'ABCDEFGHJKLMNPQRSTUVWXYZ',
+    'abcdefghijkmnopqrstuvwxyz',
+    '23456789',
+    '!@#$%&*?',
+  ];
+  const passwordCharacters = characterGroups.map(
+    (group) => group[getSecureRandomIndex(group.length)]
+  );
+  const allCharacters = characterGroups.join('');
+
+  while (passwordCharacters.length < length) {
+    passwordCharacters.push(allCharacters[getSecureRandomIndex(allCharacters.length)]);
+  }
+
+  for (let index = passwordCharacters.length - 1; index > 0; index -= 1) {
+    const swapIndex = getSecureRandomIndex(index + 1);
+    [passwordCharacters[index], passwordCharacters[swapIndex]] = [
+      passwordCharacters[swapIndex],
+      passwordCharacters[index],
+    ];
+  }
+
+  return passwordCharacters.join('');
+};
+
 
 const buildDefaultFormValues = (roleId = EMPTY_ROLE_VALUE): FormValues => ({
   firstName: '',
@@ -99,6 +172,8 @@ export function UserFormDialog({
 
   const [formValues, setFormValues] = useState<FormValues>(buildDefaultFormValues());
   const [errors, setErrors] = useState<FormErrors>({});
+  const [phoneCountryCode, setPhoneCountryCode] = useState<PhoneCountryCode>(DEFAULT_COUNTRY_CODE);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const defaultRoleId = useMemo(() => roleOptions[0]?.id ?? EMPTY_ROLE_VALUE, [roleOptions]);
 
@@ -108,13 +183,16 @@ export function UserFormDialog({
     }
 
     setErrors({});
+    setIsPasswordVisible(false);
 
     if (mode === 'edit' && defaultUser) {
+      const parsedPhoneNumber = splitPhoneNumber(defaultUser.phoneNumber);
+      setPhoneCountryCode(parsedPhoneNumber.countryCode);
       setFormValues({
         firstName: defaultUser.firstName,
         lastName: defaultUser.lastName,
         email: defaultUser.email,
-        phoneNumber: defaultUser.phoneNumber,
+        phoneNumber: parsedPhoneNumber.localNumber,
         password: '',
         location: defaultUser.location ?? '',
         latitude: defaultUser.latitude != null ? String(defaultUser.latitude) : '',
@@ -125,6 +203,7 @@ export function UserFormDialog({
       return;
     }
 
+    setPhoneCountryCode(DEFAULT_COUNTRY_CODE);
     setFormValues(buildDefaultFormValues(defaultRoleId));
   }, [defaultRoleId, defaultUser, mode, open]);
 
@@ -149,10 +228,42 @@ export function UserFormDialog({
     return mode === 'create' ? 'users.createUser' : 'users.editUser';
   }, [mode]);
 
+  const openGoogleMaps = (): void => {
+    const latitude = formValues.latitude.trim();
+    const longitude = formValues.longitude.trim();
+    const hasCoordinates =
+      latitude.length > 0 &&
+      longitude.length > 0 &&
+      Number.isFinite(Number(latitude)) &&
+      Number.isFinite(Number(longitude));
+    const query = hasCoordinates
+      ? `${latitude},${longitude}`
+      : formValues.location.trim();
+    const mapsUrl = query
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+      : 'https://www.google.com/maps';
+
+    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const generatePassword = (): void => {
+    setFormValues((previous) => ({
+      ...previous,
+      password: generateStrongPassword(),
+    }));
+    setIsPasswordVisible(true);
+    setErrors((previous) => ({
+      ...previous,
+      password: undefined,
+    }));
+  };
+
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
     const normalizedPassword = formValues.password.trim();
+    const normalizedLocalPhoneNumber = formValues.phoneNumber.replace(/\D/g, '').replace(/^0+/, '');
+    const normalizedPhoneNumber = `${phoneCountryCode}${normalizedLocalPhoneNumber}`;
     const normalizedLatitude = formValues.latitude.trim();
     const normalizedLongitude = formValues.longitude.trim();
     const parsedLatitude = normalizedLatitude.length > 0 ? Number(normalizedLatitude) : undefined;
@@ -162,7 +273,7 @@ export function UserFormDialog({
       firstName: formValues.firstName,
       lastName: formValues.lastName,
       email: formValues.email,
-      phoneNumber: formValues.phoneNumber,
+      phoneNumber: normalizedPhoneNumber,
       password: normalizedPassword || undefined,
       location: formValues.location,
       latitude: parsedLatitude,
@@ -292,17 +403,41 @@ export function UserFormDialog({
               required
               error={errors.phoneNumber}
             >
-              <Input
-                id="user-phone-number"
-                value={formValues.phoneNumber}
-                placeholder={t('users.form.phoneNumberPlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    phoneNumber: event.target.value,
-                  }))
-                }
-              />
+              <div className="flex gap-2" dir="ltr">
+                <Select
+                  value={phoneCountryCode}
+                  onValueChange={(value) => setPhoneCountryCode(value as PhoneCountryCode)}
+                >
+                  <SelectTrigger
+                    className="w-[118px] shrink-0 rounded-2xl"
+                    aria-label={t('users.form.phoneCountryCode')}
+                  >
+                    <SelectValue placeholder={t('users.form.countryCodePlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PHONE_COUNTRY_CODES.map((country) => (
+                      <SelectItem key={country.value} value={country.value}>
+                        {country.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  id="user-phone-number"
+                  inputMode="tel"
+                  dir="ltr"
+                  className="min-w-0 text-left"
+                  value={formValues.phoneNumber}
+                  placeholder={t('users.form.phoneNumberPlaceholder')}
+                  onChange={(event) =>
+                    setFormValues((previous) => ({
+                      ...previous,
+                      phoneNumber: event.target.value,
+                    }))
+                  }
+                />
+              </div>
             </FormField>
           </div>
 
@@ -314,18 +449,57 @@ export function UserFormDialog({
               descriptionKey={mode === 'edit' ? 'users.form.passwordEditHint' : undefined}
               error={errors.password}
             >
-              <Input
-                id="user-password"
-                type="password"
-                value={formValues.password}
-                placeholder={t('users.form.passwordPlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    password: event.target.value,
-                  }))
-                }
-              />
+              <div className="flex gap-2">
+                <div className="relative min-w-0 flex-1">
+                  <Input
+                    id="user-password"
+                    type={isPasswordVisible ? 'text' : 'password'}
+                    className="pe-11"
+                    value={formValues.password}
+                    placeholder={t('users.form.passwordPlaceholder')}
+                    onChange={(event) =>
+                      setFormValues((previous) => ({
+                        ...previous,
+                        password: event.target.value,
+                      }))
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute end-0 top-0 h-11 w-11 rounded-2xl"
+                    onClick={() => setIsPasswordVisible((visible) => !visible)}
+                    aria-label={
+                      isPasswordVisible
+                        ? t('users.form.hidePassword')
+                        : t('users.form.showPassword')
+                    }
+                    title={
+                      isPasswordVisible
+                        ? t('users.form.hidePassword')
+                        : t('users.form.showPassword')
+                    }
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 shrink-0 px-3"
+                  onClick={generatePassword}
+                  title={t('users.form.generatePassword')}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span>{t('users.form.generatePassword')}</span>
+                </Button>
+              </div>
             </FormField>
 
             <FormField labelKey="common.role" error={errors.roleId}>
@@ -361,17 +535,31 @@ export function UserFormDialog({
 
           <div className="grid gap-4 md:grid-cols-3">
             <FormField labelKey="users.form.location" htmlFor="user-location" error={errors.location}>
-              <Input
-                id="user-location"
-                value={formValues.location}
-                placeholder={t('users.form.locationPlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    location: event.target.value,
-                  }))
-                }
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="user-location"
+                  className="min-w-0"
+                  value={formValues.location}
+                  placeholder={t('users.form.locationPlaceholder')}
+                  onChange={(event) =>
+                    setFormValues((previous) => ({
+                      ...previous,
+                      location: event.target.value,
+                    }))
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={openGoogleMaps}
+                  aria-label={t('users.form.openGoogleMaps')}
+                  title={t('users.form.openGoogleMaps')}
+                >
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </div>
             </FormField>
 
             <FormField labelKey="users.form.latitude" htmlFor="user-latitude" error={errors.latitude}>
