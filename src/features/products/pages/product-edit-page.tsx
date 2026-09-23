@@ -10,16 +10,21 @@ import { ProductVariantsManager } from '@/features/products/components/product-v
 import { useProductQuery, useUpdateProductMutation } from '@/features/products/hooks/use-products-query';
 import { buildProductsListRoute } from '@/features/products/lib/product-list-url';
 import type { CreateProductInput } from '@/features/products/types/product-types';
+import { ROUTES } from '@/constants/routes';
+import { isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export default function ProductEditPage(): React.JSX.Element {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const productsListRoute = buildProductsListRoute(searchParams);
+  const currentUser = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(currentUser?.roles ?? []);
   const productQuery = useProductQuery(productId);
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery();
+  const marketsQuery = useMarketOptionsQuery(!isMarket);
   const updateProductMutation = useUpdateProductMutation();
 
   if (!productId) return <Navigate to={productsListRoute} replace />;
@@ -44,10 +49,17 @@ export default function ProductEditPage(): React.JSX.Element {
 
   const product = productQuery.data;
   if (!product) return <Navigate to={productsListRoute} replace />;
+  if (isMarket && (!currentUser || product.marketUserId !== currentUser.id)) {
+    return <Navigate to={ROUTES.unauthorized} replace />;
+  }
 
   const submitProduct = (payload: CreateProductInput): void => {
     updateProductMutation.mutate(
-      { id: productId, ...payload },
+      {
+        id: productId,
+        ...payload,
+        marketUserId: isMarket && currentUser ? currentUser.id : payload.marketUserId,
+      },
       { onSuccess: () => navigate(productsListRoute, { replace: true }) }
     );
   };
@@ -61,6 +73,8 @@ export default function ProductEditPage(): React.JSX.Element {
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        fixedMarketUserId={isMarket ? currentUser?.id : undefined}
+        fixedMarketName={isMarket ? currentUser?.name : undefined}
         onSubmit={submitProduct}
         onBack={() => navigate(productsListRoute, { replace: true })}
         isSubmitting={updateProductMutation.isPending}
