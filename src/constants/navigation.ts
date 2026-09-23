@@ -4,6 +4,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   Megaphone,
+  MessageCircleMore,
   Package,
   Settings,
   SlidersHorizontal,
@@ -71,6 +72,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     to: ROUTES.notifications,
     icon: Bell,
     permission: PERMISSIONS.notificationsView,
+  },
+  {
+    key: 'otp-admin',
+    labelKey: 'nav.otpAdmin',
+    to: ROUTES.otpAdmin,
+    icon: MessageCircleMore,
+    permission: PERMISSIONS.otpAdminView,
   },
   {
     key: 'settings',
