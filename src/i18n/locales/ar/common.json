@@ -60,7 +60,10 @@
     "settingsPreferences": "التفضيلات",
     "login": "تسجيل الدخول",
     "otpAdmin": "OTP وواتساب",
-    "settingsPricing": "التسعير وأسعار الصرف"
+    "settingsPricing": "التسعير وأسعار الصرف",
+    "storeDashboard": "لوحة المتجر",
+    "myProducts": "منتجاتي",
+    "myOrders": "طلباتي"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
