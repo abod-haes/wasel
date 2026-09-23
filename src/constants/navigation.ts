@@ -44,7 +44,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     labelKey: 'nav.brands',
     to: ROUTES.brands,
     icon: Bookmark,
-    permission: PERMISSIONS.productsView,
+    permission: PERMISSIONS.brandsView,
   },
   {
     key: 'categories',
