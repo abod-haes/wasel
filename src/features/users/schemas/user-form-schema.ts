@@ -9,7 +9,6 @@ const optionalTextSchema = z
 const userBaseSchema = z.object({
   firstName: z.string().trim().min(2),
   lastName: z.string().trim().min(2),
-  email: z.union([z.string().trim().email(), z.literal('')]),
   phoneNumber: z.string().trim().min(6),
   location: optionalTextSchema,
   latitude: z.number().min(-90).max(90).optional(),
