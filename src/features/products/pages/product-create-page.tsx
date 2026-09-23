@@ -13,12 +13,16 @@ import {
 } from '@/features/products/components/product-variants-manager';
 import { useCreateProductMutation } from '@/features/products/hooks/use-products-query';
 import type { CreateProductInput } from '@/features/products/types/product-types';
+import { isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export default function ProductCreatePage(): React.JSX.Element {
   const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(currentUser?.roles ?? []);
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery();
+  const marketsQuery = useMarketOptionsQuery(!isMarket);
   const createProductMutation = useCreateProductMutation();
   const [variants, setVariants] = useState<PendingProductVariant[]>([]);
 
@@ -38,6 +42,7 @@ export default function ProductCreatePage(): React.JSX.Element {
     createProductMutation.mutate(
       {
         ...payload,
+        marketUserId: isMarket && currentUser ? currentUser.id : payload.marketUserId,
         variants,
       },
       {
@@ -60,6 +65,8 @@ export default function ProductCreatePage(): React.JSX.Element {
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        fixedMarketUserId={isMarket ? currentUser?.id : undefined}
+        fixedMarketName={isMarket ? currentUser?.name : undefined}
         variants={variants}
         onSubmit={submitProduct}
         isSubmitting={
