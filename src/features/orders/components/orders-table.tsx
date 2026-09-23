@@ -18,6 +18,7 @@ interface OrdersTableProps {
   onAccept: (order: Order) => void;
   onReject: (order: Order) => void;
   isMutating?: boolean;
+  canManage?: boolean;
   pagination?: Pick<PaginatedData<Order>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
@@ -45,6 +46,7 @@ export function OrdersTable({
   onAccept,
   onReject,
   isMutating = false,
+  canManage = true,
   pagination,
   onPageChange,
   onPageSizeChange,
@@ -125,7 +127,7 @@ export function OrdersTable({
         className: 'text-end',
         headerClassName: 'text-end',
         renderCell: (order: Order) => {
-          if (order.status !== ORDER_STATUS_VALUES.pending) {
+          if (!canManage || order.status !== ORDER_STATUS_VALUES.pending) {
             return <span className="text-xs text-muted-foreground">-</span>;
           }
 
@@ -150,7 +152,7 @@ export function OrdersTable({
         },
       },
     ],
-    [isMutating, onAccept, onReject, t]
+    [canManage, isMutating, onAccept, onReject, t]
   );
 
   return (
