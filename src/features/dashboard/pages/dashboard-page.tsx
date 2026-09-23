@@ -16,9 +16,13 @@ import {
 } from '@/components/ui';
 import { KpiCard } from '@/features/dashboard/components/kpi-card';
 import { useDashboardSummaryQuery } from '@/features/dashboard/hooks/use-dashboard-query';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export default function DashboardPage(): React.JSX.Element {
   const { t } = useTranslation();
+  const user = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(user?.roles ?? []) && !isAdminRole(user?.roles ?? []);
   const summaryQuery = useDashboardSummaryQuery();
 
   if (summaryQuery.isLoading) {
@@ -31,7 +35,10 @@ export default function DashboardPage(): React.JSX.Element {
 
   return (
     <PageContainer>
-      <SectionHeader titleKey="dashboard.title" descriptionKey="dashboard.description" />
+      <SectionHeader
+        titleKey={isMarket ? 'dashboard.marketTitle' : 'dashboard.title'}
+        descriptionKey={isMarket ? 'dashboard.marketDescription' : 'dashboard.description'}
+      />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryQuery.data.kpis.map((kpi) => (
@@ -39,34 +46,48 @@ export default function DashboardPage(): React.JSX.Element {
         ))}
       </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.activity.title')}</CardTitle>
-          <CardDescription>{t('dashboard.activity.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.name')}</TableHead>
-                <TableHead>{t('common.actions')}</TableHead>
-                <TableHead className="text-end">{t('users.table.lastLogin')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {summaryQuery.data.activity.map((activity) => (
-                <TableRow key={activity.id}>
-                  <TableCell className="font-medium">{activity.actor}</TableCell>
-                  <TableCell>{t(activity.actionKey)}</TableCell>
-                  <TableCell className="text-end text-muted-foreground">
-                    {new Date(activity.createdAt).toLocaleString()}
-                  </TableCell>
+      {isMarket ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('dashboard.marketWelcome')}</CardTitle>
+            <CardDescription>{t('dashboard.marketWelcomeDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {t('dashboard.marketHint')}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('dashboard.activity.title')}</CardTitle>
+            <CardDescription>{t('dashboard.activity.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('common.name')}</TableHead>
+                  <TableHead>{t('common.actions')}</TableHead>
+                  <TableHead className="text-end">{t('users.table.lastLogin')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {summaryQuery.data.activity.map((activity) => (
+                  <TableRow key={activity.id}>
+                    <TableCell className="font-medium">{activity.actor}</TableCell>
+                    <TableCell>{t(activity.actionKey)}</TableCell>
+                    <TableCell className="text-end text-muted-foreground">
+                      {new Date(activity.createdAt).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </PageContainer>
   );
 }
