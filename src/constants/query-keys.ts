@@ -2,6 +2,7 @@ export const queryKeys = {
   dashboard: {
     root: ['dashboard'] as const,
     summary: () => ['dashboard', 'summary'] as const,
+    marketSummary: (marketUserId: string) => ['dashboard', 'market-summary', marketUserId] as const,
   },
   users: {
     root: ['users'] as const,
