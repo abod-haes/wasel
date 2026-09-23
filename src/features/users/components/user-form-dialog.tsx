@@ -4,6 +4,11 @@ import { Eye, EyeOff, MapPin, Sparkles } from 'lucide-react';
 
 import { FormField } from '@/components/shared/FormField';
 import {
+  DEFAULT_COUNTRY_CALLING_CODE,
+  PHONE_COUNTRY_CODES,
+  normalizeNationalPhoneNumber,
+} from '@/constants/phone';
+import {
   Button,
   Dialog,
   DialogContent,
@@ -62,45 +67,6 @@ interface FormErrors {
 }
 
 const EMPTY_ROLE_VALUE = 'none';
-const DEFAULT_COUNTRY_CODE = '+963';
-
-const PHONE_COUNTRY_CODES = [
-  { value: '+963', label: '🇸🇾 +963' },
-  { value: '+965', label: '🇰🇼 +965' },
-  { value: '+966', label: '🇸🇦 +966' },
-  { value: '+971', label: '🇦🇪 +971' },
-  { value: '+974', label: '🇶🇦 +974' },
-  { value: '+973', label: '🇧🇭 +973' },
-  { value: '+968', label: '🇴🇲 +968' },
-  { value: '+964', label: '🇮🇶 +964' },
-  { value: '+961', label: '🇱🇧 +961' },
-  { value: '+962', label: '🇯🇴 +962' },
-  { value: '+90', label: '🇹🇷 +90' },
-] as const;
-
-type PhoneCountryCode = (typeof PHONE_COUNTRY_CODES)[number]['value'];
-
-const splitPhoneNumber = (
-  phoneNumber: string
-): { countryCode: PhoneCountryCode; localNumber: string } => {
-  const compactPhoneNumber = phoneNumber.replace(/\s+/g, '');
-  const matchedCountry = [...PHONE_COUNTRY_CODES]
-    .sort((first, second) => second.value.length - first.value.length)
-    .find((option) => compactPhoneNumber.startsWith(option.value));
-
-  if (!matchedCountry) {
-    return {
-      countryCode: DEFAULT_COUNTRY_CODE,
-      localNumber: compactPhoneNumber.replace(/^\+/, ''),
-    };
-  }
-
-  return {
-    countryCode: matchedCountry.value,
-    localNumber: compactPhoneNumber.slice(matchedCountry.value.length),
-  };
-};
-
 const getSecureRandomIndex = (max: number): number => {
   const value = new Uint32Array(1);
   crypto.getRandomValues(value);
@@ -169,7 +135,7 @@ export function UserFormDialog({
 
   const [formValues, setFormValues] = useState<FormValues>(buildDefaultFormValues());
   const [errors, setErrors] = useState<FormErrors>({});
-  const [phoneCountryCode, setPhoneCountryCode] = useState<PhoneCountryCode>(DEFAULT_COUNTRY_CODE);
+  const [phoneCountryCode, setPhoneCountryCode] = useState(DEFAULT_COUNTRY_CALLING_CODE);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const defaultRoleId = useMemo(() => roleOptions[0]?.id ?? EMPTY_ROLE_VALUE, [roleOptions]);
@@ -183,12 +149,11 @@ export function UserFormDialog({
     setIsPasswordVisible(false);
 
     if (mode === 'edit' && defaultUser) {
-      const parsedPhoneNumber = splitPhoneNumber(defaultUser.phoneNumber);
-      setPhoneCountryCode(parsedPhoneNumber.countryCode);
+      setPhoneCountryCode(defaultUser.countryCallingCode || DEFAULT_COUNTRY_CALLING_CODE);
       setFormValues({
         firstName: defaultUser.firstName,
         lastName: defaultUser.lastName,
-        phoneNumber: parsedPhoneNumber.localNumber,
+        phoneNumber: defaultUser.phoneNumber,
         password: '',
         location: defaultUser.location ?? '',
         latitude: defaultUser.latitude != null ? String(defaultUser.latitude) : '',
@@ -199,7 +164,7 @@ export function UserFormDialog({
       return;
     }
 
-    setPhoneCountryCode(DEFAULT_COUNTRY_CODE);
+    setPhoneCountryCode(DEFAULT_COUNTRY_CALLING_CODE);
     setFormValues(buildDefaultFormValues(defaultRoleId));
   }, [defaultRoleId, defaultUser, mode, open]);
 
@@ -258,8 +223,7 @@ export function UserFormDialog({
     event.preventDefault();
 
     const normalizedPassword = formValues.password.trim();
-    const normalizedLocalPhoneNumber = formValues.phoneNumber.replace(/\D/g, '').replace(/^0+/, '');
-    const normalizedPhoneNumber = `${phoneCountryCode}${normalizedLocalPhoneNumber}`;
+    const normalizedPhoneNumber = normalizeNationalPhoneNumber(formValues.phoneNumber);
     const normalizedLatitude = formValues.latitude.trim();
     const normalizedLongitude = formValues.longitude.trim();
     const parsedLatitude = normalizedLatitude.length > 0 ? Number(normalizedLatitude) : undefined;
@@ -268,6 +232,7 @@ export function UserFormDialog({
     const candidatePayload = {
       firstName: formValues.firstName,
       lastName: formValues.lastName,
+      countryCallingCode: phoneCountryCode,
       phoneNumber: normalizedPhoneNumber,
       password: normalizedPassword || undefined,
       location: formValues.location,
@@ -385,7 +350,7 @@ export function UserFormDialog({
               <div className="flex gap-2" dir="ltr">
                 <Select
                   value={phoneCountryCode}
-                  onValueChange={(value) => setPhoneCountryCode(value as PhoneCountryCode)}
+                  onValueChange={setPhoneCountryCode}
                 >
                   <SelectTrigger
                     className="w-[118px] shrink-0 rounded-2xl"
@@ -412,7 +377,7 @@ export function UserFormDialog({
                   onChange={(event) =>
                     setFormValues((previous) => ({
                       ...previous,
-                      phoneNumber: event.target.value,
+                      phoneNumber: event.target.value.replace(/\D/g, '').replace(/^0+/, ''),
                     }))
                   }
                 />
