@@ -31,7 +31,8 @@ const parseStoredSession = (rawValue: string): AuthSession | null => {
         firstName: typeof user.firstName === 'string' ? user.firstName : '',
         lastName: typeof user.lastName === 'string' ? user.lastName : '',
         name: typeof user.name === 'string' ? user.name : '',
-        email: typeof user.email === 'string' ? user.email : '',
+        countryCallingCode:
+          typeof user.countryCallingCode === 'string' ? user.countryCallingCode : '+963',
         phoneNumber: typeof user.phoneNumber === 'string' ? user.phoneNumber : '',
         phoneNumberVerified: typeof user.phoneNumberVerified === 'boolean' ? user.phoneNumberVerified : false,
         phoneNumberVerifiedAt:
