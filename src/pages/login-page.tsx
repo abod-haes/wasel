@@ -4,8 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import { FormField, WaselBrandLogo } from '@/components/shared';
+import { DEFAULT_COUNTRY_CALLING_CODE, PHONE_COUNTRY_CODES } from '@/constants/phone';
 import { ROUTES } from '@/constants/routes';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui';
 import { getErrorMessage } from '@/services/api/api-error';
 import { useAuthStore } from '@/store/use-auth-store';
 import type { LoginPayload } from '@/types/auth';
@@ -29,6 +43,7 @@ export default function LoginPage(): React.JSX.Element {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const login = useAuthStore((state) => state.login);
   const [credentials, setCredentials] = useState<LoginPayload>({
+    countryCallingCode: DEFAULT_COUNTRY_CALLING_CODE,
     phoneNumber: '',
     password: '',
   });
@@ -115,14 +130,40 @@ export default function LoginPage(): React.JSX.Element {
               error={errors.phoneNumber}
               required
             >
-              <Input
-                id="phone-number"
-                type="tel"
-                value={credentials.phoneNumber}
-                autoComplete="tel"
-                onChange={(event) => setFieldValue('phoneNumber', event.target.value)}
-                placeholder={t('auth.phoneNumberPlaceholder')}
-              />
+              <div className="flex gap-2" dir="ltr">
+                <Select
+                  value={credentials.countryCallingCode}
+                  onValueChange={(value) => setFieldValue('countryCallingCode', value)}
+                >
+                  <SelectTrigger
+                    className="w-[118px] shrink-0 rounded-2xl"
+                    aria-label={t('auth.countryCallingCodeLabel')}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PHONE_COUNTRY_CODES.map((country) => (
+                      <SelectItem key={country.value} value={country.value}>
+                        {country.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  id="phone-number"
+                  type="tel"
+                  inputMode="numeric"
+                  dir="ltr"
+                  className="min-w-0 text-left"
+                  value={credentials.phoneNumber}
+                  autoComplete="tel-national"
+                  onChange={(event) =>
+                    setFieldValue('phoneNumber', event.target.value.replace(/\D/g, '').replace(/^0+/, ''))
+                  }
+                  placeholder={t('auth.phoneNumberPlaceholder')}
+                />
+              </div>
             </FormField>
 
             <FormField labelKey="auth.passwordLabel" htmlFor="password" error={errors.password} required>
