@@ -27,20 +27,6 @@ export function SettingsForm({ values, onChange }: SettingsFormProps): React.JSX
         />
       </FormField>
 
-      <FormField labelKey="settings.form.email" htmlFor="settings-email" required>
-        <Input
-          id="settings-email"
-          type="email"
-          value={values.email}
-          onChange={(event) =>
-            onChange({
-              ...values,
-              email: event.target.value,
-            })
-          }
-        />
-      </FormField>
-
       <FormField labelKey="language.label">
         <Select
           value={values.language}
@@ -70,19 +56,6 @@ export function SettingsForm({ values, onChange }: SettingsFormProps): React.JSX
               onChange({
                 ...values,
                 compactSidebar: checked,
-              })
-            }
-          />
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-medium">{t('settings.form.emailNotifications')}</p>
-          <Switch
-            checked={values.emailNotifications}
-            onCheckedChange={(checked) =>
-              onChange({
-                ...values,
-                emailNotifications: checked,
               })
             }
           />
