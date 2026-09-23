@@ -41,6 +41,16 @@ export const queryKeys = {
     root: ['notifications'] as const,
     list: (filters: unknown) => ['notifications', 'list', filters] as const,
   },
+  otpAdmin: {
+    root: ['otp-admin'] as const,
+    summary: () => ['otp-admin', 'summary'] as const,
+    session: () => ['otp-admin', 'session'] as const,
+    requests: (pagination: unknown) => ['otp-admin', 'requests', pagination] as const,
+    request: (requestId: string) => ['otp-admin', 'request', requestId] as const,
+    auditLogs: (pagination: unknown) => ['otp-admin', 'audit-logs', pagination] as const,
+    clients: () => ['otp-admin', 'clients'] as const,
+    apiKeys: () => ['otp-admin', 'api-keys'] as const,
+  },
   settings: {
     root: ['settings'] as const,
     profile: () => ['settings', 'profile'] as const,
