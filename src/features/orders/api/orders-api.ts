@@ -308,10 +308,18 @@ const updateOrderStatusInDb = (orderId: string, status: OrderStatus): Order => {
 };
 
 export const ordersApi = {
-  async getOrders(filters: OrdersFilter, pagination: PaginationParams): Promise<PaginatedData<Order>> {
+  async getOrders(
+    filters: OrdersFilter,
+    pagination: PaginationParams,
+    marketUserId?: string
+  ): Promise<PaginatedData<Order>> {
     if (env.enableMockApi) {
       await delay(400);
-      const filteredOrders = applyFilters(ordersDb.map(cloneOrder), filters);
+      const filteredOrders = applyFilters(ordersDb.map(cloneOrder), filters).filter((order) =>
+        marketUserId
+          ? order.marketStops?.some((stop) => stop.marketUserId === marketUserId) ?? false
+          : true
+      );
       return paginateLocalData(filteredOrders, pagination);
     }
 
@@ -321,14 +329,38 @@ export const ordersApi = {
         pageSize: pagination.pageSize,
         search: filters.search || undefined,
         status: filters.status === 'all' ? undefined : filters.status,
+        marketUserId: marketUserId || undefined,
       },
     });
 
     const paginatedOrders = toPaginatedData(data, pagination);
 
+    const mappedOrders = paginatedOrders.items.map(mapOrderResponse);
+
+    if (!marketUserId) {
+      return {
+        ...paginatedOrders,
+        items: mappedOrders,
+      };
+    }
+
+    const scopedOrders = mappedOrders.filter((order) =>
+      order.marketStops?.some((stop) => stop.marketUserId === marketUserId)
+    );
+    const backendReturnedForeignOrders = scopedOrders.length !== mappedOrders.length;
+
+    if (!backendReturnedForeignOrders) {
+      return {
+        ...paginatedOrders,
+        items: scopedOrders,
+      };
+    }
+
     return {
       ...paginatedOrders,
-      items: paginatedOrders.items.map(mapOrderResponse),
+      items: scopedOrders,
+      totalCount: scopedOrders.length,
+      totalPages: Math.max(1, Math.ceil(scopedOrders.length / pagination.pageSize)),
     };
   },
 
