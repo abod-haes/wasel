@@ -15,6 +15,7 @@ export interface User {
   firstName: string;
   lastName: string;
   name: string;
+  countryCallingCode: string;
   phoneNumber: string;
   location?: string;
   latitude: number | null;
@@ -37,6 +38,7 @@ export interface UsersFilter {
 export interface UserFormInput {
   firstName: string;
   lastName: string;
+  countryCallingCode: string;
   phoneNumber: string;
   password?: string;
   location?: string;
@@ -54,6 +56,7 @@ export interface UpdateUserInput {
   id: string;
   firstName?: string;
   lastName?: string;
+  countryCallingCode?: string;
   phoneNumber?: string;
   password?: string;
   location?: string;
