@@ -11,7 +11,7 @@ import { useProductQuery, useUpdateProductMutation } from '@/features/products/h
 import { buildProductsListRoute } from '@/features/products/lib/product-list-url';
 import type { CreateProductInput } from '@/features/products/types/product-types';
 import { ROUTES } from '@/constants/routes';
-import { isMarketRole } from '@/services/auth/auth-roles';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
 
 export default function ProductEditPage(): React.JSX.Element {
@@ -20,7 +20,7 @@ export default function ProductEditPage(): React.JSX.Element {
   const [searchParams] = useSearchParams();
   const productsListRoute = buildProductsListRoute(searchParams);
   const currentUser = useAuthStore((state) => state.user);
-  const isMarket = isMarketRole(currentUser?.roles ?? []);
+  const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
   const productQuery = useProductQuery(productId);
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery();
