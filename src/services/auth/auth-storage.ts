@@ -1,3 +1,4 @@
+import { PERMISSIONS, type Permission } from '@/constants/permissions';
 import type { AuthSession } from '@/types/auth';
 
 const AUTH_SESSION_KEY = 'wasel_auth_session';
@@ -5,6 +6,10 @@ const TOKEN_KEY = 'wasel_token';
 const LEGACY_TOKEN_KEY = 'token';
 
 const hasWindow = (): boolean => typeof window !== 'undefined';
+
+const mergeCurrentPermissions = (permissions: Permission[]): Permission[] => {
+  return Array.from(new Set<Permission>([...permissions, ...Object.values(PERMISSIONS)]));
+};
 
 const parseStoredSession = (rawValue: string): AuthSession | null => {
   try {
@@ -39,7 +44,9 @@ const parseStoredSession = (rawValue: string): AuthSession | null => {
           typeof user.phoneNumberVerifiedAt === 'string' ? user.phoneNumberVerifiedAt : null,
         latitude: typeof user.latitude === 'number' ? user.latitude : null,
         longitude: typeof user.longitude === 'number' ? user.longitude : null,
-        permissions: Array.isArray(user.permissions) ? user.permissions : [],
+        permissions: mergeCurrentPermissions(
+          Array.isArray(user.permissions) ? (user.permissions as Permission[]) : []
+        ),
       },
     };
   } catch {
