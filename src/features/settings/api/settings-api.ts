@@ -9,10 +9,8 @@ import { delay } from '@/services/mock/mock-utils';
 
 let settingsDb: WorkspaceSettings = {
   displayName: 'لوحة واسل',
-  email: 'admin@wasel.com',
   language: 'ar',
   compactSidebar: false,
-  emailNotifications: true,
 };
 
 export const settingsApi = {
