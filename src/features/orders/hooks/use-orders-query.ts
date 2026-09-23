@@ -4,13 +4,19 @@ import { toast } from 'sonner';
 
 import { queryKeys } from '@/constants/query-keys';
 import { ordersApi } from '@/features/orders/api/orders-api';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 import type { OrdersFilter } from '@/features/orders/types/order-types';
 import type { PaginationParams } from '@/types/api';
 
 export const useOrdersQuery = (filters: OrdersFilter, pagination: PaginationParams) => {
+  const user = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(user?.roles ?? []) && !isAdminRole(user?.roles ?? []);
+  const marketUserId = isMarket ? user?.id : undefined;
+
   return useQuery({
-    queryKey: queryKeys.orders.list({ filters, pagination }),
-    queryFn: () => ordersApi.getOrders(filters, pagination),
+    queryKey: queryKeys.orders.list({ filters, pagination, marketUserId }),
+    queryFn: () => ordersApi.getOrders(filters, pagination, marketUserId),
     placeholderData: keepPreviousData,
     refetchInterval: 7_000,
     refetchIntervalInBackground: false,
