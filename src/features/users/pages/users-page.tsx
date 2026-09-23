@@ -88,6 +88,7 @@ export default function UsersPage(): React.JSX.Element {
       id: selectedUser.id,
       firstName: payload.firstName,
       lastName: payload.lastName,
+      countryCallingCode: payload.countryCallingCode,
       phoneNumber: payload.phoneNumber,
       location: payload.location,
       latitude: payload.latitude,
