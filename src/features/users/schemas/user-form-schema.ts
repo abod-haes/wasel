@@ -9,7 +9,8 @@ const optionalTextSchema = z
 const userBaseSchema = z.object({
   firstName: z.string().trim().min(2),
   lastName: z.string().trim().min(2),
-  phoneNumber: z.string().trim().min(6),
+  countryCallingCode: z.string().trim().regex(/^\+\d{1,4}$/),
+  phoneNumber: z.string().trim().regex(/^\d+$/).min(4),
   location: optionalTextSchema,
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
