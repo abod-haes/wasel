@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DataTable } from '@/components/shared/DataTable';
+import { formatFullPhoneNumber } from '@/constants/phone';
 import { Badge, Button } from '@/components/ui';
 import type { User } from '@/features/users/types/user-types';
 import type { PaginatedData } from '@/types/api';
@@ -44,6 +45,9 @@ export function UsersTable({
         renderCell: (user: User) => (
           <div>
             <p className="font-medium">{user.name}</p>
+            <p className="text-xs text-muted-foreground" dir="ltr">
+              {formatFullPhoneNumber(user.countryCallingCode, user.phoneNumber)}
+            </p>
           </div>
         ),
       },
