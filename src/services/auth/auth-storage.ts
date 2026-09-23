@@ -1,4 +1,4 @@
-import { PERMISSIONS, type Permission } from '@/constants/permissions';
+import { getPermissionsForRoles, getRolesFromToken } from '@/services/auth/auth-roles';
 import type { AuthSession } from '@/types/auth';
 
 const AUTH_SESSION_KEY = 'wasel_auth_session';
@@ -7,9 +7,6 @@ const LEGACY_TOKEN_KEY = 'token';
 
 const hasWindow = (): boolean => typeof window !== 'undefined';
 
-const mergeCurrentPermissions = (permissions: Permission[]): Permission[] => {
-  return Array.from(new Set<Permission>([...permissions, ...Object.values(PERMISSIONS)]));
-};
 
 const parseStoredSession = (rawValue: string): AuthSession | null => {
   try {
@@ -28,6 +25,8 @@ const parseStoredSession = (rawValue: string): AuthSession | null => {
       return null;
     }
 
+    const roles = getRolesFromToken(parsed.token);
+
     return {
       token: parsed.token,
       expiresAt: parsed.expiresAt,
@@ -36,6 +35,7 @@ const parseStoredSession = (rawValue: string): AuthSession | null => {
         firstName: typeof user.firstName === 'string' ? user.firstName : '',
         lastName: typeof user.lastName === 'string' ? user.lastName : '',
         name: typeof user.name === 'string' ? user.name : '',
+        roles,
         countryCallingCode:
           typeof user.countryCallingCode === 'string' ? user.countryCallingCode : '+963',
         phoneNumber: typeof user.phoneNumber === 'string' ? user.phoneNumber : '',
@@ -44,9 +44,7 @@ const parseStoredSession = (rawValue: string): AuthSession | null => {
           typeof user.phoneNumberVerifiedAt === 'string' ? user.phoneNumberVerifiedAt : null,
         latitude: typeof user.latitude === 'number' ? user.latitude : null,
         longitude: typeof user.longitude === 'number' ? user.longitude : null,
-        permissions: mergeCurrentPermissions(
-          Array.isArray(user.permissions) ? (user.permissions as Permission[]) : []
-        ),
+        permissions: getPermissionsForRoles(roles),
       },
     };
   } catch {
