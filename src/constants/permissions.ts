@@ -10,6 +10,7 @@ export const PERMISSIONS = {
   ordersManage: 'orders:manage',
   notificationsView: 'notifications:view',
   notificationsSend: 'notifications:send',
+  otpAdminView: 'otp-admin:view',
   settingsView: 'settings:view',
   settingsEdit: 'settings:edit',
 } as const;
