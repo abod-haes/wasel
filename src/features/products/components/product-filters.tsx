@@ -5,12 +5,14 @@ import type { Brand } from '@/features/brands/types/brand-types';
 import type { CategoryOption } from '@/features/categories/types/category-types';
 import type { MarketOption } from '@/features/markets/types/market-types';
 import type { ProductsFilter } from '@/features/products/types/product-types';
+import { cn } from '@/lib/utils';
 
 interface ProductFiltersProps {
   filters: ProductsFilter;
   categories: CategoryOption[];
   brands: Brand[];
   markets: MarketOption[];
+  showMarketFilters?: boolean;
   onChange: (filters: ProductsFilter) => void;
   onReset: () => void;
 }
@@ -20,13 +22,21 @@ export function ProductFilters({
   categories,
   brands,
   markets,
+  showMarketFilters = true,
   onChange,
   onReset,
 }: ProductFiltersProps): React.JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div className="grid gap-3 rounded-xl border bg-card p-4 xl:grid-cols-[1fr_200px_200px_200px_200px_auto] xl:items-end">
+    <div
+      className={cn(
+        'grid gap-3 rounded-xl border bg-card p-4 xl:items-end',
+        showMarketFilters
+          ? 'xl:grid-cols-[1fr_200px_200px_200px_200px_auto]'
+          : 'xl:grid-cols-[1fr_220px_220px_auto]'
+      )}
+    >
       <Input
         value={filters.search}
         placeholder={t('products.searchPlaceholder')}
@@ -44,7 +54,8 @@ export function ProductFilters({
           <SelectItem value="all">{t('common.all')}</SelectItem>
           {categories.map((category) => (
             <SelectItem key={category.id} value={category.id}>
-              {'— '.repeat(category.level ?? 0)}{category.name}
+              {'— '.repeat(category.level ?? 0)}
+              {category.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -67,28 +78,32 @@ export function ProductFilters({
         </SelectContent>
       </Select>
 
-      <Input
-        value={filters.marketName ?? ''}
-        placeholder="اسم السوق"
-        onChange={(event) => onChange({ ...filters, marketName: event.target.value })}
-      />
+      {showMarketFilters ? (
+        <>
+          <Input
+            value={filters.marketName ?? ''}
+            placeholder="اسم السوق"
+            onChange={(event) => onChange({ ...filters, marketName: event.target.value })}
+          />
 
-      <Select
-        value={filters.marketUserId ?? 'all'}
-        onValueChange={(marketUserId) => onChange({ ...filters, marketUserId })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="السوق" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">كل الأسواق</SelectItem>
-          {markets.map((market) => (
-            <SelectItem key={market.id} value={market.id}>
-              {market.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <Select
+            value={filters.marketUserId ?? 'all'}
+            onValueChange={(marketUserId) => onChange({ ...filters, marketUserId })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="السوق" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">كل الأسواق</SelectItem>
+              {markets.map((market) => (
+                <SelectItem key={market.id} value={market.id}>
+                  {market.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </>
+      ) : null}
 
       <Button variant="outline" onClick={onReset}>
         {t('common.reset')}
