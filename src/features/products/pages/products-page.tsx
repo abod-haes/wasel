@@ -52,7 +52,11 @@ export default function ProductsPage(): React.JSX.Element {
   const importProductsMutation = useImportProductsMutation();
 
   const updateListUrl = (nextFilters: ProductsFilter, nextPagination: PaginationParams): void => {
-    setSearchParams(createProductListSearchParams(nextFilters, nextPagination), { replace: true });
+    const visibleFilters = isMarket
+      ? { ...nextFilters, marketUserId: 'all' as const, marketName: '' }
+      : nextFilters;
+
+    setSearchParams(createProductListSearchParams(visibleFilters, nextPagination), { replace: true });
   };
 
   if (productsQuery.isError || categoriesQuery.isError || brandsQuery.isError || marketsQuery.isError) {
