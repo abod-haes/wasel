@@ -8,6 +8,7 @@ import { Button, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle } from
 import { SidebarNav, WaselBrandLogo } from '@/components/shared';
 import { cn } from '@/lib/utils';
 import { hasPermission } from '@/services/permissions/mock-permissions';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useUiStore } from '@/store/use-ui-store';
 import type { SidebarNavItem } from '@/types/navigation';
@@ -44,11 +45,24 @@ function SidebarInner({
 }): React.JSX.Element {
   const { i18n } = useTranslation();
   const userPermissions = useAuthStore((state) => state.user?.permissions ?? []);
+  const userRoles = useAuthStore((state) => state.user?.roles ?? []);
   const direction = i18n.dir();
+  const isMarket = isMarketRole(userRoles) && !isAdminRole(userRoles);
 
   const items = useMemo(() => {
-    return filterNavByPermission(SIDEBAR_NAV_ITEMS, userPermissions);
-  }, [userPermissions]);
+    const visibleItems = filterNavByPermission(SIDEBAR_NAV_ITEMS, userPermissions);
+
+    if (!isMarket) {
+      return visibleItems;
+    }
+
+    return visibleItems.map((item) => {
+      if (item.key === 'dashboard') return { ...item, labelKey: 'nav.storeDashboard' };
+      if (item.key === 'products') return { ...item, labelKey: 'nav.myProducts' };
+      if (item.key === 'orders') return { ...item, labelKey: 'nav.myOrders' };
+      return item;
+    });
+  }, [isMarket, userPermissions]);
 
   return (
     <>
