@@ -7,6 +7,8 @@ import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/compo
 import { Button } from '@/components/ui';
 import { useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
 import { ROUTES } from '@/constants/routes';
+import { isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
 import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
 import { ProductFilters } from '@/features/products/components/product-filters';
@@ -31,13 +33,17 @@ export default function ProductsPage(): React.JSX.Element {
   const importInputRef = useRef<HTMLInputElement>(null);
   const { filters, pagination } = readProductListUrlState(searchParams);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const currentUser = useAuthStore((state) => state.user);
+  const isMarket = isMarketRole(currentUser?.roles ?? []);
 
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery();
+  const marketsQuery = useMarketOptionsQuery(!isMarket);
   const selectedCategory = filters.categoryId === 'all' ? undefined : categoriesQuery.data?.find((category) => category.id === filters.categoryId);
   const effectiveFilters: ProductsFilter = {
     ...filters,
+    marketUserId: isMarket && currentUser ? currentUser.id : filters.marketUserId,
+    marketName: isMarket ? '' : filters.marketName,
     categoryIds: selectedCategory ? [selectedCategory.id, ...(selectedCategory.descendantIds ?? [])] : undefined,
   };
 
@@ -81,24 +87,33 @@ export default function ProductsPage(): React.JSX.Element {
         descriptionKey="products.description"
         actions={
           <div className="flex flex-wrap gap-2">
-            <input ref={importInputRef} type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" className="sr-only" onChange={(event) => handleImport(event.target.files)} />
-            <Button type="button" variant="outline" disabled={importProductsMutation.isPending} onClick={() => importInputRef.current?.click()} className="gap-2">
-              <Upload className="h-4 w-4" />{importProductsMutation.isPending ? 'جاري الاستيراد...' : 'استيراد Excel'}
-            </Button>
+            {!isMarket ? <input ref={importInputRef} type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" className="sr-only" onChange={(event) => handleImport(event.target.files)} /> : null}
+            {!isMarket ? (
+              <Button type="button" variant="outline" disabled={importProductsMutation.isPending} onClick={() => importInputRef.current?.click()} className="gap-2">
+                <Upload className="h-4 w-4" />{importProductsMutation.isPending ? 'جاري الاستيراد...' : 'استيراد Excel'}
+              </Button>
+            ) : null}
             <Button onClick={() => navigate(ROUTES.productCreate)} className="gap-2"><Plus className="h-4 w-4" />{t('products.createProduct')}</Button>
           </div>
         }
       />
-      <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
-        استيراد Excel أصبح Market-scoped: الملف لازم يحتوي عمود <strong className="text-foreground">Market</strong> أو
-        <strong className="text-foreground"> السوق / المتجر</strong>، ويتم استبدال كتالوج الأسواق المذكورة فقط.
-      </div>
+      {!isMarket ? (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+          استيراد Excel أصبح Market-scoped: الملف لازم يحتوي عمود <strong className="text-foreground">Market</strong> أو
+          <strong className="text-foreground"> السوق / المتجر</strong>، ويتم استبدال كتالوج الأسواق المذكورة فقط.
+        </div>
+      ) : (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+          تعرض هذه الصفحة منتجات متجرك فقط، وأي منتج جديد يُربط بحسابك تلقائيًا.
+        </div>
+      )}
 
       <ProductFilters
         filters={filters}
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        showMarketFilters={!isMarket}
         onChange={(nextFilters) => updateListUrl(nextFilters, { ...pagination, page: defaultProductPagination.page })}
         onReset={() => updateListUrl(defaultProductFilters, defaultProductPagination)}
       />
