@@ -52,7 +52,6 @@ interface UserApiResponse {
 interface CreateUserRequest {
   firstName: string;
   lastName: string;
-  email?: string | null;
   phoneNumber: string;
   password: string;
   location?: string;
@@ -65,7 +64,6 @@ interface CreateUserRequest {
 interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
-  email?: string | null;
   phoneNumber?: string;
   password?: string;
   location?: string;
@@ -103,7 +101,6 @@ const createMockUser = (
   id: string,
   firstName: string,
   lastName: string,
-  email: string,
   phoneNumber: string,
   roleKey: UserRole,
   phoneNumberVerified: boolean,
@@ -117,7 +114,6 @@ const createMockUser = (
     firstName,
     lastName,
     name: `${firstName} ${lastName}`.trim(),
-    email,
     phoneNumber,
     location: undefined,
     latitude: null,
@@ -137,7 +133,6 @@ let usersDb: User[] = [
     'u-1001',
     'سارة',
     'ووكر',
-    'sarah@wasel.com',
     '+963944000001',
     'admin',
     true,
@@ -148,7 +143,6 @@ let usersDb: User[] = [
     'u-1002',
     'عمر',
     'حداد',
-    'omar@wasel.com',
     '+963944000002',
     'editor',
     true,
@@ -159,7 +153,6 @@ let usersDb: User[] = [
     'u-1003',
     'لينا',
     'جورج',
-    'lina@wasel.com',
     '+963944000003',
     'viewer',
     false,
@@ -170,7 +163,6 @@ let usersDb: User[] = [
     'u-1004',
     'يزن',
     'صالح',
-    'yazan@wasel.com',
     '+963944000004',
     'viewer',
     false,
@@ -191,7 +183,6 @@ const applyFilters = (users: User[], filters: UsersFilter): User[] => {
     const matchesSearch =
       searchValue.length === 0 ||
       user.name.toLowerCase().includes(searchValue) ||
-      user.email.toLowerCase().includes(searchValue) ||
       user.phoneNumber.toLowerCase().includes(searchValue);
 
     const matchesRole = filters.role === 'all' || user.role === filters.role;
@@ -288,7 +279,6 @@ const mapUserResponse = (user: UserApiResponse): User => {
   const firstName = resolveOptionalString(user.FirstName, user.firstName) ?? '';
   const lastName = resolveOptionalString(user.LastName, user.lastName) ?? '';
   const phoneNumber = resolveOptionalString(user.PhoneNumber, user.phoneNumber) ?? '';
-  const email = resolveOptionalString(user.Email, user.email) ?? '';
   const fullName = `${firstName} ${lastName}`.trim();
   const mappedRoles =
     (user.Roles ?? user.roles ?? [])
@@ -306,11 +296,10 @@ const mapUserResponse = (user: UserApiResponse): User => {
   );
 
   return {
-    id: resolveOptionalString(user.Id, user.id, phoneNumber, email, fullName) ?? '',
+    id: resolveOptionalString(user.Id, user.id, phoneNumber, fullName) ?? '',
     firstName,
     lastName,
-    name: fullName || phoneNumber || email || 'User',
-    email,
+    name: fullName || phoneNumber || 'User',
     phoneNumber,
     location: resolveOptionalString(user.Location, user.location),
     latitude: resolveNumber(user.Latitude, user.latitude),
@@ -376,7 +365,6 @@ const buildCreateUserRequest = (payload: CreateUserInput): CreateUserRequest => 
   const requestPayload: CreateUserRequest = {
     firstName: parsed.firstName,
     lastName: parsed.lastName,
-    email: parsed.email.trim() || null,
     phoneNumber: parsed.phoneNumber,
     password: parsed.password,
     phoneNumberVerified: Boolean(parsed.phoneNumberVerified),
@@ -411,10 +399,6 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
 
   if (parsed.lastName != null) {
     requestPayload.lastName = parsed.lastName;
-  }
-
-  if (parsed.email != null) {
-    requestPayload.email = parsed.email.trim() || null;
   }
 
   if (parsed.phoneNumber != null) {
@@ -505,7 +489,6 @@ export const usersApi = {
         firstName: requestPayload.firstName,
         lastName: requestPayload.lastName,
         name: `${requestPayload.firstName} ${requestPayload.lastName}`.trim(),
-        email: requestPayload.email ?? '',
         phoneNumber: requestPayload.phoneNumber,
         location: requestPayload.location,
         latitude: requestPayload.latitude ?? null,
@@ -554,10 +537,6 @@ export const usersApi = {
           nextUser.lastName = requestPayload.lastName;
         }
 
-        if (requestPayload.email != null) {
-          nextUser.email = requestPayload.email;
-        }
-
         if (requestPayload.phoneNumber != null) {
           nextUser.phoneNumber = requestPayload.phoneNumber;
         }
@@ -585,7 +564,7 @@ export const usersApi = {
           nextUser.roles = mapRoleIdsToAssignments(requestPayload.roleIds);
         }
 
-        nextUser.name = `${nextUser.firstName} ${nextUser.lastName}`.trim() || nextUser.phoneNumber || nextUser.email;
+        nextUser.name = `${nextUser.firstName} ${nextUser.lastName}`.trim() || nextUser.phoneNumber;
         nextUser.role = resolvePrimaryRole(nextUser.roles);
         nextUser.status = nextUser.phoneNumberVerified ? 'active' : 'invited';
         nextUser.lastLogin = resolveIsoDate(nextUser.phoneNumberVerifiedAt ?? nextUser.createdAt);
