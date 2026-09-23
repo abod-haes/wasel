@@ -13,6 +13,7 @@ export const ROUTES = {
   notifications: '/notifications',
   otpAdmin: '/otp-whatsapp',
   settings: '/settings',
+  settingsPricing: '/settings/pricing',
   settingsPreferences: '/settings/preferences',
   unauthorized: '/unauthorized',
 } as const;
