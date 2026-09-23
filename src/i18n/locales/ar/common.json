@@ -9,7 +9,6 @@
     "update": "تحديث",
     "search": "بحث",
     "name": "الاسم",
-    "email": "البريد الإلكتروني",
     "role": "الدور",
     "status": "الحالة",
     "actions": "الإجراءات",
@@ -124,7 +123,7 @@
     "createUser": "إنشاء مستخدم",
     "editUser": "تعديل مستخدم",
     "deleteUser": "حذف مستخدم",
-    "searchPlaceholder": "ابحث بالاسم أو البريد",
+    "searchPlaceholder": "ابحث بالاسم أو رقم الهاتف",
     "table": {
       "lastLogin": "آخر تسجيل دخول"
     },
@@ -141,7 +140,6 @@
       "noRole": "بدون دور",
       "firstNamePlaceholder": "أدخل الاسم الأول",
       "lastNamePlaceholder": "أدخل اسم العائلة",
-      "emailPlaceholder": "أدخل بريد العمل",
       "phoneNumberPlaceholder": "أدخل رقم الهاتف",
       "passwordPlaceholder": "أدخل كلمة المرور",
       "passwordEditHint": "اتركها فارغة للإبقاء على كلمة المرور الحالية.",
@@ -350,9 +348,7 @@
     "preferencesDescription": "ضبط سلوك الواجهة",
     "form": {
       "displayName": "اسم العرض",
-      "email": "بريد التواصل",
-      "compactSidebar": "شريط جانبي مضغوط",
-      "emailNotifications": "إشعارات البريد"
+      "compactSidebar": "شريط جانبي مضغوط"
     },
     "messages": {
       "saved": "تم حفظ الإعدادات"
