@@ -1,4 +1,5 @@
 import { PERMISSIONS, type Permission } from '@/constants/permissions';
+import { DEFAULT_COUNTRY_CALLING_CODE, normalizeCountryCallingCode, normalizeNationalPhoneNumber } from '@/constants/phone';
 import { env } from '@/env';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
@@ -39,14 +40,18 @@ const resolveExpiresAt = (value: string): string => {
 const mapApiUser = (apiUser: LoginApiUserResponse): AuthUser => {
   const firstName = resolveString(apiUser.FirstName, apiUser.firstName);
   const lastName = resolveString(apiUser.LastName, apiUser.lastName);
-  const phoneNumber = resolveString(apiUser.PhoneNumber, apiUser.phoneNumber);
-  const name = `${firstName} ${lastName}`.trim() || phoneNumber || 'User';
+  const countryCallingCode = normalizeCountryCallingCode(
+    resolveString(apiUser.CountryCallingCode, apiUser.countryCallingCode) || DEFAULT_COUNTRY_CALLING_CODE
+  );
+  const phoneNumber = normalizeNationalPhoneNumber(resolveString(apiUser.PhoneNumber, apiUser.phoneNumber));
+  const name = `${firstName} ${lastName}`.trim() || `${countryCallingCode}${phoneNumber}` || 'User';
 
   return {
     id: resolveString(apiUser.Id, apiUser.id, phoneNumber, name),
     firstName,
     lastName,
     name,
+    countryCallingCode,
     phoneNumber,
     phoneNumberVerified: Boolean(apiUser.PhoneNumberVerified ?? apiUser.phoneNumberVerified),
     phoneNumberVerifiedAt:
@@ -79,17 +84,19 @@ const mapLoginResponse = (payload: LoginApiResponse): AuthSession => {
 };
 
 const buildMockSession = (credentials: LoginPayload): AuthSession => {
-  const normalizedPhoneNumber = credentials.phoneNumber.trim();
+  const normalizedCountryCallingCode = normalizeCountryCallingCode(credentials.countryCallingCode);
+  const normalizedPhoneNumber = normalizeNationalPhoneNumber(credentials.phoneNumber);
   const now = new Date();
 
   return {
     token: `mock-token-${Date.now()}`,
     expiresAt: new Date(now.getTime() + DEFAULT_SESSION_DURATION_MS).toISOString(),
     user: {
-      id: normalizedPhoneNumber,
+      id: `${normalizedCountryCallingCode}${normalizedPhoneNumber}`,
       firstName: '',
       lastName: '',
-      name: normalizedPhoneNumber,
+      name: `${normalizedCountryCallingCode}${normalizedPhoneNumber}`,
+      countryCallingCode: normalizedCountryCallingCode,
       phoneNumber: normalizedPhoneNumber,
       phoneNumberVerified: true,
       phoneNumberVerifiedAt: now.toISOString(),
@@ -102,11 +109,12 @@ const buildMockSession = (credentials: LoginPayload): AuthSession => {
 
 const validateCredentials = (credentials: LoginPayload): LoginPayload => {
   const normalizedCredentials = {
-    phoneNumber: credentials.phoneNumber.trim(),
+    countryCallingCode: normalizeCountryCallingCode(credentials.countryCallingCode),
+    phoneNumber: normalizeNationalPhoneNumber(credentials.phoneNumber),
     password: credentials.password.trim(),
   };
 
-  if (!normalizedCredentials.phoneNumber || !normalizedCredentials.password) {
+  if (!normalizedCredentials.countryCallingCode || !normalizedCredentials.phoneNumber || !normalizedCredentials.password) {
     throw new Error('Phone number and password are required.');
   }
 
