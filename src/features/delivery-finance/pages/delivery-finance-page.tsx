@@ -53,12 +53,14 @@ const money = (value: number): string =>
 const dateTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString() : '-';
 
-function paymentWayLabel(value: 0 | 1, t: (key: string) => string): string {
-  return value === 0 ? t('deliveryFinance.direct') : t('deliveryFinance.shamCash');
+function paymentWayLabel(value: 0 | 1, t: (key: string) => unknown): string {
+  return String(value === 0 ? t('deliveryFinance.direct') : t('deliveryFinance.shamCash'));
 }
 
-function pricingModeLabel(value: 0 | 1, t: (key: string) => string): string {
-  return value === 0 ? t('deliveryFinance.distanceBased') : t('deliveryFinance.fixed');
+function pricingModeLabel(value: 0 | 1, t: (key: string) => unknown): string {
+  return String(
+    value === 0 ? t('deliveryFinance.distanceBased') : t('deliveryFinance.fixed'),
+  );
 }
 
 function Pager({
@@ -143,10 +145,6 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   const orderQuery = useDeliveryFinanceOrderQuery(selectedOrderId);
   const settleMutation = useSettleDeliveryCashMutation();
 
-  if (listQuery.isError) {
-    return <ErrorState onRetry={() => void listQuery.refetch()} />;
-  }
-
   useEffect(() => {
     if (deepLinkedDeliveryId) {
       setSelectedDeliveryId(deepLinkedDeliveryId);
@@ -154,6 +152,10 @@ export default function DeliveryFinancePage(): React.JSX.Element {
       setDetailPagination({ page: 1, pageSize: 10 });
     }
   }, [deepLinkedDeliveryId]);
+
+  if (listQuery.isError) {
+    return <ErrorState onRetry={() => void listQuery.refetch()} />;
+  }
 
   const selectedSummary = summaryQuery.data;
   const list = listQuery.data;
