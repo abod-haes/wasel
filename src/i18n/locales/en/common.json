@@ -575,7 +575,8 @@
     "note": "Note",
     "collection": "Collection",
     "settlement": "Settlement",
-    "openFinance": "Open delivery finance"
+    "openFinance": "Open delivery finance",
+    "admin": "Admin"
   },
   "deliveryPricing": {
     "title": "Delivery Pricing & Cash Limit",
