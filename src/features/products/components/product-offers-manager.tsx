@@ -118,7 +118,7 @@ export function ProductOffersManager({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingOffer, setEditingOffer] = useState<ProductOfferResponse | null>(null);
   const [form, setForm] = useState<OfferFormState>(emptyForm);
-  const basePrice = product.basePrice ?? product.price;
+  const basePrice = product.originalBasePrice ?? product.basePrice ?? product.price;
   const isMutating =
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 

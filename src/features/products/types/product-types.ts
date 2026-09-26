@@ -47,6 +47,9 @@ export interface Product {
   baseCurrency?: 'USD';
   priceCurrency?: ProductCurrency;
   prices?: ProductPriceInfo;
+  originalPrice?: number;
+  originalBasePrice?: number;
+  hasActiveOffer?: boolean;
   images: ProductImage[];
   variants: ProductVariant[];
   categories: ProductCategorySummary[];

@@ -31,6 +31,8 @@ interface ProductApiResponse {
   marketUserId?: string; MarketUserId?: string; marketName?: string; MarketName?: string;
   type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit;
   description?: string; Description?: string; price?: number; Price?: number; basePrice?: number; BasePrice?: number;
+  originalPrice?: number; OriginalPrice?: number; originalBasePrice?: number; OriginalBasePrice?: number;
+  hasActiveOffer?: boolean; HasActiveOffer?: boolean;
   baseCurrency?: string; BaseCurrency?: string; priceCurrency?: string; PriceCurrency?: string;
   prices?: ProductPriceInfoApiResponse; Prices?: ProductPriceInfoApiResponse;
   images?: ProductImageApiResponse[]; Images?: ProductImageApiResponse[];
@@ -119,6 +121,9 @@ const mapProduct = (product: ProductApiResponse): Product => {
     baseCurrency: 'USD',
     priceCurrency,
     prices,
+    originalPrice: product.originalPrice ?? product.OriginalPrice,
+    originalBasePrice: product.originalBasePrice ?? product.OriginalBasePrice,
+    hasActiveOffer: product.hasActiveOffer ?? product.HasActiveOffer ?? false,
     images: images.map((image) => ({ id: image.id ?? image.Id ?? '', imagePath: image.imagePath ?? image.ImagePath ?? '', isMain: image.isMain ?? image.IsMain ?? false })),
     variants: variants.map((variant, index) => ({
       id: variant.id ?? variant.Id ?? '', name: variant.name ?? variant.Name ?? '', imagePath: variant.imagePath ?? variant.ImagePath ?? null,
