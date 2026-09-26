@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { DataTable } from '@/components/shared';
-import { Badge } from '@/components/ui';
+import { Badge, Button } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 import type { AppNotification } from '@/features/notifications/types/notification-types';
 import type { User } from '@/features/users/types/user-types';
 import type { PaginatedData } from '@/types/api';
@@ -25,6 +27,7 @@ export function NotificationsTable({
   onPageSizeChange,
 }: NotificationsTableProps): React.JSX.Element {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const usersById = useMemo(() => new Map(users.map((user) => [user.id, user])), [users]);
 
   const columns = useMemo(
@@ -91,6 +94,27 @@ export function NotificationsTable({
             return <span className="text-xs text-muted-foreground">-</span>;
           }
 
+          if (
+            notification.data.type === 'delivery.cash-limit.reached' &&
+            notification.data.deliveryPersonId
+          ) {
+            return (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  navigate(
+                    `${ROUTES.deliveryFinance}?deliveryPersonId=${encodeURIComponent(
+                      notification.data?.deliveryPersonId ?? '',
+                    )}`,
+                  )
+                }
+              >
+                {t('deliveryFinance.openFinance')}
+              </Button>
+            );
+          }
+
           return (
             <span className="text-xs text-muted-foreground">
               {Object.entries(notification.data)
@@ -102,7 +126,7 @@ export function NotificationsTable({
         },
       },
     ],
-    [t, usersById]
+    [navigate, t, usersById]
   );
 
   return (
