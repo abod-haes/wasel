@@ -6,7 +6,8 @@ import {
   RefreshCw,
   WalletCards,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorState, PageContainer, SectionHeader } from '@/components/shared';
@@ -112,6 +113,8 @@ function LimitBadge({ delivery }: { delivery: DeliveryFinanceSummary }): React.J
 
 export default function DeliveryFinancePage(): React.JSX.Element {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const deepLinkedDeliveryId = searchParams.get('deliveryPersonId') || undefined;
   const [listPagination, setListPagination] = useState<PaginationParams>({
     page: 1,
     pageSize: 20,
@@ -120,7 +123,8 @@ export default function DeliveryFinancePage(): React.JSX.Element {
     page: 1,
     pageSize: 10,
   });
-  const [selectedDeliveryId, setSelectedDeliveryId] = useState<string>();
+  const [selectedDeliveryId, setSelectedDeliveryId] =
+    useState<string | undefined>(deepLinkedDeliveryId);
   const [activeTab, setActiveTab] = useState<'orders' | 'transactions'>('orders');
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
   const [settleOpen, setSettleOpen] = useState(false);
@@ -142,6 +146,14 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   if (listQuery.isError) {
     return <ErrorState onRetry={() => void listQuery.refetch()} />;
   }
+
+  useEffect(() => {
+    if (deepLinkedDeliveryId) {
+      setSelectedDeliveryId(deepLinkedDeliveryId);
+      setActiveTab('orders');
+      setDetailPagination({ page: 1, pageSize: 10 });
+    }
+  }, [deepLinkedDeliveryId]);
 
   const selectedSummary = summaryQuery.data;
   const list = listQuery.data;
