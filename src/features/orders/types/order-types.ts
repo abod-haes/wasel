@@ -36,7 +36,11 @@ export interface Order {
   id: string;
   totalAmount: number;
   fixedDeliveryFee?: number;
+  distanceBasedTotalAmount?: number;
   fixedTotalAmount?: number;
+  appliedDeliveryPricingMode?: 0 | 1;
+  chargedDeliveryFee?: number;
+  chargedAmount?: number;
   marketStops?: MarketStop[];
   journeyPrice?: number;
   pricePerKilometer?: number;
