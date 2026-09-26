@@ -33,8 +33,16 @@ interface OrderApiResponse {
   totalAmount?: number;
   FixedDeliveryFee?: number;
   fixedDeliveryFee?: number;
+  DistanceBasedTotalAmount?: number;
+  distanceBasedTotalAmount?: number;
   FixedTotalAmount?: number;
   fixedTotalAmount?: number;
+  AppliedDeliveryPricingMode?: 0 | 1;
+  appliedDeliveryPricingMode?: 0 | 1;
+  ChargedDeliveryFee?: number;
+  chargedDeliveryFee?: number;
+  ChargedAmount?: number;
+  chargedAmount?: number;
   MarketStops?: Array<{
     MarketUserId?: string; marketUserId?: string;
     MarketName?: string; marketName?: string;
@@ -211,7 +219,13 @@ const mapOrderResponse = (order: OrderApiResponse): Order => {
     id: order.Id ?? order.id ?? '',
     totalAmount: order.TotalAmount ?? order.totalAmount ?? 0,
     fixedDeliveryFee: order.FixedDeliveryFee ?? order.fixedDeliveryFee,
+    distanceBasedTotalAmount:
+      order.DistanceBasedTotalAmount ?? order.distanceBasedTotalAmount,
     fixedTotalAmount: order.FixedTotalAmount ?? order.fixedTotalAmount,
+    appliedDeliveryPricingMode:
+      order.AppliedDeliveryPricingMode ?? order.appliedDeliveryPricingMode,
+    chargedDeliveryFee: order.ChargedDeliveryFee ?? order.chargedDeliveryFee,
+    chargedAmount: order.ChargedAmount ?? order.chargedAmount,
     marketStops: (order.MarketStops ?? order.marketStops ?? [])
       .map((stop) => ({
         marketUserId: stop.MarketUserId ?? stop.marketUserId ?? '',
