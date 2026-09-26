@@ -19,6 +19,9 @@ const ProductEditPage = lazy(() => import('@/features/products/pages/product-edi
 const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
 const AdsPage = lazy(() => import('@/features/ads/pages/ads-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
+const DeliveryFinancePage = lazy(
+  () => import('@/features/delivery-finance/pages/delivery-finance-page')
+);
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
 const OtpAdminPage = lazy(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazy(() => import('@/features/settings/pages/settings-page'));
@@ -150,6 +153,17 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.orders',
+            },
+          },
+          {
+            path: ROUTES.deliveryFinance,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsView}>
+                {withSuspense(<DeliveryFinancePage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'nav.deliveryFinance',
             },
           },
           {
