@@ -1,5 +1,6 @@
 import { RefreshCw, Save, Truck } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Button,
@@ -10,6 +11,7 @@ import {
   CardTitle,
   Input,
   Label,
+  Switch,
 } from '@/components/ui';
 import {
   useDeliveryPricingQuery,
@@ -18,16 +20,23 @@ import {
 import { deliveryPricingSchema } from '@/features/settings/schemas/delivery-pricing-schema';
 
 export function DeliveryPricingCard(): React.JSX.Element {
+  const { t } = useTranslation();
   const query = useDeliveryPricingQuery();
   const mutation = useUpdateDeliveryPricingMutation();
   const [pricePerKilometer, setPricePerKilometer] = useState('');
   const [fixedDeliveryFee, setFixedDeliveryFee] = useState('');
+  const [deliveryPricingMode, setDeliveryPricingMode] = useState<0 | 1>(0);
+  const [cashLimitEnabled, setCashLimitEnabled] = useState(false);
+  const [cashLimitAmount, setCashLimitAmount] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!query.data) return;
     setPricePerKilometer(String(query.data.pricePerKilometer));
     setFixedDeliveryFee(String(query.data.fixedDeliveryFee));
+    setDeliveryPricingMode(query.data.deliveryPricingMode);
+    setCashLimitEnabled(query.data.deliveryCashLimitEnabled);
+    setCashLimitAmount(String(query.data.deliveryCashLimitAmount));
     setError('');
   }, [query.data]);
 
@@ -35,15 +44,25 @@ export function DeliveryPricingCard(): React.JSX.Element {
     const parsed = deliveryPricingSchema.safeParse({
       pricePerKilometer,
       fixedDeliveryFee,
+      deliveryPricingMode,
+      deliveryCashLimitEnabled: cashLimitEnabled,
+      deliveryCashLimitAmount: cashLimitAmount,
     });
 
     if (!parsed.success) {
-      setError('القيم يجب أن تكون أرقامًا أكبر من أو تساوي صفر.');
+      setError(
+        cashLimitEnabled && Number(cashLimitAmount) <= 0
+          ? t('deliveryPricing.cashLimitPositive')
+          : t('deliveryPricing.invalidValues'),
+      );
       return;
     }
 
     setError('');
-    mutation.mutate(parsed.data);
+    mutation.mutate({
+      ...parsed.data,
+      deliveryPricingMode: parsed.data.deliveryPricingMode as 0 | 1,
+    });
   };
 
   return (
@@ -51,29 +70,47 @@ export function DeliveryPricingCard(): React.JSX.Element {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Truck className="h-5 w-5 text-primary" />
-          <CardTitle>تسعير التوصيل</CardTitle>
+          <CardTitle>{t('deliveryPricing.title')}</CardTitle>
         </div>
-        <CardDescription>
-          الرسم الثابت هو المعروض حاليًا في تطبيق العميل، بينما سعر الكيلومتر محفوظ لنموذج المسار.
-        </CardDescription>
+        <CardDescription>{t('deliveryPricing.description')}</CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-6">
         {query.isLoading ? (
-          <p className="text-sm text-muted-foreground">جاري تحميل إعدادات التوصيل...</p>
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : query.isError ? (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-3">
-            <p className="text-sm text-destructive">تعذر تحميل إعدادات التوصيل.</p>
+            <p className="text-sm text-destructive">{t('deliveryPricing.loadError')}</p>
             <Button variant="outline" size="sm" onClick={() => void query.refetch()}>
               <RefreshCw className="h-4 w-4" />
-              إعادة المحاولة
+              {t('deliveryPricing.retry')}
             </Button>
           </div>
         ) : (
           <>
+            <div className="space-y-3">
+              <Label>{t('deliveryPricing.mode')}</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant={deliveryPricingMode === 0 ? 'default' : 'outline'}
+                  onClick={() => setDeliveryPricingMode(0)}
+                >
+                  {t('deliveryPricing.distanceBased')}
+                </Button>
+                <Button
+                  type="button"
+                  variant={deliveryPricingMode === 1 ? 'default' : 'outline'}
+                  onClick={() => setDeliveryPricingMode(1)}
+                >
+                  {t('deliveryPricing.fixed')}
+                </Button>
+              </div>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="delivery-price-km">السعر لكل كيلومتر</Label>
+                <Label htmlFor="delivery-price-km">{t('deliveryPricing.pricePerKm')}</Label>
                 <Input
                   id="delivery-price-km"
                   type="number"
@@ -85,7 +122,7 @@ export function DeliveryPricingCard(): React.JSX.Element {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="delivery-fixed-fee">رسم التوصيل الثابت</Label>
+                <Label htmlFor="delivery-fixed-fee">{t('deliveryPricing.fixedFee')}</Label>
                 <Input
                   id="delivery-fixed-fee"
                   type="number"
@@ -97,9 +134,39 @@ export function DeliveryPricingCard(): React.JSX.Element {
               </div>
             </div>
 
+            <div className="rounded-xl border p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <Label htmlFor="delivery-cash-limit">{t('deliveryPricing.cashLimit')}</Label>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {t('deliveryPricing.cashLimitDescription')}
+                  </p>
+                </div>
+                <Switch
+                  id="delivery-cash-limit"
+                  checked={cashLimitEnabled}
+                  onCheckedChange={setCashLimitEnabled}
+                />
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="delivery-cash-limit-amount">
+                  {t('deliveryPricing.cashLimitAmount')}
+                </Label>
+                <Input
+                  id="delivery-cash-limit-amount"
+                  type="number"
+                  min="0"
+                  step="any"
+                  disabled={!cashLimitEnabled}
+                  value={cashLimitAmount}
+                  onChange={(event) => setCashLimitAmount(event.target.value)}
+                />
+              </div>
+            </div>
+
             <div className="rounded-xl border bg-primary/5 p-4 text-sm text-muted-foreground">
-              تطبيق العميل يعتمد حاليًا <strong className="text-foreground">fixedDeliveryFee</strong> و
-              <strong className="text-foreground"> fixedTotalAmount</strong>.
+              {t('deliveryPricing.authoritativeHint')}
             </div>
 
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -107,7 +174,7 @@ export function DeliveryPricingCard(): React.JSX.Element {
             <div className="flex justify-end">
               <Button className="gap-2" disabled={mutation.isPending} onClick={save}>
                 <Save className="h-4 w-4" />
-                حفظ إعدادات التوصيل
+                {t('deliveryPricing.save')}
               </Button>
             </div>
           </>
