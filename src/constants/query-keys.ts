@@ -52,6 +52,16 @@ export const queryKeys = {
     clients: () => ['otp-admin', 'clients'] as const,
     apiKeys: () => ['otp-admin', 'api-keys'] as const,
   },
+  deliveryFinance: {
+    root: ['delivery-finance'] as const,
+    list: (pagination: unknown) => ['delivery-finance', 'list', pagination] as const,
+    detail: (deliveryPersonId: string) => ['delivery-finance', 'detail', deliveryPersonId] as const,
+    orders: (deliveryPersonId: string, pagination: unknown) =>
+      ['delivery-finance', 'orders', deliveryPersonId, pagination] as const,
+    order: (orderId: string) => ['delivery-finance', 'order', orderId] as const,
+    transactions: (deliveryPersonId: string, pagination: unknown) =>
+      ['delivery-finance', 'transactions', deliveryPersonId, pagination] as const,
+  },
   settings: {
     root: ['settings'] as const,
     profile: () => ['settings', 'profile'] as const,
