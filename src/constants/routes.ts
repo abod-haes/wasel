@@ -10,6 +10,7 @@ export const ROUTES = {
   categories: '/categories',
   ads: '/ads',
   orders: '/orders',
+  deliveryFinance: '/delivery-finance',
   notifications: '/notifications',
   otpAdmin: '/otp-whatsapp',
   settings: '/settings',
