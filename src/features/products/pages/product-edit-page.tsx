@@ -6,6 +6,7 @@ import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categor
 import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
 import { ProductDetailsForm } from '@/features/products/components/product-details-form';
 import { ProductImagesManager } from '@/features/products/components/product-images-manager';
+import { ProductOffersManager } from '@/features/products/components/product-offers-manager';
 import { ProductVariantsManager } from '@/features/products/components/product-variants-manager';
 import { useProductQuery, useUpdateProductMutation } from '@/features/products/hooks/use-products-query';
 import { buildProductsListRoute } from '@/features/products/lib/product-list-url';
@@ -80,6 +81,7 @@ export default function ProductEditPage(): React.JSX.Element {
         isSubmitting={updateProductMutation.isPending}
       />
       <ProductImagesManager product={product} />
+      {!isMarket ? <ProductOffersManager product={product} /> : null}
       <ProductVariantsManager productId={productId} />
     </PageContainer>
   );
