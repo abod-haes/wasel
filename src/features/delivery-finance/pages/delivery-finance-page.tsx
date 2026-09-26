@@ -460,6 +460,10 @@ export default function DeliveryFinancePage(): React.JSX.Element {
             <div className="space-y-5">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <MiniValue
+                  label={t('deliveryFinance.order')}
+                  value={orderQuery.data.order.orderId}
+                />
+                <MiniValue
                   label={t('deliveryFinance.paymentWay')}
                   value={paymentWayLabel(orderQuery.data.order.paymentWay, t)}
                 />
@@ -585,6 +589,9 @@ function FinanceOrdersTable({
           <TableHead>{t('deliveryFinance.order')}</TableHead>
           <TableHead>{t('deliveryFinance.deliveredAt')}</TableHead>
           <TableHead>{t('deliveryFinance.paymentWay')}</TableHead>
+          <TableHead>{t('deliveryFinance.itemsTotal')}</TableHead>
+          <TableHead>{t('deliveryFinance.distanceFee')}</TableHead>
+          <TableHead>{t('deliveryFinance.fixedFee')}</TableHead>
           <TableHead>{t('deliveryFinance.appliedMode')}</TableHead>
           <TableHead>{t('deliveryFinance.chargedAmount')}</TableHead>
           <TableHead>{t('deliveryFinance.cashCollected')}</TableHead>
@@ -594,13 +601,13 @@ function FinanceOrdersTable({
       <TableBody>
         {loading ? (
           <TableRow>
-            <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+            <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
               {t('common.loading')}
             </TableCell>
           </TableRow>
         ) : orders.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+            <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
               {t('deliveryFinance.noOrders')}
             </TableCell>
           </TableRow>
@@ -610,6 +617,9 @@ function FinanceOrdersTable({
               <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
               <TableCell>{dateTime(order.deliveredAt)}</TableCell>
               <TableCell>{paymentWayLabel(order.paymentWay, t)}</TableCell>
+              <TableCell>{money(order.itemsTotal)}</TableCell>
+              <TableCell>{money(order.distanceBasedDeliveryFee)}</TableCell>
+              <TableCell>{money(order.fixedDeliveryFee)}</TableCell>
               <TableCell>{pricingModeLabel(order.appliedDeliveryPricingMode, t)}</TableCell>
               <TableCell className="font-medium">{money(order.chargedAmount)}</TableCell>
               <TableCell>{money(order.cashCollectedAmount)}</TableCell>
@@ -643,19 +653,20 @@ function TransactionsTable({
           <TableHead>{t('deliveryFinance.type')}</TableHead>
           <TableHead>{t('deliveryFinance.order')}</TableHead>
           <TableHead>{t('deliveryFinance.amount')}</TableHead>
+          <TableHead>{t('deliveryFinance.admin')}</TableHead>
           <TableHead>{t('deliveryFinance.note')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {loading ? (
           <TableRow>
-            <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+            <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
               {t('common.loading')}
             </TableCell>
           </TableRow>
         ) : transactions.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+            <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
               {t('deliveryFinance.noTransactions')}
             </TableCell>
           </TableRow>
@@ -674,6 +685,9 @@ function TransactionsTable({
                 {transaction.orderId ?? '-'}
               </TableCell>
               <TableCell className="font-medium">{money(transaction.amount)}</TableCell>
+              <TableCell className="font-mono text-xs">
+                {transaction.settledByAdminId ?? '-'}
+              </TableCell>
               <TableCell>{transaction.note ?? '-'}</TableCell>
             </TableRow>
           ))
