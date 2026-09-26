@@ -575,7 +575,8 @@
     "note": "الملاحظة",
     "collection": "تحصيل",
     "settlement": "تسوية",
-    "openFinance": "فتح مالية المندوب"
+    "openFinance": "فتح مالية المندوب",
+    "admin": "المدير"
   },
   "deliveryPricing": {
     "title": "تسعير التوصيل وحد الكاش",
