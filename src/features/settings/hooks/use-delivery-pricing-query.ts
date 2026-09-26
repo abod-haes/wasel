@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -6,6 +7,17 @@ import {
   deliveryPricingApi,
   type DeliveryPricingSettings,
 } from '@/features/settings/api/delivery-pricing-api';
+
+function apiErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { message?: string } | undefined;
+    if (typeof data?.message === 'string' && data.message.trim()) {
+      return data.message;
+    }
+  }
+
+  return error instanceof Error ? error.message : 'تعذر حفظ إعدادات التوصيل.';
+}
 
 export const useDeliveryPricingQuery = () =>
   useQuery({
@@ -21,6 +33,9 @@ export const useUpdateDeliveryPricingMutation = () => {
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.settings.deliveryPricing(), data);
       toast.success('تم حفظ إعدادات التوصيل');
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error));
     },
   });
 };
