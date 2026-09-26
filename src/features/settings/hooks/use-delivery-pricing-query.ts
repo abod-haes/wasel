@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { queryKeys } from '@/constants/query-keys';
 import {
   deliveryPricingApi,
-  type DeliveryPricingSettings,
+  type UpdateDeliveryPricingSettings,
 } from '@/features/settings/api/delivery-pricing-api';
 
 function apiErrorMessage(error: unknown): string {
@@ -29,7 +29,7 @@ export const useUpdateDeliveryPricingMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: DeliveryPricingSettings) => deliveryPricingApi.update(input),
+    mutationFn: (input: UpdateDeliveryPricingSettings) => deliveryPricingApi.update(input),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.settings.deliveryPricing(), data);
       toast.success('تم حفظ إعدادات التوصيل');
