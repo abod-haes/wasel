@@ -71,15 +71,9 @@ export const useSettleDeliveryCashMutation = () => {
       deliveryFinanceApi.settle(deliveryPersonId, note),
     onSuccess: async (_, variables) => {
       toast.success('تمت تسوية رصيد المندوب');
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: queryKeys.deliveryFinance.root }),
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.deliveryFinance.detail(variables.deliveryPersonId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ['delivery-finance', 'transactions', variables.deliveryPersonId],
-        }),
-      ]);
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.deliveryFinance.root,
+      });
     },
     onError: (error) => {
       toast.error(apiErrorMessage(error));
