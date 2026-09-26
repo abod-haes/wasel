@@ -112,10 +112,18 @@ export function OrdersTable({
         header: t('orders.table.totalAmount'),
         renderCell: (order: Order) => (
           <div>
-            <p className="font-medium">{formatCurrency(order.fixedTotalAmount ?? order.totalAmount)}</p>
-            {order.fixedDeliveryFee != null ? (
+            <p className="font-medium">{formatCurrency(order.chargedAmount ?? order.totalAmount)}</p>
+            {order.chargedDeliveryFee != null ||
+            order.fixedDeliveryFee != null ||
+            order.journeyPrice != null ? (
               <p className="text-xs text-muted-foreground">
-                توصيل: {formatCurrency(order.fixedDeliveryFee)}
+                توصيل:{' '}
+                {formatCurrency(
+                  order.chargedDeliveryFee ??
+                    order.fixedDeliveryFee ??
+                    order.journeyPrice ??
+                    0,
+                )}
               </p>
             ) : null}
           </div>
