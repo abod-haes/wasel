@@ -3,6 +3,7 @@ import {
   Bell,
   Bookmark,
   ClipboardList,
+  HandCoins,
   LayoutDashboard,
   Megaphone,
   MessageCircleMore,
@@ -66,6 +67,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     to: ROUTES.orders,
     icon: ClipboardList,
     permission: PERMISSIONS.ordersView,
+  },
+  {
+    key: 'delivery-finance',
+    labelKey: 'nav.deliveryFinance',
+    to: ROUTES.deliveryFinance,
+    icon: HandCoins,
+    permission: PERMISSIONS.settingsView,
   },
   {
     key: 'notifications',
