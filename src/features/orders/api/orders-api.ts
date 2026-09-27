@@ -43,6 +43,26 @@ interface OrderApiResponse {
   chargedDeliveryFee?: number;
   ChargedAmount?: number;
   chargedAmount?: number;
+  TotalBeforeDiscount?: number;
+  totalBeforeDiscount?: number;
+  ItemsDiscountAmount?: number;
+  itemsDiscountAmount?: number;
+  DeliveryDiscountAmount?: number;
+  deliveryDiscountAmount?: number;
+  DiscountAmount?: number;
+  discountAmount?: number;
+  DiscountedItemsTotal?: number;
+  discountedItemsTotal?: number;
+  DiscountCodeId?: string;
+  discountCodeId?: string;
+  DiscountCode?: string;
+  discountCode?: string;
+  DiscountType?: 'Percentage' | 'FixedAmount';
+  discountType?: 'Percentage' | 'FixedAmount';
+  DiscountScope?: 'ProductsOnly' | 'DeliveryOnly' | 'EntireOrder';
+  discountScope?: 'ProductsOnly' | 'DeliveryOnly' | 'EntireOrder';
+  DiscountValue?: number;
+  discountValue?: number;
   MarketStops?: Array<{
     MarketUserId?: string; marketUserId?: string;
     MarketName?: string; marketName?: string;
@@ -226,6 +246,16 @@ const mapOrderResponse = (order: OrderApiResponse): Order => {
       order.AppliedDeliveryPricingMode ?? order.appliedDeliveryPricingMode,
     chargedDeliveryFee: order.ChargedDeliveryFee ?? order.chargedDeliveryFee,
     chargedAmount: order.ChargedAmount ?? order.chargedAmount,
+    totalBeforeDiscount: order.TotalBeforeDiscount ?? order.totalBeforeDiscount,
+    itemsDiscountAmount: order.ItemsDiscountAmount ?? order.itemsDiscountAmount,
+    deliveryDiscountAmount: order.DeliveryDiscountAmount ?? order.deliveryDiscountAmount,
+    discountAmount: order.DiscountAmount ?? order.discountAmount,
+    discountedItemsTotal: order.DiscountedItemsTotal ?? order.discountedItemsTotal,
+    discountCodeId: order.DiscountCodeId ?? order.discountCodeId,
+    discountCode: order.DiscountCode ?? order.discountCode,
+    discountType: order.DiscountType ?? order.discountType,
+    discountScope: order.DiscountScope ?? order.discountScope,
+    discountValue: order.DiscountValue ?? order.discountValue,
     marketStops: (order.MarketStops ?? order.marketStops ?? [])
       .map((stop) => ({
         marketUserId: stop.MarketUserId ?? stop.marketUserId ?? '',
