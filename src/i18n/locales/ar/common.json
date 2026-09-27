@@ -64,7 +64,8 @@
     "storeDashboard": "لوحة المتجر",
     "myProducts": "منتجاتي",
     "myOrders": "طلباتي",
-    "deliveryFinance": "مالية المندوبين"
+    "deliveryFinance": "مالية المندوبين",
+    "discountCodes": "أكواد الخصم"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
