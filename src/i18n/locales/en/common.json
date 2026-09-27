@@ -64,7 +64,8 @@
     "storeDashboard": "Store Dashboard",
     "myProducts": "My Products",
     "myOrders": "My Orders",
-    "deliveryFinance": "Delivery Finance"
+    "deliveryFinance": "Delivery Finance",
+    "discountCodes": "Discount Codes"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
