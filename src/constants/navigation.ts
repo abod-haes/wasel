@@ -11,6 +11,7 @@ import {
   Settings,
   SlidersHorizontal,
   Tags,
+  TicketPercent,
   Users,
 } from 'lucide-react';
 
@@ -67,6 +68,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     to: ROUTES.orders,
     icon: ClipboardList,
     permission: PERMISSIONS.ordersView,
+  },
+  {
+    key: 'discount-codes',
+    labelKey: 'nav.discountCodes',
+    to: ROUTES.discountCodes,
+    icon: TicketPercent,
+    permission: PERMISSIONS.discountCodesView,
   },
   {
     key: 'delivery-finance',
