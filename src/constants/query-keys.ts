@@ -24,6 +24,10 @@ export const queryKeys = {
     offers: (productId: string) => ['products', 'offers', productId] as const,
     brief: () => ['products', 'brief'] as const,
   },
+  discountCodes: {
+    root: ['discount-codes'] as const,
+    list: (pagination: unknown) => ['discount-codes', 'list', pagination] as const,
+  },
   categories: {
     root: ['categories'] as const,
     list: (filters: unknown) => ['categories', 'list', filters] as const,
