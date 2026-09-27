@@ -19,6 +19,7 @@ const ProductEditPage = lazy(() => import('@/features/products/pages/product-edi
 const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
 const AdsPage = lazy(() => import('@/features/ads/pages/ads-page'));
 const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
+const DiscountCodesPage = lazy(() => import('@/features/discount-codes/pages/discount-codes-page'));
 const DeliveryFinancePage = lazy(
   () => import('@/features/delivery-finance/pages/delivery-finance-page')
 );
@@ -153,6 +154,17 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.orders',
+            },
+          },
+          {
+            path: ROUTES.discountCodes,
+            element: (
+              <PermissionGuard required={PERMISSIONS.discountCodesView}>
+                {withSuspense(<DiscountCodesPage />)}
+              </PermissionGuard>
+            ),
+            handle: {
+              breadcrumbKey: 'nav.discountCodes',
             },
           },
           {
