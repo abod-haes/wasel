@@ -26,7 +26,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'group flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-border/90 bg-background/80 px-3.5 text-start text-sm font-medium text-foreground shadow-[0_1px_2px_hsl(var(--foreground)/0.03),inset_0_1px_0_hsl(var(--background)/0.55)] outline-none transition-[border-color,box-shadow,background-color,transform] duration-200 data-[placeholder]:text-muted-foreground hover:border-primary/35 hover:bg-card focus:border-primary/60 focus:bg-card focus:ring-4 focus:ring-primary/12 data-[state=open]:border-primary/55 data-[state=open]:bg-card data-[state=open]:ring-4 data-[state=open]:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50',
+      'group flex h-12 w-full min-w-0 items-center justify-between gap-3 rounded-[16px] border border-border/70 bg-muted/35 px-4 text-start text-sm font-medium text-foreground shadow-[inset_0_1px_0_hsl(var(--background)/0.45)] outline-none transition-[border-color,box-shadow,background-color] duration-200 data-[placeholder]:text-muted-foreground hover:border-border hover:bg-muted/50 focus:border-primary/50 focus:bg-card focus:ring-4 focus:ring-primary/10 data-[state=open]:border-primary/50 data-[state=open]:bg-card data-[state=open]:ring-4 data-[state=open]:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50',
       className
     )}
     {...props}
