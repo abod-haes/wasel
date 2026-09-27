@@ -113,6 +113,11 @@ export function OrdersTable({
         renderCell: (order: Order) => (
           <div>
             <p className="font-medium">{formatCurrency(order.chargedAmount ?? order.totalAmount)}</p>
+            {order.discountCode && (order.discountAmount ?? 0) > 0 ? (
+              <p className="text-xs font-medium text-emerald-600 dark:text-emerald-300">
+                {order.discountCode}: -{formatCurrency(order.discountAmount ?? 0)}
+              </p>
+            ) : null}
             {order.chargedDeliveryFee != null ||
             order.fixedDeliveryFee != null ||
             order.journeyPrice != null ? (
