@@ -68,7 +68,7 @@ function SidebarInner({
     <>
       <div
         className={cn(
-          'flex h-16 items-center border-b border-brand-border/80 bg-gradient-to-b from-brand-green-soft/70 to-transparent px-4 dark:from-primary/10',
+          'flex h-16 items-center border-b border-brand-border/80 bg-gradient-to-b from-brand-red-soft/80 to-transparent px-4 dark:from-primary/10',
           collapsed ? 'justify-start px-2' : 'justify-start'
         )}
       >
