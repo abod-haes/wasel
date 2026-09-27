@@ -41,6 +41,16 @@ export interface Order {
   appliedDeliveryPricingMode?: 0 | 1;
   chargedDeliveryFee?: number;
   chargedAmount?: number;
+  totalBeforeDiscount?: number;
+  itemsDiscountAmount?: number;
+  deliveryDiscountAmount?: number;
+  discountAmount?: number;
+  discountedItemsTotal?: number;
+  discountCodeId?: string;
+  discountCode?: string;
+  discountType?: 'Percentage' | 'FixedAmount';
+  discountScope?: 'ProductsOnly' | 'DeliveryOnly' | 'EntireOrder';
+  discountValue?: number;
   marketStops?: MarketStop[];
   journeyPrice?: number;
   pricePerKilometer?: number;
