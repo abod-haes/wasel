@@ -112,11 +112,11 @@ export default function LoginPage(): React.JSX.Element {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-surface p-4 dark:bg-background">
-      <div className="pointer-events-none absolute -start-24 -top-24 h-72 w-72 rounded-full bg-brand-green/10 blur-3xl" />
+      <div className="pointer-events-none absolute -start-24 -top-24 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -end-20 h-72 w-72 rounded-full bg-brand-red/10 blur-3xl" />
 
       <Card className="relative w-full max-w-md overflow-hidden rounded-wasel-lg border-brand-border/90 bg-card/95 shadow-floating dark:border-border">
-        <div className="h-1.5 w-full bg-gradient-to-l from-brand-green via-brand-green to-brand-red" />
+        <div className="h-1.5 w-full bg-gradient-to-l from-brand-red-dark via-brand-red to-primary/60" />
         <CardHeader className="items-center px-7 pb-3 pt-7 text-center">
           <WaselBrandLogo className="mb-2 h-16 w-48" />
           <CardTitle className="text-2xl">{t('auth.loginTitle')}</CardTitle>
