@@ -9,6 +9,7 @@ export const PERMISSIONS = {
   adsView: 'ads:view',
   ordersView: 'orders:view',
   ordersManage: 'orders:manage',
+  discountCodesView: 'discount-codes:view',
   notificationsView: 'notifications:view',
   notificationsSend: 'notifications:send',
   otpAdminView: 'otp-admin:view',
