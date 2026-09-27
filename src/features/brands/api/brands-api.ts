@@ -34,12 +34,23 @@ export const brandsApi = {
   },
 
   async getOptions(): Promise<Brand[]> {
-    const { data } = await apiClient.get<BrandPaginatedResponse>('/api/Brands', {
-      params: { page: 1, pageSize: 100 },
-    });
+    const pageSize = 100;
+    let page = 1;
+    const brands: Brand[] = [];
 
-    const paginated = toPaginatedData(data, { page: 1, pageSize: 100 });
-    return paginated.items.map(mapBrand);
+    while (true) {
+      const { data } = await apiClient.get<BrandPaginatedResponse>('/api/Brands', {
+        params: { page, pageSize },
+      });
+
+      const paginated = toPaginatedData(data, { page, pageSize });
+      brands.push(...paginated.items.map(mapBrand).filter((brand) => Boolean(brand.id)));
+
+      if (page >= paginated.totalPages || paginated.items.length === 0) break;
+      page += 1;
+    }
+
+    return Array.from(new Map(brands.map((brand) => [brand.id, brand])).values());
   },
 
   async createBrand(input: BrandInput): Promise<Brand> {
