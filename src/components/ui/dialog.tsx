@@ -26,7 +26,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto overscroll-contain rounded-[28px] border border-border/70 bg-card p-0 shadow-[0_28px_90px_-34px_rgba(0,0,0,0.5)]',
+        'fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto overscroll-contain rounded-[28px] border border-border/70 bg-card p-6 shadow-[0_28px_90px_-34px_rgba(0,0,0,0.5)]',
         className
       )}
       {...props}
@@ -42,11 +42,11 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div className={cn('flex flex-col space-y-1.5 border-b border-border/60 bg-muted/25 px-6 py-5 text-center sm:text-start', className)} {...props} />
+  <div className={cn('-mx-6 -mt-6 flex flex-col space-y-1.5 border-b border-border/60 bg-muted/25 px-6 py-5 pe-16 text-center sm:text-start', className)} {...props} />
 );
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div className={cn('flex flex-col-reverse gap-2 border-t border-border/60 bg-muted/20 px-6 py-4 sm:flex-row sm:justify-end', className)} {...props} />
+  <div className={cn('-mx-6 -mb-6 flex flex-col-reverse gap-2 border-t border-border/60 bg-muted/20 px-6 py-4 sm:flex-row sm:justify-end', className)} {...props} />
 );
 
 const DialogTitle = React.forwardRef<
