@@ -138,13 +138,59 @@ export function ProductDetailsForm({
     }
   }, [fixedMarketUserId, mode, product]);
 
+  const brandOptions = useMemo(() => {
+    if (!product?.brandId || brands.some((brand) => brand.id === product.brandId)) {
+      return brands;
+    }
+
+    return [
+      {
+        id: product.brandId,
+        name: product.brand || 'العلامة التجارية الحالية',
+      },
+      ...brands,
+    ];
+  }, [brands, product?.brand, product?.brandId]);
+
+  const marketOptions = useMemo(() => {
+    if (!product?.marketUserId || markets.some((market) => market.id === product.marketUserId)) {
+      return markets;
+    }
+
+    return [
+      {
+        id: product.marketUserId,
+        name: product.marketName || 'السوق الحالي',
+        location: '',
+      },
+      ...markets,
+    ];
+  }, [markets, product?.marketName, product?.marketUserId]);
+
+  const categoryOptions = useMemo(() => {
+    const knownIds = new Set(categories.map((category) => category.id));
+    const missingCurrentCategories =
+      product?.categories
+        .filter((category) => category.id && !knownIds.has(category.id))
+        .map((category) => ({
+          id: category.id,
+          name: category.name || 'التصنيف الحالي',
+          level: 0,
+        })) ?? [];
+
+    return [...missingCurrentCategories, ...categories];
+  }, [categories, product?.categories]);
+
   const filteredCategories = useMemo(() => {
     const search = categorySearch.trim().toLowerCase();
-    if (!search) return categories;
-    return categories.filter((category) => category.name.toLowerCase().includes(search));
-  }, [categories, categorySearch]);
+    if (!search) return categoryOptions;
+    return categoryOptions.filter((category) => category.name.toLowerCase().includes(search));
+  }, [categoryOptions, categorySearch]);
 
-  const selectedMarket = markets.find((market) => market.id === values.marketUserId);
+  const selectedMarket = marketOptions.find((market) => market.id === values.marketUserId);
+  const selectedCategories = categoryOptions.filter((category) =>
+    values.categoryIds.includes(category.id)
+  );
 
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -254,7 +300,7 @@ export function ProductDetailsForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={NONE_VALUE}>بدون براند</SelectItem>
-                  {brands.map((brand) => (
+                  {brandOptions.map((brand) => (
                     <SelectItem key={brand.id} value={brand.id}>
                       {brand.name}
                     </SelectItem>
@@ -286,7 +332,7 @@ export function ProductDetailsForm({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
-                      {markets.map((market) => (
+                      {marketOptions.map((market) => (
                         <SelectItem key={market.id} value={market.id}>
                           {market.name}
                         </SelectItem>
@@ -294,7 +340,9 @@ export function ProductDetailsForm({
                     </SelectContent>
                   </Select>
                   {selectedMarket ? (
-                    <p className="mt-1 text-xs text-muted-foreground">{selectedMarket.location}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {selectedMarket.location || selectedMarket.name}
+                    </p>
                   ) : null}
                 </>
               )}
@@ -375,6 +423,20 @@ export function ProductDetailsForm({
               </div>
               <span className="text-xs text-muted-foreground">محدد: {values.categoryIds.length}</span>
             </div>
+
+            {selectedCategories.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {selectedCategories.map((category) => (
+                  <span
+                    key={category.id}
+                    className="rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {category.name}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
             <Input value={categorySearch} placeholder="ابحث عن تصنيف" onChange={(event) => setCategorySearch(event.target.value)} />
             <div className="max-h-52 space-y-1 overflow-y-auto rounded-lg border p-2">
               {filteredCategories.length === 0 ? (
