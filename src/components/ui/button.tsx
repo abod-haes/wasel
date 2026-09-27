@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'border border-primary/25 bg-gradient-to-b from-brand-green via-primary to-brand-green-dark text-primary-foreground shadow-[0_10px_26px_-14px_rgba(0,176,80,0.78)] hover:-translate-y-0.5 hover:shadow-[0_18px_30px_-16px_rgba(0,176,80,0.72)]',
+          'border border-primary/20 bg-gradient-to-b from-[#E13A3A] via-primary to-brand-red-dark text-primary-foreground shadow-[0_12px_28px_-16px_rgba(214,40,40,0.72)] hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-17px_rgba(214,40,40,0.66)]',
         secondary:
-          'border border-brand-border/80 bg-gradient-to-b from-card to-brand-green-soft/60 text-foreground shadow-sm hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-soft dark:border-border dark:to-muted/60',
+          'border border-border/80 bg-gradient-to-b from-card to-muted/55 text-foreground shadow-sm hover:-translate-y-0.5 hover:border-primary/20 hover:bg-primary/[0.035] hover:shadow-soft dark:border-border dark:to-muted/60',
         ghost:
           'border border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/8 hover:text-primary',
         outline:
           'border border-brand-border bg-background/80 text-foreground backdrop-blur hover:border-primary/45 hover:bg-primary/5 dark:border-border',
         destructive:
-          'border border-brand-red/20 bg-gradient-to-b from-brand-red via-destructive to-brand-red-dark text-destructive-foreground shadow-[0_10px_24px_-14px_rgba(237,28,36,0.72)] hover:-translate-y-0.5 hover:shadow-[0_16px_28px_-15px_rgba(237,28,36,0.62)]',
+          'border border-brand-red/20 bg-gradient-to-b from-brand-red via-destructive to-brand-red-dark text-destructive-foreground shadow-[0_10px_24px_-14px_rgba(183,28,28,0.72)] hover:-translate-y-0.5 hover:shadow-[0_16px_28px_-15px_rgba(183,28,28,0.62)]',
       },
       size: {
         default: 'h-11 px-5',
