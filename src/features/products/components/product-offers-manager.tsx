@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Pencil, Plus, Tag, Trash2 } from 'lucide-react';
+import { BadgePercent, CalendarRange, Pencil, Plus, Tag, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { DateTimeField } from '@/components/shared';
 import {
   Badge,
   Button,
@@ -123,6 +124,23 @@ export function ProductOffersManager({
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   const offers = useMemo(() => offersQuery.data ?? [], [offersQuery.data]);
+  const preview = useMemo(() => {
+    const value = Number(form.value);
+
+    if (!Number.isFinite(value) || value < 0) {
+      return { finalPrice: basePrice, savings: 0 };
+    }
+
+    const finalPrice =
+      form.discountType === 'Percentage'
+        ? Math.max(0, basePrice * (1 - Math.min(value, 100) / 100))
+        : Math.max(0, Math.min(value, basePrice));
+
+    return {
+      finalPrice,
+      savings: Math.max(0, basePrice - finalPrice),
+    };
+  }, [basePrice, form.discountType, form.value]);
 
   const openCreate = (): void => {
     setEditingOffer(null);
@@ -315,15 +333,37 @@ export function ProductOffersManager({
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingOffer ? 'تعديل العرض' : 'إضافة عرض جديد'}</DialogTitle>
-            <DialogDescription>
-              استخدم توقيت جهازك، وسيتم إرسال التاريخ بصيغة ISO-8601 للباك إند.
-            </DialogDescription>
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <BadgePercent className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle>{editingOffer ? 'تعديل العرض' : 'إضافة عرض جديد'}</DialogTitle>
+                <DialogDescription className="mt-1">
+                  حدد قيمة الخصم والفترة، والباقي ينحسب من الباك إند.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
-          <div className="grid gap-5 py-2 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2 grid gap-3 rounded-[22px] border border-primary/10 bg-primary/[0.035] p-4 sm:grid-cols-3">
+              <div className="rounded-2xl bg-card px-4 py-3">
+                <p className="text-xs font-medium text-muted-foreground">السعر الأساسي</p>
+                <p className="mt-1 text-lg font-bold">{formatMoney(basePrice)} USD</p>
+              </div>
+              <div className="rounded-2xl bg-card px-4 py-3">
+                <p className="text-xs font-medium text-muted-foreground">السعر بعد العرض</p>
+                <p className="mt-1 text-lg font-bold text-primary">{formatMoney(preview.finalPrice)} USD</p>
+              </div>
+              <div className="rounded-2xl bg-card px-4 py-3">
+                <p className="text-xs font-medium text-muted-foreground">التوفير</p>
+                <p className="mt-1 text-lg font-bold">{formatMoney(preview.savings)} USD</p>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>نوع الخصم</Label>
               <Select
@@ -344,45 +384,60 @@ export function ProductOffersManager({
 
             <div className="space-y-2">
               <Label>{form.discountType === 'Percentage' ? 'نسبة الخصم' : 'السعر النهائي (USD)'}</Label>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.value}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, value: event.target.value }))
-                }
-                placeholder={form.discountType === 'Percentage' ? 'مثال: 20' : 'مثال: 7.50'}
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.value}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, value: event.target.value }))
+                  }
+                  placeholder={form.discountType === 'Percentage' ? 'مثال: 20' : 'مثال: 7.50'}
+                  className="pe-12"
+                />
+                <span className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                  {form.discountType === 'Percentage' ? '%' : 'USD'}
+                </span>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>يبدأ في</Label>
-              <Input
-                type="datetime-local"
-                value={form.startsAt}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, startsAt: event.target.value }))
-                }
-              />
+            <div className="space-y-2 sm:col-span-2">
+              <div className="flex items-center gap-2">
+                <CalendarRange className="h-4 w-4 text-primary" />
+                <Label>مدة العرض</Label>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground">يبدأ في</p>
+                  <DateTimeField
+                    value={form.startsAt}
+                    onChange={(startsAt) =>
+                      setForm((current) => ({ ...current, startsAt }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-muted-foreground">ينتهي في</p>
+                  <DateTimeField
+                    value={form.endsAt}
+                    min={form.startsAt}
+                    onChange={(endsAt) =>
+                      setForm((current) => ({ ...current, endsAt }))
+                    }
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>ينتهي في</Label>
-              <Input
-                type="datetime-local"
-                value={form.endsAt}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, endsAt: event.target.value }))
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border/70 p-4 sm:col-span-2">
-              <div>
-                <p className="font-medium">تفعيل العرض</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  يمكن حفظ عرض معطل ثم تفعيله لاحقاً.
+            <div
+              dir="rtl"
+              className="flex items-center justify-between gap-4 rounded-[20px] border border-border/65 bg-muted/25 p-4 sm:col-span-2"
+            >
+              <div className="min-w-0">
+                <p className="font-semibold">تفعيل العرض</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  إذا كان معطلاً بيضل محفوظ، بس ما رح ينعرض للمستخدمين.
                 </p>
               </div>
               <Switch
@@ -390,6 +445,7 @@ export function ProductOffersManager({
                 onCheckedChange={(checked) =>
                   setForm((current) => ({ ...current, isEnabled: checked }))
                 }
+                aria-label="تفعيل العرض"
               />
             </div>
           </div>
@@ -403,7 +459,7 @@ export function ProductOffersManager({
               onClick={submit}
               disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {createMutation.isPending || updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ'}
+              {createMutation.isPending || updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ العرض'}
             </Button>
           </DialogFooter>
         </DialogContent>
