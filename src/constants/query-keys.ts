@@ -66,8 +66,6 @@ export const queryKeys = {
     order: (orderId: string) => ['delivery-finance', 'order', orderId] as const,
     transactions: (deliveryPersonId: string, pagination: unknown) =>
       ['delivery-finance', 'transactions', deliveryPersonId, pagination] as const,
-    unsettled: (deliveryPersonId: string, lastSettlementAt: string | null, currentCashHeld: number) =>
-      ['delivery-finance', 'unsettled', deliveryPersonId, lastSettlementAt, currentCashHeld] as const,
   },
   settings: {
     root: ['settings'] as const,
