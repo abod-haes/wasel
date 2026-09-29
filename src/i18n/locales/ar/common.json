@@ -583,7 +583,9 @@
     "collection": "تحصيل",
     "settlement": "تسوية",
     "openFinance": "فتح مالية المندوب",
-    "admin": "المدير"
+    "admin": "المدير",
+    "authoritativeBalanceTitle": "الرصيد الرسمي من الباك",
+    "authoritativeBalanceHint": "الرصيد الحالي لا يُعاد حسابه من سجل الطلبات. نعتمد currentCashHeld والـledger من الباك، والتسوية تُنفّذ فقط من زر التسوية."
   },
   "deliveryPricing": {
     "title": "تسعير التوصيل وحد الكاش",
