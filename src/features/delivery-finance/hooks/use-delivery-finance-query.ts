@@ -63,27 +63,6 @@ export const useDeliveryFinanceOrderQuery = (orderId?: string) =>
     enabled: Boolean(orderId),
   });
 
-export const useDeliveryFinanceUnsettledBreakdownQuery = (
-  deliveryPersonId: string | undefined,
-  lastSettlementAt: string | null | undefined,
-  currentCashHeld: number | undefined,
-) =>
-  useQuery({
-    queryKey: queryKeys.deliveryFinance.unsettled(
-      deliveryPersonId ?? '',
-      lastSettlementAt ?? null,
-      currentCashHeld ?? 0,
-    ),
-    queryFn: () =>
-      deliveryFinanceApi.getUnsettledBreakdown(
-        deliveryPersonId ?? '',
-        lastSettlementAt ?? null,
-        currentCashHeld ?? 0,
-      ),
-    enabled: Boolean(deliveryPersonId) && currentCashHeld !== undefined,
-    staleTime: 30_000,
-  });
-
 export const useSettleDeliveryCashMutation = () => {
   const queryClient = useQueryClient();
 
