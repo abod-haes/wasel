@@ -583,7 +583,9 @@
     "collection": "Collection",
     "settlement": "Settlement",
     "openFinance": "Open delivery finance",
-    "admin": "Admin"
+    "admin": "Admin",
+    "authoritativeBalanceTitle": "Backend-authoritative balance",
+    "authoritativeBalanceHint": "The current balance is never reconstructed from order history. The UI trusts currentCashHeld and the backend ledger, and settlement only happens through the settlement action."
   },
   "deliveryPricing": {
     "title": "Delivery Pricing & Cash Limit",
