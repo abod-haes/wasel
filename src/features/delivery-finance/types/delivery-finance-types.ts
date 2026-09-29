@@ -63,16 +63,6 @@ export interface DeliveryCashTransaction {
   createdAt: string;
 }
 
-export interface DeliveryUnsettledBreakdown {
-  currentCashHeld: number;
-  unsettledInvoicesTotal: number;
-  unsettledDeliveryFeesTotal: number;
-  unsettledOrdersCount: number;
-  reconciledAmount: number;
-  reconciliationDifference: number;
-  isReconciled: boolean;
-}
-
 export interface DeliverySettlementResult {
   transactionId: string;
   deliveryPersonId: string;
