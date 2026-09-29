@@ -38,7 +38,6 @@ import {
   useDeliveryFinanceOrdersQuery,
   useDeliveryFinanceSummaryQuery,
   useDeliveryFinanceTransactionsQuery,
-  useDeliveryFinanceUnsettledBreakdownQuery,
   useSettleDeliveryCashMutation,
 } from '@/features/delivery-finance/hooks/use-delivery-finance-query';
 import type {
@@ -135,11 +134,6 @@ export default function DeliveryFinancePage(): React.JSX.Element {
 
   const listQuery = useDeliveryFinanceListQuery(listPagination);
   const summaryQuery = useDeliveryFinanceSummaryQuery(selectedDeliveryId);
-  const unsettledQuery = useDeliveryFinanceUnsettledBreakdownQuery(
-    selectedDeliveryId,
-    summaryQuery.data?.lastSettlementAt,
-    summaryQuery.data?.currentCashHeld,
-  );
   const ordersQuery = useDeliveryFinanceOrdersQuery(
     selectedDeliveryId,
     detailPagination,
@@ -328,53 +322,21 @@ export default function DeliveryFinancePage(): React.JSX.Element {
             {selectedSummary ? (
               <div className="space-y-3">
                 <div className="rounded-xl border border-primary/15 bg-primary/[0.03] p-4">
-                  <div className="mb-3">
-                    <p className="font-semibold">{t('deliveryFinance.unsettledBalance')}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {t('deliveryFinance.unsettledHint')}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <SummaryCard
                       icon={<WalletCards className="h-5 w-5" />}
-                      label={t('deliveryFinance.unsettledBalance')}
+                      label={t('deliveryFinance.cashHeld')}
                       value={`${money(selectedSummary.currentCashHeld)} ${t('deliveryFinance.currency')}`}
                     />
-                    <SummaryCard
-                      icon={<ReceiptText className="h-5 w-5" />}
-                      label={t('deliveryFinance.unsettledInvoices')}
-                      value={
-                        unsettledQuery.data
-                          ? `${money(unsettledQuery.data.unsettledInvoicesTotal)} ${t('deliveryFinance.currency')}`
-                          : t('common.loading')
-                      }
-                    />
-                    <SummaryCard
-                      icon={<Banknote className="h-5 w-5" />}
-                      label={t('deliveryFinance.unsettledDeliveryFees')}
-                      value={
-                        unsettledQuery.data
-                          ? `${money(unsettledQuery.data.unsettledDeliveryFeesTotal)} ${t('deliveryFinance.currency')}`
-                          : t('common.loading')
-                      }
-                    />
-                    <SummaryCard
-                      icon={<HandCoins className="h-5 w-5" />}
-                      label={t('deliveryFinance.unsettledOrders')}
-                      value={
-                        unsettledQuery.data
-                          ? String(unsettledQuery.data.unsettledOrdersCount)
-                          : t('common.loading')
-                      }
-                    />
+                    <div className="rounded-xl border bg-background/80 p-4">
+                      <p className="text-sm font-medium">
+                        {t('deliveryFinance.authoritativeBalanceTitle')}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {t('deliveryFinance.authoritativeBalanceHint')}
+                      </p>
+                    </div>
                   </div>
-
-                  {unsettledQuery.data && !unsettledQuery.data.isReconciled ? (
-                    <p className="mt-3 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-                      {t('deliveryFinance.unsettledMismatch')}
-                    </p>
-                  ) : null}
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
