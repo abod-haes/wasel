@@ -1,16 +1,20 @@
 import {
   BellRing,
   ChevronLeft,
+  Clock3,
   Database,
   MapPinned,
+  ServerCog,
   ShieldCheck,
   ShoppingBag,
   Trash2,
+  UsersRound,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { WaselBrandLogo } from '@/components/shared';
 import { ROUTES } from '@/constants/routes';
+import { env } from '@/env';
 
 const sections = [
   {
@@ -32,6 +36,16 @@ const sections = [
     icon: BellRing,
     title: 'الإشعارات والجهاز',
     body: 'يتم تسجيل رمز الإشعارات للجهاز لإرسال تحديثات الطلب والتوصيل والتنبيهات المرتبطة بالخدمة.',
+  },
+  {
+    icon: ServerCog,
+    title: 'مزودو الخدمة',
+    body: 'قد تمر البيانات الضرورية عبر خدمات البنية التحتية والإشعارات والخرائط التي يعتمد عليها واصل لتشغيل التطبيق. لا نستخدم الموقع للإعلانات.',
+  },
+  {
+    icon: Clock3,
+    title: 'الاحتفاظ بالبيانات',
+    body: 'نحتفظ بالبيانات للمدة اللازمة لتقديم الخدمة وحماية الحساب وتسوية الطلبات، وقد نحتفظ ببعض السجلات مدة أطول إذا كان ذلك مطلوباً قانونياً أو لأغراض منع الاحتيال والنزاعات.',
   },
 ];
 
@@ -109,9 +123,40 @@ export default function PrivacyPage(): React.JSX.Element {
           </div>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-2">
+          <article className="animate-stagger rounded-[28px] border border-border/80 bg-card p-6 shadow-card">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+              <UsersRound className="h-5 w-5" />
+            </div>
+            <h2 className="text-xl font-bold">اختياراتك وحقوقك</h2>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">
+              يمكنك تعديل بيانات الحساب المتاحة، إدارة العناوين، تغيير كلمة المرور، التحكم بأذونات
+              الموقع والإشعارات من إعدادات الجهاز، وطلب حذف الحساب والبيانات المرتبطة.
+            </p>
+          </article>
+
+          <article className="animate-stagger rounded-[28px] border border-border/80 bg-card p-6 shadow-card">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <h2 className="text-xl font-bold">التواصل والخصوصية</h2>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">
+              إذا كان عندك سؤال عن بياناتك أو طلب حذف أو تصحيح، استخدم صفحة الدعم العامة.
+              {env.supportEmail ? ` ويمكن التواصل عبر ${env.supportEmail}.` : ''}
+            </p>
+            <Link
+              to={ROUTES.support}
+              className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-semibold transition hover:border-primary/30 hover:text-primary"
+            >
+              فتح صفحة الدعم
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </article>
+        </section>
+
         <footer className="pb-4 text-center text-xs leading-6 text-muted-foreground">
-          يجب أن تتطابق هذه السياسة مع ممارسات التطبيق الفعلية ومع بيانات الخصوصية المصرح بها في
-          App Store Connect وGoogle Play Console.
+          آخر تحديث: 3 أكتوبر 2026. يجب أن تتطابق هذه السياسة مع ممارسات التطبيق الفعلية ومع بيانات
+          الخصوصية المصرح بها في App Store Connect وGoogle Play Console.
         </footer>
       </div>
     </main>

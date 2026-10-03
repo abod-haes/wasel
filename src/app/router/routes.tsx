@@ -10,6 +10,7 @@ import AccountDeletionPage from '@/pages/account-deletion-page';
 import LoginPage from '@/pages/login-page';
 import NotFoundPage from '@/pages/not-found-page';
 import PrivacyPage from '@/pages/privacy-page';
+import SupportPage from '@/pages/support-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'));
@@ -52,6 +53,10 @@ export const appRoutes: RouteObject[] = [
   {
     path: ROUTES.accountDeletion,
     element: <AccountDeletionPage />,
+  },
+  {
+    path: ROUTES.support,
+    element: <SupportPage />,
   },
   {
     path: ROUTES.unauthorized,
