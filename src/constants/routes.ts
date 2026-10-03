@@ -5,6 +5,7 @@ export const ROUTES = {
   accountDeletion: '/account-deletion',
   support: '/support',
   dashboard: '/dashboard',
+  profile: '/profile',
   users: '/users',
   products: '/products',
   brands: '/brands',
