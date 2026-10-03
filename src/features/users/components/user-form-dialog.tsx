@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, MapPin, Sparkles } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff, MapPin, Sparkles } from 'lucide-react';
 
 import { FormField } from '@/components/shared/FormField';
 import {
@@ -27,6 +27,7 @@ import {
   createUserSchema,
   updateUserPayloadSchema,
 } from '@/features/users/schemas/user-form-schema';
+import { UserLocationMapDialog } from '@/features/users/components/user-location-map-dialog';
 import type {
   User,
   UserFormInput,
@@ -137,6 +138,7 @@ export function UserFormDialog({
   const [errors, setErrors] = useState<FormErrors>({});
   const [phoneCountryCode, setPhoneCountryCode] = useState(DEFAULT_COUNTRY_CALLING_CODE);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const defaultRoleId = useMemo(() => roleOptions[0]?.id ?? EMPTY_ROLE_VALUE, [roleOptions]);
 
@@ -188,23 +190,6 @@ export function UserFormDialog({
   const dialogTitleKey = useMemo(() => {
     return mode === 'create' ? 'users.createUser' : 'users.editUser';
   }, [mode]);
-
-  const googleMapsUrl = useMemo(() => {
-    const latitude = formValues.latitude.trim();
-    const longitude = formValues.longitude.trim();
-    const hasCoordinates =
-      latitude.length > 0 &&
-      longitude.length > 0 &&
-      Number.isFinite(Number(latitude)) &&
-      Number.isFinite(Number(longitude));
-    const query = hasCoordinates
-      ? `${latitude},${longitude}`
-      : formValues.location.trim();
-
-    return query
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
-      : 'https://www.google.com/maps';
-  }, [formValues.latitude, formValues.location, formValues.longitude]);
 
   const generatePassword = (): void => {
     setFormValues((previous) => ({
@@ -271,14 +256,14 @@ export function UserFormDialog({
     if (isMarketRole) {
       const marketErrors: FormErrors = {};
 
-      if (!formValues.location.trim()) {
-        marketErrors.location = 'موقع السوق مطلوب.';
-      }
-      if (parsedLatitude == null || !Number.isFinite(parsedLatitude)) {
-        marketErrors.latitude = 'خط العرض مطلوب للسوق.';
-      }
-      if (parsedLongitude == null || !Number.isFinite(parsedLongitude)) {
-        marketErrors.longitude = 'خط الطول مطلوب للسوق.';
+      if (
+        !formValues.location.trim() ||
+        parsedLatitude == null ||
+        !Number.isFinite(parsedLatitude) ||
+        parsedLongitude == null ||
+        !Number.isFinite(parsedLongitude)
+      ) {
+        marketErrors.location = 'حدد موقع السوق من الخريطة.';
       }
 
       if (Object.keys(marketErrors).length > 0) {
@@ -477,8 +462,8 @@ export function UserFormDialog({
             </div>
           ) : null}
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <FormField labelKey="users.form.location" htmlFor="user-location" error={errors.location}>
+          <FormField labelKey="users.form.location" htmlFor="user-location" error={errors.location}>
+            <div className="space-y-2">
               <div className="flex gap-2">
                 <Input
                   id="user-location"
@@ -492,59 +477,28 @@ export function UserFormDialog({
                     }))
                   }
                 />
+
                 <Button
-                  asChild
                   type="button"
                   variant="outline"
-                  size="icon"
-                  className="shrink-0"
-                  aria-label={t('users.form.openGoogleMaps')}
-                  title={t('users.form.openGoogleMaps')}
+                  className="h-11 shrink-0 gap-2 px-4"
+                  onClick={() => setIsMapOpen(true)}
+                  aria-label="اختيار الموقع من الخريطة"
+                  title="اختيار الموقع من الخريطة"
                 >
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={t('users.form.openGoogleMaps')}
-                  >
-                    <MapPin className="h-4 w-4" />
-                  </a>
+                  <MapPin className="h-4 w-4" />
+                  <span className="hidden sm:inline">الخريطة</span>
                 </Button>
               </div>
-            </FormField>
 
-            <FormField labelKey="users.form.latitude" htmlFor="user-latitude" error={errors.latitude}>
-              <Input
-                id="user-latitude"
-                type="number"
-                step="0.000001"
-                value={formValues.latitude}
-                placeholder={t('users.form.latitudePlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    latitude: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-
-            <FormField labelKey="users.form.longitude" htmlFor="user-longitude" error={errors.longitude}>
-              <Input
-                id="user-longitude"
-                type="number"
-                step="0.000001"
-                value={formValues.longitude}
-                placeholder={t('users.form.longitudePlaceholder')}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    longitude: event.target.value,
-                  }))
-                }
-              />
-            </FormField>
-          </div>
+              {formValues.latitude && formValues.longitude ? (
+                <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  تم تحديد الموقع على الخريطة
+                </div>
+              ) : null}
+            </div>
+          </FormField>
 
           <div className="flex items-center justify-between rounded-lg border px-3 py-2">
             <p className="text-sm font-medium">{t('users.form.phoneNumberVerified')}</p>
@@ -558,6 +512,27 @@ export function UserFormDialog({
               }
             />
           </div>
+
+          <UserLocationMapDialog
+            open={isMapOpen}
+            latitude={formValues.latitude ? Number(formValues.latitude) : undefined}
+            longitude={formValues.longitude ? Number(formValues.longitude) : undefined}
+            onOpenChange={setIsMapOpen}
+            onConfirm={({ latitude, longitude }) => {
+              setFormValues((previous) => ({
+                ...previous,
+                latitude: String(latitude),
+                longitude: String(longitude),
+                location: previous.location.trim() || 'موقع محدد على الخريطة',
+              }));
+              setErrors((previous) => ({
+                ...previous,
+                location: undefined,
+                latitude: undefined,
+                longitude: undefined,
+              }));
+            }}
+          />
 
           <DialogFooter className="gap-2">
             <Button variant="outline" type="button" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
