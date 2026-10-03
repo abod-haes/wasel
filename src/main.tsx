@@ -8,6 +8,7 @@ import {
   cleanupChunkRecoveryUrl,
   recoverFromChunkError,
 } from '@/lib/chunk-recovery';
+import { useAuthStore } from '@/store/use-auth-store';
 
 import './index.css';
 
@@ -17,6 +18,10 @@ window.addEventListener('vite:preloadError', (event) => {
   if (recoverFromChunkError()) {
     event.preventDefault();
   }
+});
+
+window.addEventListener('wasel:auth-invalidated', () => {
+  useAuthStore.getState().logout();
 });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
