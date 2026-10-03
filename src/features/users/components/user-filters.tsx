@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
-import { USER_ROLES, USER_STATUSES, type UsersFilter } from '@/features/users/types/user-types';
+import {
+  MANAGEABLE_USER_ROLES,
+  USER_STATUSES,
+  type UsersFilter,
+} from '@/features/users/types/user-types';
 
 interface UserFiltersProps {
   filters: UsersFilter;
@@ -42,7 +46,7 @@ export function UserFilters({ filters, onChange, onReset }: UserFiltersProps): R
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('common.all')}</SelectItem>
-            {USER_ROLES.map((role) => (
+            {MANAGEABLE_USER_ROLES.map((role) => (
               <SelectItem key={role} value={role}>
                 {t(`users.role.${role}`)}
               </SelectItem>
