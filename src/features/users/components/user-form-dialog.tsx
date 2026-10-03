@@ -189,7 +189,7 @@ export function UserFormDialog({
     return mode === 'create' ? 'users.createUser' : 'users.editUser';
   }, [mode]);
 
-  const openGoogleMaps = (): void => {
+  const googleMapsUrl = useMemo(() => {
     const latitude = formValues.latitude.trim();
     const longitude = formValues.longitude.trim();
     const hasCoordinates =
@@ -200,12 +200,11 @@ export function UserFormDialog({
     const query = hasCoordinates
       ? `${latitude},${longitude}`
       : formValues.location.trim();
-    const mapsUrl = query
+
+    return query
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
       : 'https://www.google.com/maps';
-
-    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
-  };
+  }, [formValues.latitude, formValues.location, formValues.longitude]);
 
   const generatePassword = (): void => {
     setFormValues((previous) => ({
@@ -494,15 +493,22 @@ export function UserFormDialog({
                   }
                 />
                 <Button
+                  asChild
                   type="button"
                   variant="outline"
                   size="icon"
                   className="shrink-0"
-                  onClick={openGoogleMaps}
                   aria-label={t('users.form.openGoogleMaps')}
                   title={t('users.form.openGoogleMaps')}
                 >
-                  <MapPin className="h-4 w-4" />
+                  <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={t('users.form.openGoogleMaps')}
+                  >
+                    <MapPin className="h-4 w-4" />
+                  </a>
                 </Button>
               </div>
             </FormField>
