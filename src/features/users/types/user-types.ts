@@ -23,6 +23,10 @@ export interface User {
   longitude: number | null;
   phoneNumberVerified: boolean;
   phoneNumberVerifiedAt: string | null;
+  isBlocked: boolean;
+  blockedAt: string | null;
+  blockedByAdminId: string | null;
+  blockReason: string | null;
   roles: UserRoleAssignment[];
   role: UserRole;
   status: UserStatus;
@@ -65,4 +69,15 @@ export interface UpdateUserInput {
   longitude?: number;
   phoneNumberVerified?: boolean;
   roleIds?: string[];
+}
+
+
+export interface BlockUserInput {
+  userId: string;
+  reason?: string | null;
+}
+
+export interface AdminResetPasswordInput {
+  userId: string;
+  newPassword: string;
 }
