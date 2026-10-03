@@ -17,6 +17,8 @@ interface UsersTableProps {
   onBlockUser: (user: User) => void;
   onUnblockUser: (user: User) => void;
   onResetPassword: (user: User) => void;
+  currentUserId?: string;
+  currentIsSuperAdmin?: boolean;
   pagination?: Pick<PaginatedData<User>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
@@ -37,6 +39,8 @@ export function UsersTable({
   onBlockUser,
   onUnblockUser,
   onResetPassword,
+  currentUserId,
+  currentIsSuperAdmin = false,
   pagination,
   onPageChange,
   onPageSizeChange,
@@ -107,66 +111,95 @@ export function UsersTable({
         header: t('common.actions'),
         className: 'min-w-[220px] text-end',
         headerClassName: 'min-w-[220px] text-end',
-        renderCell: (user: User) => (
-          <div className="flex items-center justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEditUser(user)}
-              disabled={isMutating}
-              title={t('users.actions.edit')}
-              aria-label={t('users.actions.edit')}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onResetPassword(user)}
-              disabled={isMutating}
-              title={t('users.actions.resetPassword')}
-              aria-label={t('users.actions.resetPassword')}
-            >
-              <KeyRound className="h-4 w-4" />
-            </Button>
-            {user.isBlocked ? (
+        renderCell: (user: User) => {
+          const isSelf = Boolean(currentUserId && user.id === currentUserId);
+          const isTargetSuperAdmin = user.roles.some(
+            (role) => role.name.toLowerCase() === 'superadmin',
+          );
+          const canManageAccountState =
+            !isSelf && (currentIsSuperAdmin || !isTargetSuperAdmin);
+
+          return (
+            <div className="flex items-center justify-end gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onUnblockUser(user)}
+                onClick={() => onEditUser(user)}
                 disabled={isMutating}
-                title={t('users.actions.unblock')}
-                aria-label={t('users.actions.unblock')}
+                title={t('users.actions.edit')}
+                aria-label={t('users.actions.edit')}
               >
-                <LockOpen className="h-4 w-4 text-emerald-600" />
+                <Pencil className="h-4 w-4" />
               </Button>
-            ) : (
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onBlockUser(user)}
-                disabled={isMutating}
-                title={t('users.actions.block')}
-                aria-label={t('users.actions.block')}
+                onClick={() => onResetPassword(user)}
+                disabled={isMutating || !canManageAccountState}
+                title={
+                  isSelf
+                    ? t('users.actions.useOwnPasswordChange')
+                    : isTargetSuperAdmin && !currentIsSuperAdmin
+                      ? t('users.actions.superAdminProtected')
+                      : t('users.actions.resetPassword')
+                }
+                aria-label={t('users.actions.resetPassword')}
               >
-                <Ban className="h-4 w-4 text-amber-600" />
+                <KeyRound className="h-4 w-4" />
               </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDeleteUser(user)}
-              disabled={isMutating}
-              title={t('users.actions.delete')}
-              aria-label={t('users.actions.delete')}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ),
+              {user.isBlocked ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onUnblockUser(user)}
+                  disabled={isMutating || !canManageAccountState}
+                  title={
+                    isSelf
+                      ? t('users.actions.selfProtection')
+                      : isTargetSuperAdmin && !currentIsSuperAdmin
+                        ? t('users.actions.superAdminProtected')
+                        : t('users.actions.unblock')
+                  }
+                  aria-label={t('users.actions.unblock')}
+                >
+                  <LockOpen className="h-4 w-4 text-emerald-600" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onBlockUser(user)}
+                  disabled={isMutating || !canManageAccountState}
+                  title={
+                    isSelf
+                      ? t('users.actions.selfProtection')
+                      : isTargetSuperAdmin && !currentIsSuperAdmin
+                        ? t('users.actions.superAdminProtected')
+                        : t('users.actions.block')
+                  }
+                  aria-label={t('users.actions.block')}
+                >
+                  <Ban className="h-4 w-4 text-amber-600" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDeleteUser(user)}
+                disabled={isMutating}
+                title={t('users.actions.delete')}
+                aria-label={t('users.actions.delete')}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        },
       },
     ],
     [
+      currentIsSuperAdmin,
+      currentUserId,
       isMutating,
       onBlockUser,
       onDeleteUser,
