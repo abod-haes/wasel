@@ -33,6 +33,10 @@ apiClient.interceptors.response.use(
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       clearStoredAuthSession();
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('wasel:auth-invalidated'));
+      }
     }
 
     return Promise.reject(error);
