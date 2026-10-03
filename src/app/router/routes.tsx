@@ -16,6 +16,7 @@ import SupportPage from '@/pages/support-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
 const DashboardPage = lazyRoute(() => import('@/features/dashboard/pages/dashboard-page'));
+const ProfilePage = lazyRoute(() => import('@/features/profile/pages/profile-page'));
 const UsersPage = lazyRoute(() => import('@/features/users/pages/users-page'));
 const ProductsPage = lazyRoute(() => import('@/features/products/pages/products-page'));
 const BrandsPage = lazyRoute(() => import('@/features/brands/pages/brands-page'));
@@ -84,6 +85,13 @@ export const appRoutes: RouteObject[] = [
             ),
             handle: {
               breadcrumbKey: 'nav.dashboard',
+            },
+          },
+          {
+            path: ROUTES.profile,
+            element: withSuspense(<ProfilePage />),
+            handle: {
+              breadcrumbKey: 'profile.title',
             },
           },
           {
