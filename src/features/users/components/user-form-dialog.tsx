@@ -356,7 +356,7 @@ export function UserFormDialog({
                   type="text"
                   inputMode="numeric"
                   dir="ltr"
-                  className="min-w-0 text-left"
+                  className="min-w-0 px-5 text-left tabular-nums tracking-[0.03em]"
                   value={formValues.phoneNumber}
                   placeholder={t('users.form.phoneNumberPlaceholder')}
                   onChange={(event) =>
