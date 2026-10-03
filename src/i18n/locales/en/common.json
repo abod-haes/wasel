@@ -410,7 +410,23 @@
       "saved": "Settings saved"
     },
     "pricingTitle": "Pricing & Exchange Rates",
-    "pricingDescription": "Manage currency exchange rates and delivery pricing in one place"
+    "pricingDescription": "Manage currency exchange rates and delivery pricing in one place",
+    "security": {
+      "title": "Account security",
+      "description": "Change the password for your current account. Your current password is required.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "action": "Change password",
+      "saving": "Changing...",
+      "required": "All password fields are required.",
+      "minLength": "The new password must contain at least 6 characters.",
+      "mustDiffer": "The new password must differ from the current password.",
+      "mismatch": "The new passwords do not match.",
+      "incorrectCurrent": "The current password is incorrect.",
+      "failed": "Could not change the password.",
+      "success": "Password changed successfully."
+    }
   },
   "pages": {
     "unauthorized": {

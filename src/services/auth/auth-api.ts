@@ -136,4 +136,16 @@ export const authApi = {
     const { data } = await apiClient.post<LoginApiResponse>('/api/Auth/login', normalizedCredentials);
     return mapLoginResponse(data);
   },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    if (env.enableMockApi) {
+      await delay(300);
+      return;
+    }
+
+    await apiClient.post('/api/Auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+  },
 };
