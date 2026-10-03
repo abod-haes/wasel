@@ -22,9 +22,7 @@ export const createUserSchema = userBaseSchema.extend({
   password: z.string().trim().min(6),
 });
 
-export const updateUserPayloadSchema = userBaseSchema.extend({
-  password: z.string().trim().min(6).optional(),
-});
+export const updateUserPayloadSchema = userBaseSchema;
 
 export const updateUserSchema = updateUserPayloadSchema.partial().extend({
   id: z.string().min(1),
