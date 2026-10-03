@@ -42,6 +42,14 @@ interface UserApiResponse {
   phoneNumberVerified?: boolean;
   PhoneNumberVerifiedAt?: string;
   phoneNumberVerifiedAt?: string;
+  IsBlocked?: boolean;
+  isBlocked?: boolean;
+  BlockedAt?: string;
+  blockedAt?: string;
+  BlockedByAdminId?: string;
+  blockedByAdminId?: string;
+  BlockReason?: string;
+  blockReason?: string;
   CreatedAt?: string;
   createdAt?: string;
   LastLogin?: string;
@@ -125,6 +133,10 @@ const createMockUser = (
     longitude: null,
     phoneNumberVerified,
     phoneNumberVerifiedAt: phoneNumberVerified ? lastLogin : null,
+    isBlocked: false,
+    blockedAt: null,
+    blockedByAdminId: null,
+    blockReason: null,
     roles: [role],
     role: role.key,
     status: phoneNumberVerified ? 'active' : 'invited',
@@ -302,6 +314,13 @@ const mapUserResponse = (user: UserApiResponse): User => {
   const phoneNumberVerifiedAt = resolveNullableIsoDate(
     user.PhoneNumberVerifiedAt ?? user.phoneNumberVerifiedAt
   );
+  const isBlocked = Boolean(user.IsBlocked ?? user.isBlocked);
+  const blockedAt = resolveNullableIsoDate(user.BlockedAt ?? user.blockedAt);
+  const blockedByAdminId = resolveOptionalString(
+    user.BlockedByAdminId,
+    user.blockedByAdminId
+  ) ?? null;
+  const blockReason = resolveOptionalString(user.BlockReason, user.blockReason) ?? null;
   const createdAt = resolveIsoDate(
     user.CreatedAt ?? user.createdAt ?? phoneNumberVerifiedAt ?? user.LastLogin ?? user.lastLogin
   );
@@ -321,9 +340,13 @@ const mapUserResponse = (user: UserApiResponse): User => {
     longitude: resolveNumber(user.Longitude, user.longitude),
     phoneNumberVerified,
     phoneNumberVerifiedAt,
+    isBlocked,
+    blockedAt,
+    blockedByAdminId,
+    blockReason,
     roles: mappedRoles,
     role: resolvePrimaryRole(mappedRoles),
-    status: phoneNumberVerified ? 'active' : 'invited',
+    status: isBlocked ? 'suspended' : phoneNumberVerified ? 'active' : 'invited',
     lastLogin,
     createdAt,
   };
@@ -516,6 +539,10 @@ export const usersApi = {
         longitude: requestPayload.longitude ?? null,
         phoneNumberVerified: requestPayload.phoneNumberVerified,
         phoneNumberVerifiedAt: requestPayload.phoneNumberVerified ? nowIso : null,
+        isBlocked: false,
+        blockedAt: null,
+        blockedByAdminId: null,
+        blockReason: null,
         roles,
         role: resolvePrimaryRole(roles),
         status: requestPayload.phoneNumberVerified ? 'active' : 'invited',
@@ -593,7 +620,11 @@ export const usersApi = {
           `${nextUser.firstName} ${nextUser.lastName}`.trim() ||
           formatFullPhoneNumber(nextUser.countryCallingCode, nextUser.phoneNumber);
         nextUser.role = resolvePrimaryRole(nextUser.roles);
-        nextUser.status = nextUser.phoneNumberVerified ? 'active' : 'invited';
+        nextUser.status = nextUser.isBlocked
+          ? 'suspended'
+          : nextUser.phoneNumberVerified
+            ? 'active'
+            : 'invited';
         nextUser.lastLogin = resolveIsoDate(nextUser.phoneNumberVerifiedAt ?? nextUser.createdAt);
         updatedUser = nextUser;
 
@@ -626,5 +657,81 @@ export const usersApi = {
     }
 
     await apiClient.delete(`/api/Users/${userId}`);
+  },
+
+  async blockUser(userId: string, reason?: string | null): Promise<User> {
+    const normalizedReason = reason?.trim() || null;
+
+    if (env.enableMockApi) {
+      await delay(350);
+      let blockedUser: User | undefined;
+
+      usersDb = usersDb.map((user) => {
+        if (user.id !== userId) return user;
+
+        const nextUser: User = {
+          ...user,
+          roles: user.roles.map(cloneUserRole),
+          isBlocked: true,
+          blockedAt: new Date().toISOString(),
+          blockedByAdminId: 'mock-admin',
+          blockReason: normalizedReason,
+          status: 'suspended',
+        };
+        blockedUser = nextUser;
+        return nextUser;
+      });
+
+      if (!blockedUser) throw new Error('User not found');
+      return cloneUser(blockedUser);
+    }
+
+    const { data } = await apiClient.post<UserApiResponse>(`/api/Users/${userId}/block`, {
+      reason: normalizedReason,
+    });
+    return mapUserResponse(data);
+  },
+
+  async unblockUser(userId: string): Promise<User> {
+    if (env.enableMockApi) {
+      await delay(350);
+      let unblockedUser: User | undefined;
+
+      usersDb = usersDb.map((user) => {
+        if (user.id !== userId) return user;
+
+        const nextUser: User = {
+          ...user,
+          roles: user.roles.map(cloneUserRole),
+          isBlocked: false,
+          blockedAt: null,
+          blockedByAdminId: null,
+          blockReason: null,
+          status: user.phoneNumberVerified ? 'active' : 'invited',
+        };
+        unblockedUser = nextUser;
+        return nextUser;
+      });
+
+      if (!unblockedUser) throw new Error('User not found');
+      return cloneUser(unblockedUser);
+    }
+
+    const { data } = await apiClient.post<UserApiResponse>(`/api/Users/${userId}/unblock`);
+    return mapUserResponse(data);
+  },
+
+  async resetUserPassword(userId: string, newPassword: string): Promise<void> {
+    if (env.enableMockApi) {
+      await delay(350);
+      if (!usersDb.some((user) => user.id === userId)) {
+        throw new Error('User not found');
+      }
+      return;
+    }
+
+    await apiClient.post(`/api/Users/${userId}/reset-password`, {
+      newPassword,
+    });
   },
 };
