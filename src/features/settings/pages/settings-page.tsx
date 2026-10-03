@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
-import { ChangePasswordCard } from '@/features/settings/components/change-password-card';
 import { SettingsForm } from '@/features/settings/components/settings-form';
 import {
   useSettingsQuery,
@@ -51,7 +50,6 @@ export default function SettingsPage(): React.JSX.Element {
       />
 
       <SettingsForm values={formValues} onChange={setFormValues} />
-      <ChangePasswordCard />
     </PageContainer>
   );
 }
