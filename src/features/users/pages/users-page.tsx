@@ -46,7 +46,10 @@ export default function UsersPage(): React.JSX.Element {
   const updateUserMutation = useUpdateUserMutation();
   const deleteUserMutation = useDeleteUserMutation();
   const roleOptions = useMemo<UserRoleAssignment[]>(
-    () => [...(rolesQuery.data ?? [])].sort((first, second) => first.name.localeCompare(second.name)),
+    () =>
+      [...(rolesQuery.data ?? [])]
+        .filter((role) => role.key !== 'viewer')
+        .sort((first, second) => first.name.localeCompare(second.name)),
     [rolesQuery.data],
   );
 
