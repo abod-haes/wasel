@@ -39,9 +39,13 @@ const defaultFilters: UsersFilter = {
 export default function UsersPage(): React.JSX.Element {
   const { t } = useTranslation();
   const currentUser = useAuthStore((state) => state.user);
-  const currentIsSuperAdmin = currentUser?.roles.some(
-    (role) => role.toLowerCase() === 'superadmin',
-  ) ?? false;
+  const currentIsSuperAdmin =
+    currentUser?.roles.some((role) => role.toLowerCase() === 'superadmin') ?? false;
+  const canManageAccountControls =
+    currentUser?.roles.some((role) => {
+      const normalized = role.toLowerCase();
+      return normalized === 'admin' || normalized === 'superadmin';
+    }) ?? false;
 
   const [filters, setFilters] = useState<UsersFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
@@ -182,6 +186,7 @@ export default function UsersPage(): React.JSX.Element {
         onResetPassword={setResetPasswordUser}
         currentUserId={currentUser?.id}
         currentIsSuperAdmin={currentIsSuperAdmin}
+        canManageAccountControls={canManageAccountControls}
         pagination={usersQuery.data}
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
