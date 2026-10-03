@@ -27,6 +27,7 @@ import type {
   UserRoleAssignment,
   UsersFilter,
 } from '@/features/users/types/user-types';
+import { useAuthStore } from '@/store/use-auth-store';
 import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: UsersFilter = {
@@ -37,6 +38,10 @@ const defaultFilters: UsersFilter = {
 
 export default function UsersPage(): React.JSX.Element {
   const { t } = useTranslation();
+  const currentUser = useAuthStore((state) => state.user);
+  const currentIsSuperAdmin = currentUser?.roles.some(
+    (role) => role.toLowerCase() === 'superadmin',
+  ) ?? false;
 
   const [filters, setFilters] = useState<UsersFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
@@ -175,6 +180,8 @@ export default function UsersPage(): React.JSX.Element {
         onBlockUser={setBlockUser}
         onUnblockUser={setUnblockUser}
         onResetPassword={setResetPasswordUser}
+        currentUserId={currentUser?.id}
+        currentIsSuperAdmin={currentIsSuperAdmin}
         pagination={usersQuery.data}
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
