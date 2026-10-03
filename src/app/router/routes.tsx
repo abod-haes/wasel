@@ -6,8 +6,10 @@ import { PermissionGuard, ProtectedRoute } from '@/app/router/route-guards';
 import { LoadingScreen } from '@/components/shared';
 import { PERMISSIONS } from '@/constants/permissions';
 import { ROUTES } from '@/constants/routes';
+import AccountDeletionPage from '@/pages/account-deletion-page';
 import LoginPage from '@/pages/login-page';
 import NotFoundPage from '@/pages/not-found-page';
+import PrivacyPage from '@/pages/privacy-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'));
@@ -42,6 +44,14 @@ export const appRoutes: RouteObject[] = [
     handle: {
       breadcrumbKey: 'nav.login',
     },
+  },
+  {
+    path: ROUTES.privacy,
+    element: <PrivacyPage />,
+  },
+  {
+    path: ROUTES.accountDeletion,
+    element: <AccountDeletionPage />,
   },
   {
     path: ROUTES.unauthorized,

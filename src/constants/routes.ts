@@ -1,6 +1,8 @@
 export const ROUTES = {
   root: '/',
   login: '/login',
+  privacy: '/privacy',
+  accountDeletion: '/account-deletion',
   dashboard: '/dashboard',
   users: '/users',
   products: '/products',

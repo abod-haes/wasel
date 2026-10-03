@@ -40,4 +40,5 @@ export const env = {
   appName: import.meta.env.VITE_APP_NAME ?? 'Wasel',
   apiBaseUrl: normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL),
   enableMockApi: toBoolean(import.meta.env.VITE_ENABLE_MOCK_API, false),
+  supportEmail: import.meta.env.VITE_SUPPORT_EMAIL?.trim() || undefined,
 } as const;
