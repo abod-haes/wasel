@@ -19,6 +19,7 @@ interface UsersTableProps {
   onResetPassword: (user: User) => void;
   currentUserId?: string;
   currentIsSuperAdmin?: boolean;
+  canManageAccountControls?: boolean;
   pagination?: Pick<PaginatedData<User>, 'page' | 'pageSize' | 'totalCount' | 'totalPages'>;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
@@ -41,6 +42,7 @@ export function UsersTable({
   onResetPassword,
   currentUserId,
   currentIsSuperAdmin = false,
+  canManageAccountControls = false,
   pagination,
   onPageChange,
   onPageSizeChange,
@@ -131,73 +133,78 @@ export function UsersTable({
               >
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onResetPassword(user)}
-                disabled={isMutating || !canManageAccountState}
-                title={
-                  isSelf
-                    ? t('users.actions.useOwnPasswordChange')
-                    : isTargetSuperAdmin && !currentIsSuperAdmin
-                      ? t('users.actions.superAdminProtected')
-                      : t('users.actions.resetPassword')
-                }
-                aria-label={t('users.actions.resetPassword')}
-              >
-                <KeyRound className="h-4 w-4" />
-              </Button>
-              {user.isBlocked ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onUnblockUser(user)}
-                  disabled={isMutating || !canManageAccountState}
-                  title={
-                    isSelf
-                      ? t('users.actions.selfProtection')
-                      : isTargetSuperAdmin && !currentIsSuperAdmin
-                        ? t('users.actions.superAdminProtected')
-                        : t('users.actions.unblock')
-                  }
-                  aria-label={t('users.actions.unblock')}
-                >
-                  <LockOpen className="h-4 w-4 text-emerald-600" />
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onBlockUser(user)}
-                  disabled={isMutating || !canManageAccountState}
-                  title={
-                    isSelf
-                      ? t('users.actions.selfProtection')
-                      : isTargetSuperAdmin && !currentIsSuperAdmin
-                        ? t('users.actions.superAdminProtected')
-                        : t('users.actions.block')
-                  }
-                  aria-label={t('users.actions.block')}
-                >
-                  <Ban className="h-4 w-4 text-amber-600" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDeleteUser(user)}
-                disabled={isMutating}
-                title={t('users.actions.delete')}
-                aria-label={t('users.actions.delete')}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {canManageAccountControls ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onResetPassword(user)}
+                    disabled={isMutating || !canManageAccountState}
+                    title={
+                      isSelf
+                        ? t('users.actions.useOwnPasswordChange')
+                        : isTargetSuperAdmin && !currentIsSuperAdmin
+                          ? t('users.actions.superAdminProtected')
+                          : t('users.actions.resetPassword')
+                    }
+                    aria-label={t('users.actions.resetPassword')}
+                  >
+                    <KeyRound className="h-4 w-4" />
+                  </Button>
+                  {user.isBlocked ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onUnblockUser(user)}
+                      disabled={isMutating || !canManageAccountState}
+                      title={
+                        isSelf
+                          ? t('users.actions.selfProtection')
+                          : isTargetSuperAdmin && !currentIsSuperAdmin
+                            ? t('users.actions.superAdminProtected')
+                            : t('users.actions.unblock')
+                      }
+                      aria-label={t('users.actions.unblock')}
+                    >
+                      <LockOpen className="h-4 w-4 text-emerald-600" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onBlockUser(user)}
+                      disabled={isMutating || !canManageAccountState}
+                      title={
+                        isSelf
+                          ? t('users.actions.selfProtection')
+                          : isTargetSuperAdmin && !currentIsSuperAdmin
+                            ? t('users.actions.superAdminProtected')
+                            : t('users.actions.block')
+                      }
+                      aria-label={t('users.actions.block')}
+                    >
+                      <Ban className="h-4 w-4 text-amber-600" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDeleteUser(user)}
+                    disabled={isMutating}
+                    title={t('users.actions.delete')}
+                    aria-label={t('users.actions.delete')}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : null}
             </div>
           );
         },
       },
     ],
     [
+      canManageAccountControls,
       currentIsSuperAdmin,
       currentUserId,
       isMutating,
