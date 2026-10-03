@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { env } from '@/env';
 import { authApi } from '@/services/auth/auth-api';
 import {
   clearStoredAuthSession,
@@ -7,7 +8,12 @@ import {
   loadStoredAuthSession,
   saveAuthSession,
 } from '@/services/auth/auth-storage';
-import type { AuthSession, AuthUser, LoginPayload } from '@/types/auth';
+import type {
+  AuthSession,
+  AuthUser,
+  LoginPayload,
+  UpdateProfileInput,
+} from '@/types/auth';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -15,6 +21,8 @@ interface AuthState {
   token: string | null;
   expiresAt: string | null;
   login: (credentials: LoginPayload) => Promise<void>;
+  refreshMe: () => Promise<void>;
+  updateProfile: (input: UpdateProfileInput) => Promise<void>;
   logout: () => void;
   checkAuth: () => boolean;
 }
@@ -61,6 +69,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const session = await authApi.login(credentials);
     saveAuthSession(session);
     set(mapSessionToSnapshot(session));
+  },
+  refreshMe: async () => {
+    const { token, expiresAt, user } = get();
+
+    if (!token || !expiresAt || !user || env.enableMockApi) {
+      return;
+    }
+
+    const refreshedUser = await authApi.getMe(token);
+    const session: AuthSession = {
+      token,
+      expiresAt,
+      user: refreshedUser,
+    };
+
+    saveAuthSession(session);
+    set({ user: refreshedUser });
+  },
+  updateProfile: async (input) => {
+    const { token, expiresAt, user } = get();
+
+    if (!token || !expiresAt || !user) {
+      return;
+    }
+
+    if (env.enableMockApi) {
+      const firstName = input.firstName.trim();
+      const lastName = input.lastName.trim();
+      const updatedUser: AuthUser = {
+        ...user,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim() || user.name,
+      };
+      const session: AuthSession = { token, expiresAt, user: updatedUser };
+      saveAuthSession(session);
+      set({ user: updatedUser });
+      return;
+    }
+
+    await authApi.updateProfile(user.id, input);
+    await get().refreshMe();
   },
   logout: () => {
     clearStoredAuthSession();
