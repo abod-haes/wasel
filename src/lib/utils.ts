@@ -14,7 +14,6 @@ export const formatPercent = (value: number): string => {
 
 const ABSOLUTE_URL_PATTERN = /^[a-z][a-z\d+\-.]*:/i;
 const PROTOCOL_RELATIVE_URL_PATTERN = /^\/\//;
-const STORAGE_PATH_PATTERN = /^\/?storage\//i;
 
 const stripLeadingSlashes = (value: string): string => value.replace(/^\/+/, '');
 const stripTrailingSlashes = (value: string): string => value.replace(/\/+$/, '');
@@ -30,14 +29,11 @@ export const resolveMediaPath = (path: string): string => {
     return normalizedPath;
   }
 
-  if (STORAGE_PATH_PATTERN.test(normalizedPath)) {
-    const normalizedBaseUrl = stripTrailingSlashes(env.apiBaseUrl.trim());
-    return `${normalizedBaseUrl}/${stripLeadingSlashes(normalizedPath)}`;
+  const normalizedBaseUrl = stripTrailingSlashes(env.apiBaseUrl.trim());
+
+  if (!normalizedBaseUrl) {
+    return `/${stripLeadingSlashes(normalizedPath)}`;
   }
 
-  if (normalizedPath.startsWith('/')) {
-    return normalizedPath;
-  }
-
-  return `/${stripLeadingSlashes(normalizedPath)}`;
+  return `${normalizedBaseUrl}/${stripLeadingSlashes(normalizedPath)}`;
 };
