@@ -3,7 +3,14 @@ import { getPermissionsForRoles, getRolesFromToken } from '@/services/auth/auth-
 import { env } from '@/env';
 import { apiClient } from '@/services/api/client';
 import { delay } from '@/services/mock/mock-utils';
-import type { AuthSession, AuthUser, LoginApiResponse, LoginApiUserResponse, LoginPayload } from '@/types/auth';
+import type {
+  AuthSession,
+  AuthUser,
+  LoginApiResponse,
+  LoginApiUserResponse,
+  LoginPayload,
+  UpdateProfileInput,
+} from '@/types/auth';
 
 const DEFAULT_SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
 
@@ -135,6 +142,23 @@ export const authApi = {
 
     const { data } = await apiClient.post<LoginApiResponse>('/api/Auth/login', normalizedCredentials);
     return mapLoginResponse(data);
+  },
+
+  async getMe(token: string): Promise<AuthUser> {
+    const { data } = await apiClient.get<LoginApiUserResponse>('/api/Auth/me');
+    return mapApiUser(data, token);
+  },
+
+  async updateProfile(userId: string, input: UpdateProfileInput): Promise<void> {
+    if (env.enableMockApi) {
+      await delay(250);
+      return;
+    }
+
+    await apiClient.patch(`/api/Users/${userId}`, {
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+    });
   },
 
   async changePassword(currentPassword: string, newPassword: string): Promise<void> {
