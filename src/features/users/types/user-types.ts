@@ -63,14 +63,12 @@ export interface UpdateUserInput {
   lastName?: string;
   countryCallingCode?: string;
   phoneNumber?: string;
-  password?: string;
   location?: string;
   latitude?: number;
   longitude?: number;
   phoneNumberVerified?: boolean;
   roleIds?: string[];
 }
-
 
 export interface BlockUserInput {
   userId: string;
