@@ -76,7 +76,6 @@ interface UpdateUserRequest {
   lastName?: string;
   countryCallingCode?: string;
   phoneNumber?: string;
-  password?: string;
   location?: string;
   latitude?: number;
   longitude?: number;
@@ -446,10 +445,6 @@ const buildUpdateUserRequest = (payload: UpdateUserInput): {
 
   if (parsed.phoneNumber != null) {
     requestPayload.phoneNumber = parsed.phoneNumber;
-  }
-
-  if (parsed.password != null) {
-    requestPayload.password = parsed.password;
   }
 
   if (parsed.location != null) {
