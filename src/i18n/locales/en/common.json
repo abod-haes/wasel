@@ -655,5 +655,20 @@
     "cashLimitPositive": "Cash limit amount must be greater than zero when enabled.",
     "invalidValues": "All values must be valid numbers greater than or equal to zero.",
     "save": "Save delivery settings"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Your account information and account security",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone number",
+    "roles": "Roles and permissions",
+    "phoneVerified": "Phone verified",
+    "save": "Save profile",
+    "saving": "Saving...",
+    "saved": "Profile updated successfully",
+    "saveFailed": "Could not update profile",
+    "nameRequired": "First name and last name are required",
+    "fallbackName": "User"
   }
 }
