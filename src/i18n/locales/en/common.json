@@ -206,7 +206,10 @@
       "delete": "Delete",
       "block": "Block user",
       "unblock": "Unblock user",
-      "resetPassword": "Reset password"
+      "resetPassword": "Reset password",
+      "selfProtection": "You cannot manage your own blocked state here",
+      "useOwnPasswordChange": "Use your own account settings to change your password",
+      "superAdminProtected": "A normal Admin cannot manage this SuperAdmin account"
     },
     "block": {
       "title": "Block {{name}}",
