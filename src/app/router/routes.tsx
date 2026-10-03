@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { AppLayout } from '@/app/layouts/app-layout';
+import { lazyRoute } from '@/app/router/lazy-route';
 import { PermissionGuard, ProtectedRoute } from '@/app/router/route-guards';
 import { LoadingScreen } from '@/components/shared';
 import { PERMISSIONS } from '@/constants/permissions';
@@ -10,27 +11,28 @@ import AccountDeletionPage from '@/pages/account-deletion-page';
 import LoginPage from '@/pages/login-page';
 import NotFoundPage from '@/pages/not-found-page';
 import PrivacyPage from '@/pages/privacy-page';
+import RouteErrorPage from '@/pages/route-error-page';
 import SupportPage from '@/pages/support-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
-const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'));
-const UsersPage = lazy(() => import('@/features/users/pages/users-page'));
-const ProductsPage = lazy(() => import('@/features/products/pages/products-page'));
-const BrandsPage = lazy(() => import('@/features/brands/pages/brands-page'));
-const ProductCreatePage = lazy(() => import('@/features/products/pages/product-create-page'));
-const ProductEditPage = lazy(() => import('@/features/products/pages/product-edit-page'));
-const CategoriesPage = lazy(() => import('@/features/categories/pages/categories-page'));
-const AdsPage = lazy(() => import('@/features/ads/pages/ads-page'));
-const OrdersPage = lazy(() => import('@/features/orders/pages/orders-page'));
-const DiscountCodesPage = lazy(() => import('@/features/discount-codes/pages/discount-codes-page'));
-const DeliveryFinancePage = lazy(
+const DashboardPage = lazyRoute(() => import('@/features/dashboard/pages/dashboard-page'));
+const UsersPage = lazyRoute(() => import('@/features/users/pages/users-page'));
+const ProductsPage = lazyRoute(() => import('@/features/products/pages/products-page'));
+const BrandsPage = lazyRoute(() => import('@/features/brands/pages/brands-page'));
+const ProductCreatePage = lazyRoute(() => import('@/features/products/pages/product-create-page'));
+const ProductEditPage = lazyRoute(() => import('@/features/products/pages/product-edit-page'));
+const CategoriesPage = lazyRoute(() => import('@/features/categories/pages/categories-page'));
+const AdsPage = lazyRoute(() => import('@/features/ads/pages/ads-page'));
+const OrdersPage = lazyRoute(() => import('@/features/orders/pages/orders-page'));
+const DiscountCodesPage = lazyRoute(() => import('@/features/discount-codes/pages/discount-codes-page'));
+const DeliveryFinancePage = lazyRoute(
   () => import('@/features/delivery-finance/pages/delivery-finance-page')
 );
-const NotificationsPage = lazy(() => import('@/features/notifications/pages/notifications-page'));
-const OtpAdminPage = lazy(() => import('@/features/otp-admin/pages/otp-admin-page'));
-const SettingsPage = lazy(() => import('@/features/settings/pages/settings-page'));
-const PricingSettingsPage = lazy(() => import('@/features/settings/pages/pricing-settings-page'));
-const SettingsPreferencesPage = lazy(
+const NotificationsPage = lazyRoute(() => import('@/features/notifications/pages/notifications-page'));
+const OtpAdminPage = lazyRoute(() => import('@/features/otp-admin/pages/otp-admin-page'));
+const SettingsPage = lazyRoute(() => import('@/features/settings/pages/settings-page'));
+const PricingSettingsPage = lazyRoute(() => import('@/features/settings/pages/pricing-settings-page'));
+const SettingsPreferencesPage = lazyRoute(
   () => import('@/features/settings/pages/settings-preferences-page')
 );
 
@@ -71,6 +73,7 @@ export const appRoutes: RouteObject[] = [
       },
       {
         element: <AppLayout />,
+        errorElement: <RouteErrorPage />,
         children: [
           {
             path: ROUTES.dashboard,
