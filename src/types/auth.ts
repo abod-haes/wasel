@@ -51,6 +51,11 @@ export interface AuthUser {
   permissions: Permission[];
 }
 
+export interface UpdateProfileInput {
+  firstName: string;
+  lastName: string;
+}
+
 export interface AuthSession {
   token: string;
   expiresAt: string;
