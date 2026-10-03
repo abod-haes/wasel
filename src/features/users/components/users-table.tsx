@@ -42,23 +42,36 @@ export function UsersTable({
       {
         key: 'name',
         header: t('common.name'),
+        headerClassName: 'min-w-[220px]',
+        className: 'min-w-[220px]',
         renderCell: (user: User) => (
-          <div>
-            <p className="font-medium">{user.name}</p>
-            <p className="text-xs text-muted-foreground" dir="ltr">
+          <div className="flex min-w-0 flex-col items-start gap-1">
+            <p className="max-w-[220px] truncate font-semibold text-foreground">{user.name}</p>
+            <span
+              dir="ltr"
+              className="inline-flex w-fit max-w-full items-center whitespace-nowrap text-xs font-medium tabular-nums text-muted-foreground"
+            >
               {formatFullPhoneNumber(user.countryCallingCode, user.phoneNumber)}
-            </p>
+            </span>
           </div>
         ),
       },
       {
         key: 'role',
         header: t('common.role'),
-        renderCell: (user: User) => t(`users.role.${user.role}`),
+        headerClassName: 'min-w-[150px]',
+        className: 'min-w-[150px]',
+        renderCell: (user: User) => (
+          <Badge variant="secondary" className="whitespace-nowrap">
+            {t(`users.role.${user.role}`)}
+          </Badge>
+        ),
       },
       {
         key: 'status',
         header: t('common.status'),
+        headerClassName: 'min-w-[120px]',
+        className: 'min-w-[120px]',
         renderCell: (user: User) => (
           <Badge variant={statusVariantMap[user.status]}>{t(`users.status.${user.status}`)}</Badge>
         ),
@@ -66,17 +79,21 @@ export function UsersTable({
       {
         key: 'lastLogin',
         header: t('users.table.lastLogin'),
+        headerClassName: 'min-w-[150px]',
+        className: 'min-w-[150px]',
         renderCell: (user: User) => (
-          <span className="text-sm text-muted-foreground">{new Date(user.lastLogin).toLocaleDateString()}</span>
+          <span className="whitespace-nowrap text-sm tabular-nums text-muted-foreground">
+            {new Date(user.lastLogin).toLocaleDateString()}
+          </span>
         ),
       },
       {
         key: 'actions',
         header: t('common.actions'),
-        className: 'text-end',
-        headerClassName: 'text-end',
+        className: 'min-w-[120px] text-end',
+        headerClassName: 'min-w-[120px] text-end',
         renderCell: (user: User) => (
-          <div className="flex justify-end gap-1">
+          <div className="flex items-center justify-end gap-1">
             <Button variant="ghost" size="icon" onClick={() => onEditUser(user)} disabled={isMutating}>
               <Pencil className="h-4 w-4" />
             </Button>
