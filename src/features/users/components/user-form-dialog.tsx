@@ -218,7 +218,7 @@ export function UserFormDialog({
       lastName: formValues.lastName,
       countryCallingCode: phoneCountryCode,
       phoneNumber: normalizedPhoneNumber,
-      password: normalizedPassword || undefined,
+      password: mode === 'create' ? normalizedPassword || undefined : undefined,
       location: formValues.location,
       latitude: parsedLatitude,
       longitude: parsedLongitude,
@@ -370,66 +370,67 @@ export function UserFormDialog({
             </FormField>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField
-              labelKey="users.form.password"
-              htmlFor="user-password"
-              required={mode === 'create'}
-              descriptionKey={mode === 'edit' ? 'users.form.passwordEditHint' : undefined}
-              error={errors.password}
-            >
-              <div className="flex gap-2">
-                <div className="relative min-w-0 flex-1">
-                  <Input
-                    id="user-password"
-                    type={isPasswordVisible ? 'text' : 'password'}
-                    className="pe-11"
-                    value={formValues.password}
-                    placeholder={t('users.form.passwordPlaceholder')}
-                    onChange={(event) =>
-                      setFormValues((previous) => ({
-                        ...previous,
-                        password: event.target.value,
-                      }))
-                    }
-                  />
+          <div className={mode === 'create' ? 'grid gap-4 md:grid-cols-2' : 'grid gap-4'}>
+            {mode === 'create' ? (
+              <FormField
+                labelKey="users.form.password"
+                htmlFor="user-password"
+                required
+                error={errors.password}
+              >
+                <div className="flex gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <Input
+                      id="user-password"
+                      type={isPasswordVisible ? 'text' : 'password'}
+                      className="pe-11"
+                      value={formValues.password}
+                      placeholder={t('users.form.passwordPlaceholder')}
+                      onChange={(event) =>
+                        setFormValues((previous) => ({
+                          ...previous,
+                          password: event.target.value,
+                        }))
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute end-0 top-0 h-11 w-11 rounded-2xl"
+                      onClick={() => setIsPasswordVisible((visible) => !visible)}
+                      aria-label={
+                        isPasswordVisible
+                          ? t('users.form.hidePassword')
+                          : t('users.form.showPassword')
+                      }
+                      title={
+                        isPasswordVisible
+                          ? t('users.form.hidePassword')
+                          : t('users.form.showPassword')
+                      }
+                    >
+                      {isPasswordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute end-0 top-0 h-11 w-11 rounded-2xl"
-                    onClick={() => setIsPasswordVisible((visible) => !visible)}
-                    aria-label={
-                      isPasswordVisible
-                        ? t('users.form.hidePassword')
-                        : t('users.form.showPassword')
-                    }
-                    title={
-                      isPasswordVisible
-                        ? t('users.form.hidePassword')
-                        : t('users.form.showPassword')
-                    }
+                    variant="outline"
+                    className="h-11 shrink-0 px-3"
+                    onClick={generatePassword}
+                    title={t('users.form.generatePassword')}
                   >
-                    {isPasswordVisible ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    <Sparkles className="h-4 w-4" />
+                    <span>{t('users.form.generatePassword')}</span>
                   </Button>
                 </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 shrink-0 px-3"
-                  onClick={generatePassword}
-                  title={t('users.form.generatePassword')}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  <span>{t('users.form.generatePassword')}</span>
-                </Button>
-              </div>
-            </FormField>
+              </FormField>
+            ) : null}
 
             <FormField labelKey="common.role" error={errors.roleId}>
               <Select
@@ -458,7 +459,7 @@ export function UserFormDialog({
 
           {roleOptions.find((role) => role.id === formValues.roleId)?.key === 'market' ? (
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
-              حساب Market يحتاج موقعًا واضحًا وخط عرض وخط طول لأن هذه الإحداثيات تُستخدم في مسار الاستلام والتوصيل.
+              حساب Market يحتاج موقعًا محددًا من الخريطة لأن هذه النقطة تُستخدم في مسار الاستلام والتوصيل.
             </div>
           ) : null}
 

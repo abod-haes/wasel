@@ -175,7 +175,8 @@
     "status": {
       "active": "Active",
       "invited": "Invited",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "blocked": "Blocked"
     },
     "role": {
       "admin": "Admin",
@@ -188,11 +189,42 @@
     "messages": {
       "created": "User created successfully",
       "updated": "User updated successfully",
-      "deleted": "User deleted successfully"
+      "deleted": "User deleted successfully",
+      "blocked": "User blocked successfully",
+      "unblocked": "User unblocked successfully",
+      "passwordReset": "User password reset successfully",
+      "blockFailed": "Could not block user",
+      "unblockFailed": "Could not unblock user",
+      "passwordResetFailed": "Could not reset user password"
     },
     "confirmDelete": {
       "title": "Delete this user?",
       "description": "This user will be removed permanently."
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "resetPassword": "Reset password"
+    },
+    "block": {
+      "title": "Block {{name}}",
+      "description": "The user will be unable to sign in and existing sessions will lose API access.",
+      "reasonPlaceholder": "Block reason (optional, up to 500 characters)"
+    },
+    "resetPassword": {
+      "title": "Reset password for {{name}}",
+      "description": "Set a new password directly. The old password and OTP are not required.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "minLength": "Password must contain at least 6 characters.",
+      "maxLength": "Password cannot exceed 256 characters.",
+      "mismatch": "Passwords do not match."
+    },
+    "confirmUnblock": {
+      "title": "Unblock this user?",
+      "description": "The user will regain access to sign in and use the account."
     }
   },
   "products": {

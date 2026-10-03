@@ -4,13 +4,18 @@ import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
+import { BlockUserDialog } from '@/features/users/components/block-user-dialog';
+import { ResetUserPasswordDialog } from '@/features/users/components/reset-user-password-dialog';
 import { UserFilters } from '@/features/users/components/user-filters';
 import { UserFormDialog } from '@/features/users/components/user-form-dialog';
 import { UsersTable } from '@/features/users/components/users-table';
 import {
+  useBlockUserMutation,
   useCreateUserMutation,
   useDeleteUserMutation,
+  useResetUserPasswordMutation,
   useRolesQuery,
+  useUnblockUserMutation,
   useUpdateUserMutation,
   useUsersQuery,
 } from '@/features/users/hooks/use-users-query';
@@ -39,12 +44,18 @@ export default function UsersPage(): React.JSX.Element {
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [blockUser, setBlockUser] = useState<User | null>(null);
+  const [unblockUser, setUnblockUser] = useState<User | null>(null);
+  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
 
   const usersQuery = useUsersQuery(filters, pagination);
   const rolesQuery = useRolesQuery();
   const createUserMutation = useCreateUserMutation();
   const updateUserMutation = useUpdateUserMutation();
   const deleteUserMutation = useDeleteUserMutation();
+  const blockUserMutation = useBlockUserMutation();
+  const unblockUserMutation = useUnblockUserMutation();
+  const resetPasswordMutation = useResetUserPasswordMutation();
   const roleOptions = useMemo<UserRoleAssignment[]>(
     () =>
       [...(rolesQuery.data ?? [])]
@@ -100,10 +111,6 @@ export default function UsersPage(): React.JSX.Element {
       roleIds: payload.roleIds,
     };
 
-    if (payload.password) {
-      updatePayload.password = payload.password;
-    }
-
     updateUserMutation.mutate(
       updatePayload,
       {
@@ -127,7 +134,12 @@ export default function UsersPage(): React.JSX.Element {
   };
 
   const isSubmitting = createUserMutation.isPending || updateUserMutation.isPending;
-  const isMutating = isSubmitting || deleteUserMutation.isPending;
+  const isMutating =
+    isSubmitting ||
+    deleteUserMutation.isPending ||
+    blockUserMutation.isPending ||
+    unblockUserMutation.isPending ||
+    resetPasswordMutation.isPending;
 
   return (
     <PageContainer>
@@ -160,6 +172,9 @@ export default function UsersPage(): React.JSX.Element {
         isMutating={isMutating}
         onEditUser={openEditDialog}
         onDeleteUser={setDeleteUser}
+        onBlockUser={setBlockUser}
+        onUnblockUser={setUnblockUser}
+        onResetPassword={setResetPasswordUser}
         pagination={usersQuery.data}
         onPageChange={(page) => setPagination((current) => ({ ...current, page }))}
         onPageSizeChange={(pageSize) => setPagination({ page: 1, pageSize })}
@@ -173,6 +188,55 @@ export default function UsersPage(): React.JSX.Element {
         onOpenChange={setIsFormOpen}
         onSubmit={submitUser}
         isSubmitting={isSubmitting || rolesQuery.isLoading}
+      />
+
+      <BlockUserDialog
+        open={Boolean(blockUser)}
+        user={blockUser}
+        onOpenChange={(open) => {
+          if (!open) setBlockUser(null);
+        }}
+        isSubmitting={blockUserMutation.isPending}
+        onSubmit={(reason) => {
+          if (!blockUser) return;
+          blockUserMutation.mutate(
+            { userId: blockUser.id, reason },
+            { onSuccess: () => setBlockUser(null) },
+          );
+        }}
+      />
+
+      <ResetUserPasswordDialog
+        open={Boolean(resetPasswordUser)}
+        user={resetPasswordUser}
+        onOpenChange={(open) => {
+          if (!open) setResetPasswordUser(null);
+        }}
+        isSubmitting={resetPasswordMutation.isPending}
+        onSubmit={(newPassword) => {
+          if (!resetPasswordUser) return;
+          resetPasswordMutation.mutate(
+            { userId: resetPasswordUser.id, newPassword },
+            { onSuccess: () => setResetPasswordUser(null) },
+          );
+        }}
+      />
+
+      <ConfirmDialog
+        open={Boolean(unblockUser)}
+        onOpenChange={(open) => {
+          if (!open) setUnblockUser(null);
+        }}
+        onConfirm={() => {
+          if (!unblockUser) return;
+          unblockUserMutation.mutate(unblockUser.id, {
+            onSuccess: () => setUnblockUser(null),
+          });
+        }}
+        titleKey="users.confirmUnblock.title"
+        descriptionKey="users.confirmUnblock.description"
+        confirmLabelKey="users.actions.unblock"
+        isLoading={unblockUserMutation.isPending}
       />
 
       <ConfirmDialog
