@@ -206,7 +206,10 @@
       "delete": "حذف",
       "block": "حظر المستخدم",
       "unblock": "إلغاء الحظر",
-      "resetPassword": "إعادة تعيين كلمة المرور"
+      "resetPassword": "إعادة تعيين كلمة المرور",
+      "selfProtection": "ما فيك تدير حظر حسابك الحالي من هون",
+      "useOwnPasswordChange": "غيّر كلمة مرور حسابك من إعدادات حسابك",
+      "superAdminProtected": "حساب SuperAdmin محمي من إدارة Admin عادي"
     },
     "block": {
       "title": "حظر {{name}}",
