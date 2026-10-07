@@ -42,8 +42,9 @@ interface ProductApiResponse {
 interface ProductBriefApiResponse { id?: string; Id?: string; name?: string; Name?: string; parCode?: string; ParCode?: string; brandId?: string; BrandId?: string; brand?: string; Brand?: string; marketUserId?: string; MarketUserId?: string; marketName?: string; MarketName?: string; type?: string; Type?: string; weight?: number; Weight?: number; weightUnit?: ProductWeightUnit; WeightUnit?: ProductWeightUnit; }
 type ProductPaginatedResponse = Partial<ApiPaginatedResult<ProductApiResponse>> & { items?: ProductApiResponse[] };
 
-const normalizeOptionalText = (value?: string | null): string | undefined => {
-  const normalized = value?.trim();
+const normalizeOptionalText = (value?: unknown): string | undefined => {
+  if (value == null) return undefined;
+  const normalized = String(value).trim();
   return normalized ? normalized : undefined;
 };
 
