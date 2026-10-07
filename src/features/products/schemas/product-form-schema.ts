@@ -24,7 +24,7 @@ export const createProductSchema = z.object({
   code: z.string().trim().min(1).max(64),
   brandId: z.string().trim().min(1).optional(),
   brand: z.string().trim().max(128).optional(),
-  marketUserId: z.string().trim().min(1, 'Market is required'),
+  marketUserId: z.string().trim().min(1, 'السوق مطلوب'),
   type: z.string().trim().max(128).optional(),
   weight: z.number().nonnegative().optional(),
   weightUnit: z.enum(['g', 'Kg', 'L']).optional(),
@@ -35,6 +35,10 @@ export const createProductSchema = z.object({
   categoryId: z.string().trim().optional(),
   categoryName: z.string().trim().optional(),
   variants: z.array(productVariantSchema).optional(),
+});
+
+export const editProductDetailsSchema = createProductSchema.extend({
+  marketUserId: z.string().trim().min(1).optional(),
 });
 
 export const updateProductSchema = createProductSchema.partial().extend({
