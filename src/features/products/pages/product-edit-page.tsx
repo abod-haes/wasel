@@ -59,7 +59,12 @@ export default function ProductEditPage(): React.JSX.Element {
       {
         id: productId,
         ...payload,
-        marketUserId: isMarket && currentUser ? currentUser.id : payload.marketUserId,
+        ...(isMarket && currentUser
+          ? { marketUserId: currentUser.id }
+          : payload.marketUserId
+            ? { marketUserId: payload.marketUserId }
+            : {}),
+        clearBrand: !payload.brandId && Boolean(product.brandId),
       },
       { onSuccess: () => navigate(productsListRoute, { replace: true }) }
     );
