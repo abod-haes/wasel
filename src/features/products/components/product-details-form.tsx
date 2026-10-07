@@ -23,7 +23,10 @@ import { ROUTES } from '@/constants/routes';
 import type { Brand } from '@/features/brands/types/brand-types';
 import type { CategoryOption } from '@/features/categories/types/category-types';
 import type { MarketOption } from '@/features/markets/types/market-types';
-import { createProductSchema } from '@/features/products/schemas/product-form-schema';
+import {
+  createProductSchema,
+  editProductDetailsSchema,
+} from '@/features/products/schemas/product-form-schema';
 import type {
   CreateProductInput,
   Product,
@@ -75,6 +78,11 @@ const defaultValues: ProductDetailsValues = {
   categoryIds: [],
 };
 
+const normalizeSelectId = (value: unknown): string => {
+  if (value == null) return '';
+  return String(value).trim();
+};
+
 const parseOptionalNumber = (value: string): number | undefined => {
   const normalizedValue = value.trim();
   if (!normalizedValue) return undefined;
@@ -113,8 +121,9 @@ export function ProductDetailsForm({
       setValues({
         name: product.name,
         code: product.code,
-        brandId: product.brandId ?? NONE_VALUE,
-        marketUserId: fixedMarketUserId ?? product.marketUserId ?? NONE_VALUE,
+        brandId: normalizeSelectId(product.brandId) || NONE_VALUE,
+        marketUserId:
+          normalizeSelectId(fixedMarketUserId ?? product.marketUserId) || NONE_VALUE,
         type: product.type ?? '',
         weight: product.weight != null ? String(product.weight) : '',
         weightUnit: product.weightUnit ?? 'none',
@@ -195,11 +204,20 @@ export function ProductDetailsForm({
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
-    const parsed = createProductSchema.safeParse({
+    const brandId =
+      values.brandId === NONE_VALUE ? undefined : normalizeSelectId(values.brandId) || undefined;
+    const marketUserId =
+      normalizeSelectId(fixedMarketUserId) ||
+      (values.marketUserId === NONE_VALUE
+        ? undefined
+        : normalizeSelectId(values.marketUserId) || undefined);
+    const schema = mode === 'edit' ? editProductDetailsSchema : createProductSchema;
+
+    const parsed = schema.safeParse({
       name: values.name,
       code: values.code,
-      brandId: values.brandId === NONE_VALUE ? undefined : values.brandId,
-      marketUserId: fixedMarketUserId ?? (values.marketUserId === NONE_VALUE ? '' : values.marketUserId),
+      brandId,
+      ...(marketUserId ? { marketUserId } : {}),
       type: values.type,
       weight: parseOptionalNumber(values.weight),
       weightUnit: values.weightUnit === 'none' ? undefined : values.weightUnit,
@@ -249,7 +267,9 @@ export function ProductDetailsForm({
         <CardHeader>
           <CardTitle>{mode === 'create' ? 'بيانات المنتج الجديد' : 'بيانات المنتج'}</CardTitle>
           <CardDescription>
-            المنتج مرتبط بسوق واحد إلزاميًا، والبراند يُختار من قائمة البراندات الموحّدة.
+            {mode === 'create'
+              ? 'المنتج الجديد لازم يرتبط بسوق واحد، والبراند اختياري.'
+              : 'يمكن تعديل بيانات المنتج وربطه بسوق أو براند بدون إجبار المنتجات القديمة على قيم غير موجودة.'}
           </CardDescription>
         </CardHeader>
 
@@ -309,7 +329,7 @@ export function ProductDetailsForm({
               </Select>
             </FormField>
 
-            <FormField labelKey="السوق" required error={errors.marketUserId}>
+            <FormField labelKey="السوق" required={mode === 'create'} error={errors.marketUserId}>
               {fixedMarketUserId ? (
                 <div className="flex h-11 items-center rounded-2xl border border-primary/20 bg-primary/5 px-3.5">
                   <div className="min-w-0">
