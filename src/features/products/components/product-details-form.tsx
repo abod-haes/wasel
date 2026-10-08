@@ -259,8 +259,6 @@ export function ProductDetailsForm({
     }));
   };
 
-  const mainImage = product?.images.find((image) => image.isMain) ?? product?.images[0];
-
   return (
     <form id="product-details-form" onSubmit={submitHandler}>
       <Card>
@@ -487,16 +485,19 @@ export function ProductDetailsForm({
             />
           </FormField>
 
-          <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
-            <ImageUploader
-              id="product-image"
-              value={values.imageFile}
-              currentImagePath={mode === 'edit' ? mainImage?.imagePath : undefined}
-              disabled={isSubmitting}
-              accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
-              onChange={(imageFile) => setValues((previous) => ({ ...previous, imageFile }))}
-            />
-          </FormField>
+          {mode === 'create' ? (
+            <FormField labelKey="products.form.imagePath" htmlFor="product-image" error={errors.imageFile}>
+              <ImageUploader
+                id="product-image"
+                value={values.imageFile}
+                disabled={isSubmitting}
+                accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+                onChange={(imageFile) =>
+                  setValues((previous) => ({ ...previous, imageFile }))
+                }
+              />
+            </FormField>
+          ) : null}
         </CardContent>
 
         <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
