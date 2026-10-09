@@ -78,6 +78,7 @@ export function ImageUploader({
 
   const handleDrop = (event: DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
+    event.stopPropagation();
     setIsDragging(false);
 
     if (disabled) {
@@ -85,6 +86,15 @@ export function ImageUploader({
     }
 
     setSelectedFile(event.dataTransfer.files);
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>): void => {
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
+      return;
+    }
+
+    setIsDragging(false);
   };
 
   const handleKeyboardChoose = (event: KeyboardEvent<HTMLDivElement>): void => {
@@ -114,18 +124,27 @@ export function ImageUploader({
         aria-disabled={disabled}
         className={cn(
           'flex min-h-44 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed border-border/80 bg-card/65 p-4 text-start transition-colors focus-visible:border-primary/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15',
-          isDragging && 'border-primary/70 bg-primary/5',
+          isDragging && 'scale-[1.01] border-primary/80 bg-primary/5 shadow-sm',
           disabled && 'cursor-not-allowed opacity-60'
         )}
         onClick={chooseFile}
         onKeyDown={handleKeyboardChoose}
-        onDragOver={(event) => {
+        onDragEnter={(event) => {
           event.preventDefault();
+          event.stopPropagation();
           if (!disabled) {
             setIsDragging(true);
           }
         }}
-        onDragLeave={() => setIsDragging(false)}
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          event.dataTransfer.dropEffect = 'copy';
+          if (!disabled) {
+            setIsDragging(true);
+          }
+        }}
+        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         {imageUrl ? (
