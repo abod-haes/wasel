@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { SidebarToggleButton } from '@/app/layouts/app-sidebar';
+import { RodoBrandLogo } from '@/components/shared';
 import {
   LanguageSwitcher,
   NotificationsButton,
@@ -24,11 +25,12 @@ export function AppHeader(): React.JSX.Element {
   const breadcrumbs = useBreadcrumbs();
 
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-brand-border bg-card/95 shadow-[0_3px_20px_-15px_rgba(20,47,125,0.35)] backdrop-blur">
       <div className="flex h-14 items-center justify-between gap-3 px-4 sm:px-6">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <SidebarToggleButton />
+            <RodoBrandLogo compact className="h-8 w-8 lg:hidden" />
             <Breadcrumb>
               <BreadcrumbList>
                 {breadcrumbs.map((item, index) => {
