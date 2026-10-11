@@ -33,7 +33,7 @@ const getSystemTheme = (): Theme => {
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
+  defaultTheme = 'light',
   storageKey = THEME_STORAGE_KEY,
 }: ThemeProviderProps): React.JSX.Element {
   const [theme, setThemeState] = useState<Theme>(() => {

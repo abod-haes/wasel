@@ -2,49 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RODO identity: navy #142F7D, yellow #FAB12E, cool neutral surfaces. */
 :root {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 12%;
+  color-scheme: light;
+  --background: 228 45.5% 97.8%;
+  --foreground: 223 48.3% 17.5%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 12%;
+  --card-foreground: 223 48.3% 17.5%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 12%;
-  --primary: 0 68.5% 49.8%;
+  --popover-foreground: 223 48.3% 17.5%;
+  --primary: 224.6 72.4% 28.4%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 141 50% 94.5%;
-  --secondary-foreground: 147 100% 26.1%;
-  --muted: 0 0% 96.5%;
-  --muted-foreground: 0 0% 45%;
-  --accent: 0 100% 97.6%;
-  --accent-foreground: 0 73.5% 41.4%;
-  --destructive: 4 74% 40%;
+  --secondary: 38.5 95.3% 58%;
+  --secondary-foreground: 224.6 72.4% 28.4%;
+  --muted: 222 44% 96%;
+  --muted-foreground: 217.7 14.4% 47.6%;
+  --accent: 222.4 63% 94.7%;
+  --accent-foreground: 224.6 72.4% 28.4%;
+  --destructive: 4.2 74.3% 48.8%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 90%;
-  --input: 0 0% 90%;
-  --ring: 0 68.5% 49.8%;
+  --border: 220 36.6% 92%;
+  --input: 220 36.6% 92%;
+  --ring: 224.6 72.4% 28.4%;
   --radius: 1.25rem;
 }
 
 .dark {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 96%;
-  --card: 0 0% 10%;
-  --card-foreground: 0 0% 96%;
-  --popover: 0 0% 10%;
-  --popover-foreground: 0 0% 96%;
-  --primary: 0 68.5% 54%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 147 24% 16%;
-  --secondary-foreground: 141 42% 91%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 68%;
-  --accent: 0 28% 16%;
-  --accent-foreground: 0 82% 72%;
+  color-scheme: dark;
+  --background: 226 47% 9%;
+  --foreground: 222 30% 94%;
+  --card: 225 40% 13%;
+  --card-foreground: 222 30% 94%;
+  --popover: 225 40% 13%;
+  --popover-foreground: 222 30% 94%;
+  --primary: 221 73% 69%;
+  --primary-foreground: 225 65% 12%;
+  --secondary: 38.5 95.3% 58%;
+  --secondary-foreground: 225 65% 12%;
+  --muted: 224 30% 20%;
+  --muted-foreground: 219 19% 72%;
+  --accent: 223 37% 24%;
+  --accent-foreground: 222 30% 94%;
   --destructive: 4 72% 52%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 0 68.5% 54%;
+  --border: 223 30% 26%;
+  --input: 223 30% 26%;
+  --ring: 221 73% 69%;
 }
 
 @layer base {
@@ -63,8 +66,8 @@
     font-family: 'Tajawal', 'Noto Sans Arabic', 'Manrope', sans-serif;
     text-align: start;
     background-image:
-      radial-gradient(circle at 16% 16%, hsl(var(--primary) / 0.09), transparent 28%),
-      radial-gradient(circle at 84% 4%, hsl(var(--destructive) / 0.055), transparent 30%);
+      radial-gradient(circle at 16% 16%, hsl(var(--primary) / 0.045), transparent 30%),
+      radial-gradient(circle at 84% 4%, hsl(var(--secondary) / 0.075), transparent 32%);
   }
 
   input,
@@ -74,7 +77,7 @@
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.22);
+    background: hsl(var(--secondary) / 0.35);
     color: hsl(var(--foreground));
   }
 }

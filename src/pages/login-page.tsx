@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { FormField, WaselBrandLogo } from '@/components/shared';
+import { FormField, RodoBrandLogo } from '@/components/shared';
 import { DEFAULT_COUNTRY_CALLING_CODE, PHONE_COUNTRY_CODES } from '@/constants/phone';
 import { ROUTES } from '@/constants/routes';
 import {
@@ -113,12 +113,12 @@ export default function LoginPage(): React.JSX.Element {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-surface p-4 dark:bg-background">
       <div className="pointer-events-none absolute -start-24 -top-24 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -end-20 h-72 w-72 rounded-full bg-brand-red/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -end-20 h-72 w-72 rounded-full bg-brand-secondary/20 blur-3xl" />
 
-      <Card className="relative w-full max-w-md overflow-hidden rounded-wasel-lg border-brand-border/90 bg-card/95 shadow-floating dark:border-border">
-        <div className="h-1.5 w-full bg-gradient-to-l from-brand-red-dark via-brand-red to-primary/60" />
+      <Card className="relative w-full max-w-md overflow-hidden rounded-rodo-lg border-brand-border/90 bg-card/95 shadow-floating dark:border-border">
+        <div className="h-1.5 w-full bg-gradient-to-l from-brand-primary via-brand-royal to-brand-secondary" />
         <CardHeader className="items-center px-7 pb-3 pt-7 text-center">
-          <WaselBrandLogo className="mb-2 h-16 w-48" />
+          <RodoBrandLogo className="mb-2 h-16 w-52" />
           <CardTitle className="text-2xl">{t('auth.loginTitle')}</CardTitle>
           <CardDescription className="max-w-sm">{t('auth.loginDescription')}</CardDescription>
         </CardHeader>

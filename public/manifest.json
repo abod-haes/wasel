@@ -1,17 +1,17 @@
 {
-  "short_name": "واصل",
-  "name": "داشبورد متجر واصل",
-  "description": "داشبورد متجر واصل لإدارة الطلبات والمنتجات والتصنيفات والإشعارات.",
+  "short_name": "RODO",
+  "name": "لوحة تحكم رودو",
+  "description": "لوحة رودو لإدارة الطلبات والمنتجات والتصنيفات والإشعارات.",
   "icons": [
     {
-      "src": "/branding/wasel-logo-official.png",
+      "src": "/branding/rodo-icon.png",
       "type": "image/png",
-      "sizes": "360x144",
+      "sizes": "268x268",
       "purpose": "any"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#00B050",
-  "background_color": "#F7F8F6"
+  "theme_color": "#142F7D",
+  "background_color": "#F7F8FC"
 }
