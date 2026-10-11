@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { WaselBrandLogo } from '@/components/shared';
+import { RodoBrandLogo } from '@/components/shared';
 import { ROUTES } from '@/constants/routes';
 import { env } from '@/env';
 
@@ -40,7 +40,7 @@ const sections = [
   {
     icon: ServerCog,
     title: 'مزودو الخدمة',
-    body: 'قد تمر البيانات الضرورية عبر خدمات البنية التحتية والإشعارات والخرائط التي يعتمد عليها واصل لتشغيل التطبيق. لا نستخدم الموقع للإعلانات.',
+    body: 'قد تمر البيانات الضرورية عبر خدمات البنية التحتية والإشعارات والخرائط التي يعتمد عليها رودو لتشغيل التطبيق. لا نستخدم الموقع للإعلانات.',
   },
   {
     icon: Clock3,
@@ -58,7 +58,7 @@ export default function PrivacyPage(): React.JSX.Element {
       <div className="relative mx-auto flex w-full max-w-4xl flex-col gap-7 px-5 py-8 sm:px-8 sm:py-12">
         <header className="animate-stagger flex flex-col gap-6 rounded-[32px] border border-border/80 bg-card/90 p-6 shadow-floating backdrop-blur sm:p-8">
           <div className="flex items-center justify-between gap-4">
-            <WaselBrandLogo className="h-14 w-40" />
+            <RodoBrandLogo className="h-14 w-40" />
             <Link
               to={ROUTES.login}
               className="inline-flex items-center gap-1 rounded-full border border-border bg-background/80 px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary/30 hover:text-primary"
@@ -73,9 +73,9 @@ export default function PrivacyPage(): React.JSX.Element {
               <ShieldCheck className="h-4 w-4" />
               الخصوصية والبيانات
             </div>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">سياسة خصوصية واصل</h1>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">سياسة خصوصية رودو</h1>
             <p className="text-base leading-8 text-muted-foreground">
-              توضح هذه الصفحة أنواع البيانات الأساسية التي يستخدمها تطبيق واصل ولماذا نحتاجها لتشغيل
+              توضح هذه الصفحة أنواع البيانات الأساسية التي يستخدمها تطبيق رودو ولماذا نحتاجها لتشغيل
               الحساب والطلبات والتوصيل والتتبع والإشعارات.
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function PrivacyPage(): React.JSX.Element {
             <div className="space-y-2">
               <h2 className="text-xl font-bold">حذف الحساب والبيانات</h2>
               <p className="leading-7 text-muted-foreground">
-                يمكنك بدء حذف حسابك مباشرة من تطبيق واصل من صفحة الحساب. كما نوفر صفحة عامة لطلب
+                يمكنك بدء حذف حسابك مباشرة من تطبيق رودو من صفحة الحساب. كما نوفر صفحة عامة لطلب
                 الحذف من خارج التطبيق. قد نحتفظ ببعض البيانات فقط عندما يكون ذلك مطلوباً قانونياً أو
                 ضرورياً لمنع الاحتيال أو تسوية الالتزامات.
               </p>
@@ -139,10 +139,10 @@ export default function PrivacyPage(): React.JSX.Element {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <h2 className="text-xl font-bold">التواصل والخصوصية</h2>
+            <h2 className="text-xl font-bold">الترودو والخصوصية</h2>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               إذا كان عندك سؤال عن بياناتك أو طلب حذف أو تصحيح، استخدم صفحة الدعم العامة.
-              {env.supportEmail ? ` ويمكن التواصل عبر ${env.supportEmail}.` : ''}
+              {env.supportEmail ? ` ويمكن الترودو عبر ${env.supportEmail}.` : ''}
             </p>
             <Link
               to={ROUTES.support}

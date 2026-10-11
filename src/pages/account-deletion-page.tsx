@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { WaselBrandLogo } from '@/components/shared';
+import { RodoBrandLogo } from '@/components/shared';
 import { Button, Input } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { env } from '@/env';
@@ -28,9 +28,9 @@ export default function AccountDeletionPage(): React.JSX.Element {
       return undefined;
     }
 
-    const subject = encodeURIComponent('طلب حذف حساب واصل');
+    const subject = encodeURIComponent('طلب حذف حساب رودو');
     const body = encodeURIComponent(
-      `مرحباً،\n\nأرغب بطلب حذف حساب واصل المرتبط برقم الهاتف: ${phoneNumber}\n\nأرجو التواصل معي للتحقق من ملكية الحساب وإتمام الطلب.\n`
+      `مرحباً،\n\nأرغب بطلب حذف حساب رودو المرتبط برقم الهاتف: ${phoneNumber}\n\nأرجو الترودو معي للتحقق من ملكية الحساب وإتمام الطلب.\n`
     );
 
     return `mailto:${env.supportEmail}?subject=${subject}&body=${body}`;
@@ -55,7 +55,7 @@ export default function AccountDeletionPage(): React.JSX.Element {
       <div className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 py-8 sm:px-8 sm:py-12">
         <header className="animate-stagger rounded-[32px] border border-border/80 bg-card/95 p-6 shadow-floating sm:p-8">
           <div className="flex items-center justify-between gap-4">
-            <WaselBrandLogo className="h-14 w-40" />
+            <RodoBrandLogo className="h-14 w-40" />
             <Link
               to={ROUTES.privacy}
               className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary/30 hover:text-primary"
@@ -68,7 +68,7 @@ export default function AccountDeletionPage(): React.JSX.Element {
           <div className="mt-7 max-w-2xl space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
               <Trash2 className="h-4 w-4" />
-              حذف حساب واصل
+              حذف حساب رودو
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">تحكم كامل بحسابك وبياناتك</h1>
             <p className="text-base leading-8 text-muted-foreground">
@@ -175,7 +175,7 @@ export default function AccountDeletionPage(): React.JSX.Element {
 
         <p className="text-center text-xs leading-6 text-muted-foreground">
           لا نطلب كلمة مرورك أو رمز التحقق عبر البريد. إذا احتجنا للتحقق من الملكية، سيتم ذلك عبر
-          القنوات الرسمية لواصل.
+          القنوات الرسمية لرودو.
         </p>
       </div>
     </main>
