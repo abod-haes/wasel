@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'border border-primary/20 bg-gradient-to-b from-[#E13A3A] via-primary to-brand-red-dark text-primary-foreground shadow-[0_12px_28px_-16px_rgba(214,40,40,0.72)] hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-17px_rgba(214,40,40,0.66)]',
+          'border border-primary/25 bg-primary text-primary-foreground shadow-[0_12px_28px_-16px_rgba(20,47,125,0.50)] hover:-translate-y-0.5 hover:bg-brand-primary-dark hover:text-white hover:shadow-[0_18px_34px_-17px_rgba(20,47,125,0.42)] dark:hover:bg-primary/85 dark:hover:text-primary-foreground',
         secondary:
-          'border border-border/80 bg-gradient-to-b from-card to-muted/55 text-foreground shadow-sm hover:-translate-y-0.5 hover:border-primary/20 hover:bg-primary/[0.035] hover:shadow-soft dark:border-border dark:to-muted/60',
+          'border border-brand-secondary/60 bg-brand-secondary-soft text-brand-primary-dark shadow-sm hover:-translate-y-0.5 hover:border-brand-secondary hover:bg-brand-secondary dark:border-brand-secondary/60 dark:bg-brand-secondary dark:text-brand-primary-dark',
         ghost:
           'border border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/8 hover:text-primary',
         outline:
           'border border-brand-border bg-background/80 text-foreground backdrop-blur hover:border-primary/45 hover:bg-primary/5 dark:border-border',
         destructive:
-          'border border-brand-red/20 bg-gradient-to-b from-brand-red via-destructive to-brand-red-dark text-destructive-foreground shadow-[0_10px_24px_-14px_rgba(183,28,28,0.72)] hover:-translate-y-0.5 hover:shadow-[0_16px_28px_-15px_rgba(183,28,28,0.62)]',
+          'border border-destructive/20 bg-destructive text-destructive-foreground shadow-sm hover:-translate-y-0.5 hover:bg-destructive/90',
       },
       size: {
         default: 'h-11 px-5',

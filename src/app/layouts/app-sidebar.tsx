@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SIDEBAR_NAV_ITEMS } from '@/constants/navigation';
 import type { Permission } from '@/constants/permissions';
 import { Button, ScrollArea, Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui';
-import { SidebarNav, WaselBrandLogo } from '@/components/shared';
+import { RodoBrandLogo, SidebarNav } from '@/components/shared';
 import { cn } from '@/lib/utils';
 import { hasPermission } from '@/services/permissions/mock-permissions';
 import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
@@ -68,11 +68,11 @@ function SidebarInner({
     <>
       <div
         className={cn(
-          'flex h-16 items-center border-b border-brand-border/80 bg-gradient-to-b from-brand-red-soft/80 to-transparent px-4 dark:from-primary/10',
+          'flex h-16 items-center border-b border-brand-border/80 bg-gradient-to-l from-brand-secondary-soft/80 via-card to-card px-4 dark:from-primary/10',
           collapsed ? 'justify-start px-2' : 'justify-start'
         )}
       >
-        {collapsed ? null : <WaselBrandLogo className="h-11 w-36" />}
+        {collapsed ? null : <RodoBrandLogo className="h-10 w-36" />}
       </div>
       <ScrollArea dir={direction} className="h-[calc(100vh-64px)] px-2 py-4">
         <SidebarNav items={items} collapsed={collapsed} onNavigate={onNavigate} />

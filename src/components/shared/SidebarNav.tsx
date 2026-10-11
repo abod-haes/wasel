@@ -72,10 +72,10 @@ export function SidebarNav({ items, collapsed = false, onNavigate }: SidebarNavP
                     onClick={onNavigate}
                     className={({ isActive }) =>
                       cn(
-                        'group flex items-center justify-center rounded-lg px-3 py-2 text-sm transition-colors',
+                        'group flex items-center justify-center rounded-xl px-3 py-2.5 text-sm transition-colors',
                         isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                          ? 'bg-brand-primary-soft text-brand-primary-dark font-semibold ring-1 ring-brand-primary/10 dark:bg-primary/15 dark:text-primary'
+                          : 'text-muted-foreground hover:bg-brand-primary-soft/70 hover:text-brand-primary-dark dark:hover:bg-primary/10 dark:hover:text-primary'
                       )
                     }
                   >
@@ -90,7 +90,7 @@ export function SidebarNav({ items, collapsed = false, onNavigate }: SidebarNavP
                 <button
                   type="button"
                   className={cn(
-                    'group flex w-full items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground',
+                    'group flex w-full items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-brand-primary-soft/70 hover:text-brand-primary-dark dark:hover:bg-primary/10 dark:hover:text-primary',
                     depth > 0 && 'ps-6'
                   )}
                   onClick={() => toggleExpand(entry.key)}
@@ -115,8 +115,8 @@ export function SidebarNav({ items, collapsed = false, onNavigate }: SidebarNavP
                 onClick={onNavigate}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center rounded-lg px-3 py-2 text-sm transition-colors',
-                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
+                    'group flex items-center rounded-xl px-3 py-2.5 text-sm transition-colors',
+                    isActive ? 'bg-brand-primary-soft text-brand-primary-dark font-semibold ring-1 ring-brand-primary/10 dark:bg-primary/15 dark:text-primary' : 'text-muted-foreground hover:bg-brand-primary-soft/70 hover:text-brand-primary-dark dark:hover:bg-primary/10 dark:hover:text-primary',
                     depth > 0 && 'ps-6',
                     collapsed && 'justify-center'
                   )
