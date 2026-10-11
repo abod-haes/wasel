@@ -14,4 +14,5 @@ export * from './SectionHeader';
 export * from './SidebarNav';
 export * from './ThemeSwitcher';
 export * from './UserMenu';
+export * from './RodoBrandLogo';
 export * from './WaselBrandLogo';
