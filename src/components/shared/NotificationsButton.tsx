@@ -22,7 +22,7 @@ export function NotificationsButton(): React.JSX.Element {
       <Link to={ROUTES.notifications} onClick={markNotificationsAsRead}>
         <Bell className="h-4 w-4" />
         {unreadCount > 0 ? (
-          <span className="absolute -end-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+          <span className="absolute -end-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-secondary px-1 text-[10px] font-bold text-brand-primary-dark">
             {unreadCount}
           </span>
         ) : null}

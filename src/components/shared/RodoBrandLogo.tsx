@@ -16,7 +16,7 @@ export function RodoBrandLogo({
       alt="RODO | رودو"
       className={cn(
         'select-none object-contain',
-        compact ? 'h-10 w-10 rounded-xl' : 'h-12 w-40',
+        compact ? 'h-10 w-10 rounded-xl' : 'h-12 w-40 rounded-lg bg-white p-1',
         className
       )}
       draggable={false}

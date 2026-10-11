@@ -17,8 +17,8 @@ export function EmptyState({
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <div className="rounded-full bg-muted p-3">
-          <Inbox className="h-6 w-6 text-muted-foreground" />
+        <div className="rounded-2xl bg-brand-primary-soft p-4 dark:bg-primary/15">
+          <Inbox className="h-6 w-6 text-brand-primary-dark dark:text-primary" />
         </div>
         <p className="text-base font-semibold">{t(titleKey)}</p>
         <p className="max-w-md text-sm text-muted-foreground">{t(descriptionKey)}</p>
