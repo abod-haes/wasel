@@ -1,9 +1,13 @@
 import { getPermissionsForRoles, getRolesFromToken } from '@/services/auth/auth-roles';
 import type { AuthSession } from '@/types/auth';
 
-const AUTH_SESSION_KEY = 'wasel_auth_session';
-const TOKEN_KEY = 'wasel_token';
+import { getApiEnvironment } from '@/config/api-environment';
+
 const LEGACY_TOKEN_KEY = 'token';
+const authSessionKey = (): string =>
+  getApiEnvironment() === 'development' ? 'rodo_dev_auth_session' : 'wasel_auth_session';
+const tokenKey = (): string =>
+  getApiEnvironment() === 'development' ? 'rodo_dev_token' : 'wasel_token';
 
 const hasWindow = (): boolean => typeof window !== 'undefined';
 
@@ -79,7 +83,7 @@ export const loadStoredAuthSession = (): AuthSession | null => {
     return null;
   }
 
-  const rawSession = window.localStorage.getItem(AUTH_SESSION_KEY);
+  const rawSession = window.localStorage.getItem(authSessionKey());
   if (!rawSession) {
     return null;
   }
@@ -102,7 +106,9 @@ export const getStoredAuthToken = (): string | null => {
     return null;
   }
 
-  return window.localStorage.getItem(TOKEN_KEY) ?? window.localStorage.getItem(LEGACY_TOKEN_KEY);
+  return getApiEnvironment() === 'development'
+    ? window.localStorage.getItem(tokenKey())
+    : window.localStorage.getItem(tokenKey()) ?? window.localStorage.getItem(LEGACY_TOKEN_KEY);
 };
 
 export const saveAuthSession = (session: AuthSession): void => {
@@ -110,9 +116,11 @@ export const saveAuthSession = (session: AuthSession): void => {
     return;
   }
 
-  window.localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-  window.localStorage.setItem(TOKEN_KEY, session.token);
-  window.localStorage.setItem(LEGACY_TOKEN_KEY, session.token);
+  window.localStorage.setItem(authSessionKey(), JSON.stringify(session));
+  window.localStorage.setItem(tokenKey(), session.token);
+  if (getApiEnvironment() === 'production') {
+    window.localStorage.setItem(LEGACY_TOKEN_KEY, session.token);
+  }
 };
 
 export const clearStoredAuthSession = (): void => {
@@ -120,7 +128,9 @@ export const clearStoredAuthSession = (): void => {
     return;
   }
 
-  window.localStorage.removeItem(AUTH_SESSION_KEY);
-  window.localStorage.removeItem(TOKEN_KEY);
-  window.localStorage.removeItem(LEGACY_TOKEN_KEY);
+  window.localStorage.removeItem(authSessionKey());
+  window.localStorage.removeItem(tokenKey());
+  if (getApiEnvironment() === 'production') {
+    window.localStorage.removeItem(LEGACY_TOKEN_KEY);
+  }
 };
