@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-import { env } from '@/env';
+import { getActiveApiBaseUrl } from '@/config/api-environment';
 import { clearStoredAuthSession, getStoredAuthToken } from '@/services/auth/auth-storage';
 import { serializeApiParams } from '@/services/api/params-serializer';
 
 export const apiClient = axios.create({
-  baseURL: env.apiBaseUrl,
+  baseURL: getActiveApiBaseUrl(),
   paramsSerializer: {
     serialize: serializeApiParams,
   },
@@ -15,6 +15,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
+  config.baseURL = getActiveApiBaseUrl();
   if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
     config.headers.setContentType(undefined);
   }
