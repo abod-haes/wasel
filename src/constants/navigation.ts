@@ -130,7 +130,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         labelKey: 'nav.appVersions',
         to: ROUTES.appVersions,
         icon: Smartphone,
-        permission: PERMISSIONS.settingsView,
+        permission: PERMISSIONS.settingsEdit,
       },
     ],
   },
