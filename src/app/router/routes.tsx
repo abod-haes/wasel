@@ -263,7 +263,7 @@ export const appRoutes: RouteObject[] = [
           {
             path: ROUTES.appVersions,
             element: (
-              <PermissionGuard required={PERMISSIONS.settingsView}>
+              <PermissionGuard required={PERMISSIONS.settingsEdit}>
                 {withSuspense(<AppVersionsPage />)}
               </PermissionGuard>
             ),
