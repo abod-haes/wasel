@@ -9,6 +9,7 @@ const arTranslation = {
   nav: {
     ...arCommon.nav,
     ads: 'الإعلانات',
+    appVersions: 'إصدارات التطبيق',
   },
 };
 
