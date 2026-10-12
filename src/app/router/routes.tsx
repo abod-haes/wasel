@@ -32,6 +32,7 @@ const DeliveryFinancePage = lazyRoute(
 const NotificationsPage = lazyRoute(() => import('@/features/notifications/pages/notifications-page'));
 const OtpAdminPage = lazyRoute(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazyRoute(() => import('@/features/settings/pages/settings-page'));
+const AppVersionsPage = lazyRoute(() => import('@/features/app-versions/pages/app-versions-page'));
 const PricingSettingsPage = lazyRoute(() => import('@/features/settings/pages/pricing-settings-page'));
 const SettingsPreferencesPage = lazyRoute(
   () => import('@/features/settings/pages/settings-preferences-page')
@@ -258,6 +259,15 @@ export const appRoutes: RouteObject[] = [
             handle: {
               breadcrumbKey: 'nav.settingsPreferences',
             },
+          },
+          {
+            path: ROUTES.appVersions,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsView}>
+                {withSuspense(<AppVersionsPage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.appVersions' },
           },
         ],
       },
