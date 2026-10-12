@@ -1,4 +1,3 @@
-export * from './ApiEnvironmentSwitcher';
 export * from './ConfirmDialog';
 export * from './DataTable';
 export * from './DateTimeField';
