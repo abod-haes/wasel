@@ -106,7 +106,7 @@ export default function AppVersionsPage(): React.JSX.Element {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const updateField = <K extends keyof FormValues>(key: K, value: FormValues[K]): void => {
+  const updateField = <K extends keyof FormValues,>(key: K, value: FormValues[K]): void => {
     setForm((previous) => ({ ...previous, [key]: value }));
     setFormError('');
   };
@@ -180,9 +180,14 @@ export default function AppVersionsPage(): React.JSX.Element {
         result = await appVersionsApi.create(payload);
         toast.success('تم إنشاء نسخة التطبيق بنجاح.');
       } else {
-        const { version: _version, ...update }: FormValues = payload;
-        void _version;
-        const patch: UpdateAppVersionInput = update;
+        const patch: UpdateAppVersionInput = {
+          needToUpdate: payload.needToUpdate,
+          forceUpdate: payload.forceUpdate,
+          isVisible: payload.isVisible,
+          googlePlayLink: payload.googlePlayLink,
+          appStoreLink: payload.appStoreLink,
+          websiteLink: payload.websiteLink,
+        };
         result = await appVersionsApi.update(selected!.version, patch);
         toast.success('تم تعديل إعدادات النسخة بنجاح.');
       }
