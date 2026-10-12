@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { ApiEnvironmentSwitcher, FormField, RodoBrandLogo } from '@/components/shared';
+import { FormField, RodoBrandLogo } from '@/components/shared';
 import { DEFAULT_COUNTRY_CALLING_CODE, PHONE_COUNTRY_CODES } from '@/constants/phone';
 import { ROUTES } from '@/constants/routes';
 import {
@@ -119,7 +119,6 @@ export default function LoginPage(): React.JSX.Element {
         <div className="h-1.5 w-full bg-gradient-to-l from-brand-primary via-brand-royal to-brand-secondary" />
         <CardHeader className="items-center px-7 pb-3 pt-7 text-center">
           <RodoBrandLogo className="mb-2 h-16 w-52" />
-          <ApiEnvironmentSwitcher compact />
           <CardTitle className="text-2xl">{t('auth.loginTitle')}</CardTitle>
           <CardDescription className="max-w-sm">{t('auth.loginDescription')}</CardDescription>
         </CardHeader>
