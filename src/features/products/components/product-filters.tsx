@@ -119,7 +119,7 @@ export function ProductFilters({
             onValueChange={(marketUserId) => {
               onMarketSelected?.(markets.find((market) => market.id === marketUserId) ?? null);
               onChange({ ...filters, marketUserId, marketName: '' });
-            }
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="السوق">
