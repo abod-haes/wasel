@@ -20,6 +20,8 @@ interface SendNotificationDialogProps {
   open: boolean;
   isSubmitting?: boolean;
   users: User[];
+  userSearch?: string;
+  onUserSearchChange?: (search: string) => void;
   isUsersLoading?: boolean;
   isUsersError?: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,6 +46,8 @@ export function SendNotificationDialog({
   open,
   isSubmitting = false,
   users,
+  userSearch = '',
+  onUserSearchChange,
   isUsersLoading = false,
   isUsersError = false,
   onOpenChange,
@@ -140,6 +144,8 @@ export function SendNotificationDialog({
           <FormField labelKey="notifications.form.userIds">
             <NotificationUsersMultiSelect
               users={users}
+              searchValue={userSearch}
+              onSearchChange={onUserSearchChange}
               selectedUserIds={values.userIds}
               isLoading={isUsersLoading}
               isError={isUsersError}
