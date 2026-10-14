@@ -17,6 +17,8 @@ export const useBrandOptionsQuery = () =>
   useQuery({
     queryKey: queryKeys.brands.options(),
     queryFn: brandsApi.getOptions,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
 export const useCreateBrandMutation = () => {

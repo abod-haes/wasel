@@ -35,22 +35,33 @@ export const brandsApi = {
 
   async getOptions(): Promise<Brand[]> {
     const pageSize = 100;
-    let page = 1;
-    const brands: Brand[] = [];
+    const maxPages = 50; // Safety limit if the API ignores pagination.
+    const brands = new Map<string, Brand>();
 
-    while (true) {
-      const { data } = await apiClient.get<BrandPaginatedResponse>('/api/Brands', {
+    for (let page = 1; page <= maxPages; page += 1) {
+      const { data } = await apiClient.get<BrandPaginatedResponse | BrandApiResponse[]>('/api/Brands', {
         params: { page, pageSize },
       });
+      const rawItems = Array.isArray(data)
+        ? data
+        : Array.isArray(data.Items) ? data.Items : Array.isArray(data.items) ? data.items : [];
+      if (rawItems.length === 0) break;
 
-      const paginated = toPaginatedData(data, { page, pageSize });
-      brands.push(...paginated.items.map(mapBrand).filter((brand) => Boolean(brand.id)));
+      const sizeBefore = brands.size;
+      for (const item of rawItems) {
+        const brand = mapBrand(item);
+        if (brand.id) brands.set(brand.id, brand);
+      }
 
-      if (page >= paginated.totalPages || paginated.items.length === 0) break;
-      page += 1;
+      // Stop if the backend returns the same page over and over.
+      if (brands.size === sizeBefore || Array.isArray(data)) break;
+      const totalPages = !Array.isArray(data) ? (data as { totalPages?: number; TotalPages?: number }).totalPages ?? (data as { TotalPages?: number }).TotalPages : undefined;
+      const totalCount = 'TotalCount' in data ? data.TotalCount : undefined;
+      const computedPages = totalCount ? Math.ceil(totalCount / pageSize) : undefined;
+      if (page >= (totalPages ?? computedPages ?? (rawItems.length < pageSize ? page : maxPages))) break;
     }
 
-    return Array.from(new Map(brands.map((brand) => [brand.id, brand])).values());
+    return [...brands.values()];
   },
 
   async createBrand(input: BrandInput): Promise<Brand> {

@@ -21,6 +21,7 @@ export const ROUTES = {
   settings: '/settings',
   settingsPricing: '/settings/pricing',
   settingsPreferences: '/settings/preferences',
+  productImageStats: '/settings/product-image-stats',
   appVersions: '/settings/app-versions',
   unauthorized: '/unauthorized',
 } as const;

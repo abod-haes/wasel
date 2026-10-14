@@ -34,6 +34,7 @@ const OtpAdminPage = lazyRoute(() => import('@/features/otp-admin/pages/otp-admi
 const SettingsPage = lazyRoute(() => import('@/features/settings/pages/settings-page'));
 const AppVersionsPage = lazyRoute(() => import('@/features/app-versions/pages/app-versions-page'));
 const PricingSettingsPage = lazyRoute(() => import('@/features/settings/pages/pricing-settings-page'));
+const ProductImageStatsPage = lazyRoute(() => import('@/features/settings/pages/product-image-stats-page'));
 const SettingsPreferencesPage = lazyRoute(
   () => import('@/features/settings/pages/settings-preferences-page')
 );
@@ -259,6 +260,15 @@ export const appRoutes: RouteObject[] = [
             handle: {
               breadcrumbKey: 'nav.settingsPreferences',
             },
+          },
+          {
+            path: ROUTES.productImageStats,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsView}>
+                {withSuspense(<ProductImageStatsPage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'إحصائيات صور المنتجات' },
           },
           {
             path: ROUTES.appVersions,

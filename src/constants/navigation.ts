@@ -8,6 +8,7 @@ import {
   Megaphone,
   MessageCircleMore,
   Package,
+  Images,
   Settings,
   Smartphone,
   SlidersHorizontal,
@@ -123,6 +124,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
         labelKey: 'nav.settingsPreferences',
         to: ROUTES.settingsPreferences,
         icon: SlidersHorizontal,
+        permission: PERMISSIONS.settingsView,
+      },
+      {
+        key: 'product-image-stats',
+        labelKey: 'إحصائيات صور المنتجات',
+        to: ROUTES.productImageStats,
+        icon: Images,
         permission: PERMISSIONS.settingsView,
       },
       {
