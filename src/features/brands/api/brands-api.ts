@@ -1,6 +1,6 @@
 import type { Brand, BrandInput, BrandsFilter } from '@/features/brands/types/brand-types';
 import { apiClient } from '@/services/api/client';
-import { toPaginatedData } from '@/services/api/pagination';
+import { getPaginatedItems, toPaginatedData } from '@/services/api/pagination';
 import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
 interface BrandApiResponse {
@@ -33,35 +33,16 @@ export const brandsApi = {
     return { ...paginated, items: paginated.items.map(mapBrand) };
   },
 
-  async getOptions(): Promise<Brand[]> {
-    const pageSize = 100;
-    const maxPages = 50; // Safety limit if the API ignores pagination.
-    const brands = new Map<string, Brand>();
-
-    for (let page = 1; page <= maxPages; page += 1) {
-      const { data } = await apiClient.get<BrandPaginatedResponse | BrandApiResponse[]>('/api/Brands', {
-        params: { page, pageSize },
-      });
-      const rawItems = Array.isArray(data)
-        ? data
-        : Array.isArray(data.Items) ? data.Items : Array.isArray(data.items) ? data.items : [];
-      if (rawItems.length === 0) break;
-
-      const sizeBefore = brands.size;
-      for (const item of rawItems) {
-        const brand = mapBrand(item);
-        if (brand.id) brands.set(brand.id, brand);
-      }
-
-      // Stop if the backend returns the same page over and over.
-      if (brands.size === sizeBefore || Array.isArray(data)) break;
-      const totalPages = !Array.isArray(data) ? (data as { totalPages?: number; TotalPages?: number }).totalPages ?? (data as { TotalPages?: number }).TotalPages : undefined;
-      const totalCount = 'TotalCount' in data ? data.TotalCount : undefined;
-      const computedPages = totalCount ? Math.ceil(totalCount / pageSize) : undefined;
-      if (page >= (totalPages ?? computedPages ?? (rawItems.length < pageSize ? page : maxPages))) break;
-    }
-
-    return [...brands.values()];
+  async getOptions(search = ''): Promise<Brand[]> {
+    // A dropdown must not download every page on mount. The search term is
+    // sent to the server so users can still find brands beyond the first page.
+    const { data } = await apiClient.get<BrandPaginatedResponse | BrandApiResponse[]>('/api/Brands', {
+      params: { page: 1, pageSize: 100, search: search.trim() || undefined },
+    });
+    const items = Array.isArray(data) ? data : getPaginatedItems(data);
+    return Array.from(
+      new Map(items.map(mapBrand).filter((brand) => brand.id).map((brand) => [brand.id, brand])).values()
+    );
   },
 
   async createBrand(input: BrandInput): Promise<Brand> {
