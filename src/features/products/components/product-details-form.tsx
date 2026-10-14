@@ -428,11 +428,6 @@ export function ProductDetailsForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  {selectedMarket ? (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {selectedMarket.location || selectedMarket.name}
-                    </p>
-                  ) : null}
                 </>
               )}
             </FormField>
