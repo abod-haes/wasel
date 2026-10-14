@@ -35,7 +35,7 @@ export const useRolesQuery = () => {
 export const useUsersQuery = (filters: UsersFilter, pagination: PaginationParams) => {
   return useQuery({
     queryKey: queryKeys.users.list({ filters, pagination }),
-    queryFn: () => usersApi.getUsers(filters, pagination),
+    queryFn: ({ signal }) => usersApi.getUsers(filters, pagination, signal),
     placeholderData: keepPreviousData,
   });
 };

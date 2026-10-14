@@ -181,7 +181,7 @@ const appendCreateFields = (formData: FormData, payload: CreateProductInput): vo
 };
 
 export const productsDashboardApi = {
-  async getProducts(filters: ProductsFilter, pagination: PaginationParams): Promise<PaginatedData<Product>> {
+  async getProducts(filters: ProductsFilter, pagination: PaginationParams, signal?: AbortSignal): Promise<PaginatedData<Product>> {
     if (env.enableMockApi) {
       return legacyProductsApi.getProducts({ ...filters, categoryId: filters.categoryId !== 'all' ? filters.categoryId : filters.categoryIds?.[0] ?? 'all' }, pagination);
     }
@@ -193,7 +193,7 @@ export const productsDashboardApi = {
       brandId: filters.brandId && filters.brandId !== 'all' ? filters.brandId : undefined,
       marketUserId: filters.marketUserId && filters.marketUserId !== 'all' ? filters.marketUserId : undefined,
       marketName: filters.marketName?.trim() || undefined,
-    } });
+    }, signal });
     const paginated = toPaginatedData(data, pagination);
     return { ...paginated, items: paginated.items.map(mapProduct) };
   },

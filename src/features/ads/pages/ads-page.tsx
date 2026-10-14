@@ -27,9 +27,10 @@ export default function AdsPage(): React.JSX.Element {
   const adsQuery = useAdsQuery();
   const productsQuery = useQuery({
     queryKey: ['ads', 'product-search', debouncedProductSearch] as const,
-    queryFn: () => productsDashboardApi.getProducts(
+    queryFn: ({ signal }) => productsDashboardApi.getProducts(
       { search: debouncedProductSearch, categoryId: 'all' },
-      { page: 1, pageSize: 50 }
+      { page: 1, pageSize: 50 },
+      signal
     ),
     enabled: isFormOpen,
     staleTime: 60_000,

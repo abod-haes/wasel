@@ -73,7 +73,7 @@ export default function ProductsPage(): React.JSX.Element {
     ...filters,
     search: debouncedProductSearch,
     marketUserId: isMarket && currentUser ? currentUser.id : filters.marketUserId,
-    marketName: isMarket ? '' : filters.marketName,
+    marketName: '',
     categoryIds: selectedCategory ? [selectedCategory.id, ...(selectedCategory.descendantIds ?? [])] : undefined,
   };
 
@@ -86,7 +86,7 @@ export default function ProductsPage(): React.JSX.Element {
       ? { ...nextFilters, marketUserId: 'all' as const, marketName: '' }
       : nextFilters;
 
-    setSearchParams(createProductListSearchParams(visibleFilters, nextPagination), { replace: true });
+    setSearchParams(createProductListSearchParams({ ...visibleFilters, marketName: '' }, nextPagination), { replace: true });
   };
 
   if (productsQuery.isError || categoriesQuery.isError || brandsQuery.isError || marketsQuery.isError) {

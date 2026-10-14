@@ -51,7 +51,7 @@ export default function NotificationsPage(): React.JSX.Element {
   const recipientPagination = { page: 1, pageSize: 100 };
   const recipientQuery = useQuery({
     queryKey: queryKeys.users.list({ filters: recipientFilters, pagination: recipientPagination }),
-    queryFn: () => usersApi.getUsers(recipientFilters, recipientPagination),
+    queryFn: ({ signal }) => usersApi.getUsers(recipientFilters, recipientPagination, signal),
     enabled: isDialogOpen,
     placeholderData: keepPreviousData,
     staleTime: 60_000,
