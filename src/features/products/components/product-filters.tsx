@@ -83,6 +83,7 @@ export function ProductFilters({
 
       <Select
         value={filters.brandId ?? 'all'}
+        onOpenChange={(open) => { if (!open) onBrandSearchChange?.(''); }}
         onValueChange={(brandId) => {
           onBrandSelected?.(brands.find((brand) => brand.id === brandId) ?? null);
           onChange({ ...filters, brandId });
@@ -116,6 +117,7 @@ export function ProductFilters({
         <>
           <Select
             value={filters.marketUserId ?? 'all'}
+            onOpenChange={(open) => { if (!open) onMarketSearchChange?.(''); }}
             onValueChange={(marketUserId) => {
               onMarketSelected?.(markets.find((market) => market.id === marketUserId) ?? null);
               onChange({ ...filters, marketUserId, marketName: '' });

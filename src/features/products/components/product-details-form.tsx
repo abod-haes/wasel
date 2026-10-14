@@ -353,6 +353,7 @@ export function ProductDetailsForm({
               <div className="space-y-2">
                 <Select
                   value={values.brandId}
+                  onOpenChange={(open) => { if (!open) onBrandSearchChange?.(''); }}
                   onValueChange={(brandId) => {
                     setSelectedBrand(brandOptions.find((brand) => brand.id === brandId) ?? null);
                     setValues((previous) => ({ ...previous, brandId }));
@@ -398,6 +399,7 @@ export function ProductDetailsForm({
                 <>
                   <Select
                     value={values.marketUserId}
+                    onOpenChange={(open) => { if (!open) onMarketSearchChange?.(''); }}
                     onValueChange={(marketUserId) => {
                       setSelectedMarketOption(marketOptions.find((market) => market.id === marketUserId) ?? null);
                       setValues((previous) => ({ ...previous, marketUserId }));

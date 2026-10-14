@@ -85,7 +85,12 @@ export function NotificationUsersMultiSelect({
 
   return (
     <div className="space-y-2">
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={(open) => {
+        if (!open) {
+          if (onSearchChange) onSearchChange('');
+          else setLocalSearch('');
+        }
+      }}>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"

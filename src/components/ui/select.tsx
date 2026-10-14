@@ -4,7 +4,29 @@ import { Check, ChevronDown, ChevronUp, LoaderCircle, Search } from 'lucide-reac
 
 import { cn } from '@/lib/utils';
 
-const Select = SelectPrimitive.Root;
+const SelectOpenContext = React.createContext(false);
+
+/** Keep the existing Radix Select API while sharing open state with its searchable menu. */
+const Select = ({
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root>): React.JSX.Element => {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const open = controlledOpen ?? uncontrolledOpen;
+
+  const handleOpenChange = (nextOpen: boolean): void => {
+    if (controlledOpen === undefined) setUncontrolledOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
+
+  return (
+    <SelectOpenContext.Provider value={open}>
+      <SelectPrimitive.Root {...props} open={open} onOpenChange={handleOpenChange} />
+    </SelectOpenContext.Provider>
+  );
+};
 const SelectGroup = SelectPrimitive.Group;
 
 type SearchMode = 'local' | 'remote';
@@ -147,7 +169,21 @@ const SelectContent = React.forwardRef<
   ...props
 }, ref) => {
   const [localSearch, setLocalSearch] = React.useState('');
+  const open = React.useContext(SelectOpenContext);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const setInputRef = React.useCallback((node: HTMLInputElement | null): void => {
+    inputRef.current = node;
+    if (node) {
+      // Focus after Radix has mounted its focus scope, without scrolling the page.
+      window.requestAnimationFrame(() => {
+        if (node.isConnected) node.focus({ preventScroll: true });
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!open && localSearch) setLocalSearch('');
+  }, [open, localSearch]);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
   const query = searchable ? normalizeSearch(searchValue ?? localSearch) : '';
   const count = countMatchingItems(children, query, searchMode);
@@ -193,7 +229,7 @@ const SelectContent = React.forwardRef<
             <div className="relative shrink-0 border-b border-border/60 p-2">
               <Search className="pointer-events-none absolute end-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                ref={inputRef}
+                ref={setInputRef}
                 type="search"
                 value={searchValue ?? localSearch}
                 onChange={(event) => handleChange(event.target.value)}

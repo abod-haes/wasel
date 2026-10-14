@@ -188,6 +188,7 @@ export function AdFormDialog({
           <FormField labelKey="المنتج المرتبط" error={errors.productId}>
             <Select
               value={values.productId}
+              onOpenChange={(open) => { if (!open) onProductSearchChange?.(''); }}
               onValueChange={(productId) => {
                 setPickedProduct(productOptions.find((product) => product.id === productId) ?? null);
                 setValues((previous) => ({ ...previous, productId }));
