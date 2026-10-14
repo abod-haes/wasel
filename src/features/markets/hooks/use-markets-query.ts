@@ -12,3 +12,13 @@ export const useMarketOptionsQuery = (enabled = true, search = '') =>
     retry: 1,
     enabled,
   });
+
+export const useMarketByIdQuery = (marketUserId?: string, enabled = true) =>
+  useQuery({
+    queryKey: ['users', 'market-details', marketUserId] as const,
+    queryFn: () => marketsApi.getById(marketUserId!),
+    enabled: enabled && Boolean(marketUserId),
+    staleTime: 5 * 60 * 1000,
+    refetchOnMount: false,
+    retry: 1,
+  });

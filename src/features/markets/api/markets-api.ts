@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import type { MarketOption } from '@/features/markets/types/market-types';
 import { apiClient } from '@/services/api/client';
 import { getPaginatedItems } from '@/services/api/pagination';
@@ -22,7 +24,33 @@ type MarketUsersResponse = Partial<ApiPaginatedResult<MarketUserApiResponse>> & 
   items?: MarketUserApiResponse[];
 };
 
+const mapMarketUser = (user: MarketUserApiResponse): MarketOption | null => {
+  const id = user.id ?? user.Id ?? '';
+  if (!id) return null;
+
+  const firstName = user.firstName ?? user.FirstName ?? '';
+  const lastName = user.lastName ?? user.LastName ?? '';
+  return {
+    id,
+    name: `${firstName} ${lastName}`.trim() || 'السوق الحالي',
+    location: user.location ?? user.Location ?? '',
+    latitude: user.latitude ?? user.Latitude,
+    longitude: user.longitude ?? user.Longitude,
+  };
+};
+
 export const marketsApi = {
+  async getById(marketUserId: string): Promise<MarketOption | null> {
+    try {
+      const { data } = await apiClient.get<MarketUserApiResponse>(`/api/Users/${encodeURIComponent(marketUserId)}`);
+      return mapMarketUser(data);
+    } catch (error) {
+      // Legacy products may reference deleted / unavailable Market accounts.
+      if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+      throw error;
+    }
+  },
+
   async getOptions(search = ''): Promise<MarketOption[]> {
     // Fetch only one page; search is server-side instead of eagerly paging
     // through every account while the product form is opening.
@@ -39,17 +67,8 @@ export const marketsApi = {
     const markets = new Map<string, MarketOption>();
 
     for (const user of users) {
-      const id = user.id ?? user.Id ?? '';
-      if (!id) continue;
-      const firstName = user.firstName ?? user.FirstName ?? '';
-      const lastName = user.lastName ?? user.LastName ?? '';
-      markets.set(id, {
-        id,
-        name: `${firstName} ${lastName}`.trim() || 'Market',
-        location: user.location ?? user.Location ?? '',
-        latitude: user.latitude ?? user.Latitude,
-        longitude: user.longitude ?? user.Longitude,
-      });
+      const market = mapMarketUser(user);
+      if (market) markets.set(market.id, market);
     }
     return Array.from(markets.values());
   },
