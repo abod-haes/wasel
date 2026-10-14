@@ -4,7 +4,7 @@ import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
 import { useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
-import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
+import { useMarketByIdQuery, useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
 import { ProductDetailsForm } from '@/features/products/components/product-details-form';
 import { ProductImagesManager } from '@/features/products/components/product-images-manager';
 import { ProductOffersManager } from '@/features/products/components/product-offers-manager';
@@ -32,6 +32,16 @@ export default function ProductEditPage(): React.JSX.Element {
   const categoriesQuery = useCategoryOptionsQuery();
   const brandsQuery = useBrandOptionsQuery(debouncedBrandSearch);
   const marketsQuery = useMarketOptionsQuery(!isMarket, debouncedMarketSearch);
+  // Resolve the product's exact Market even if it isn't in the first 100
+  // options. Avoid an unnecessary request when the Market is already listed.
+  const selectedMarketId = productQuery.data?.marketUserId;
+  const marketDetailsQuery = useMarketByIdQuery(
+    selectedMarketId,
+    !isMarket &&
+      marketsQuery.isSuccess &&
+      Boolean(selectedMarketId) &&
+      !marketsQuery.data?.some((market) => market.id === selectedMarketId)
+  );
   const updateProductMutation = useUpdateProductMutation();
 
   if (!productId) return <Navigate to={productsListRoute} replace />;
@@ -76,6 +86,7 @@ export default function ProductEditPage(): React.JSX.Element {
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        currentMarket={marketDetailsQuery.data ?? undefined}
         brandSearch={brandSearch}
         marketSearch={marketSearch}
         onBrandSearchChange={setBrandSearch}

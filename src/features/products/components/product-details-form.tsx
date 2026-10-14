@@ -40,6 +40,7 @@ interface ProductDetailsFormProps {
   categories: CategoryOption[];
   brands: Brand[];
   markets: MarketOption[];
+  currentMarket?: MarketOption;
   brandSearch?: string;
   marketSearch?: string;
   onBrandSearchChange?: (search: string) => void;
@@ -112,6 +113,7 @@ export function ProductDetailsForm({
   categories,
   brands,
   markets,
+  currentMarket,
   brandSearch = '',
   marketSearch = '',
   onBrandSearchChange,
@@ -199,17 +201,21 @@ export function ProductDetailsForm({
   const marketOptions = useMemo(() => {
     const options = new Map(markets.map((market) => [market.id, market]));
     if (product?.marketUserId && !options.has(product.marketUserId)) {
+      const backendName = product.marketName?.trim();
       options.set(product.marketUserId, {
         id: product.marketUserId,
-        name: product.marketName || 'السوق الحالي',
+        name: backendName && !/^(current market|market)$/i.test(backendName)
+          ? backendName
+          : 'السوق الحالي',
         location: '',
       });
     }
-    if (selectedMarketOption && !options.has(selectedMarketOption.id)) {
-      options.set(selectedMarketOption.id, selectedMarketOption);
-    }
+    // The detail endpoint is authoritative when the Market is missing from
+    // the paginated dropdown. Preserve any new selection during searching.
+    if (currentMarket) options.set(currentMarket.id, currentMarket);
+    if (selectedMarketOption) options.set(selectedMarketOption.id, selectedMarketOption);
     return [...options.values()];
-  }, [markets, product?.marketName, product?.marketUserId, selectedMarketOption]);
+  }, [markets, product?.marketName, product?.marketUserId, currentMarket, selectedMarketOption]);
 
   const categoryOptions = useMemo(() => {
     const knownIds = new Set(categories.map((category) => category.id));
