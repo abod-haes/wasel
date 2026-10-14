@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Send } from 'lucide-react';
 import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -43,7 +44,8 @@ export default function NotificationsPage(): React.JSX.Element {
   const [recipientSearch, setRecipientSearch] = useState('');
   const debouncedRecipientSearch = useDebouncedSelectSearch(recipientSearch);
 
-  const notificationsQuery = useNotificationsQuery(filters, pagination);
+  const debouncedListSearch = useDebouncedValue(filters.search);
+  const notificationsQuery = useNotificationsQuery({ ...filters, search: debouncedListSearch }, pagination);
   const usersQuery = useUsersQuery(usersFilters, { page: 1, pageSize: 100 });
   const recipientFilters: UsersFilter = { ...usersFilters, search: debouncedRecipientSearch };
   const recipientPagination = { page: 1, pageSize: 100 };

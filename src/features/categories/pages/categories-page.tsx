@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,8 @@ export default function CategoriesPage(): React.JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
 
-  const categoriesQuery = useCategoriesQuery(filters, pagination);
+  const debouncedSearch = useDebouncedValue(filters.search);
+  const categoriesQuery = useCategoriesQuery({ ...filters, search: debouncedSearch }, pagination);
   const categoryOptionsQuery = useCategoryOptionsQuery();
   const productsBriefQuery = useProductsBriefQuery();
   const createCategoryMutation = useCreateCategoryMutation();

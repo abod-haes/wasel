@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Plus, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,8 +68,10 @@ export default function ProductsPage(): React.JSX.Element {
       .map((market) => [market.id, market])
   ).values());
   const selectedCategory = filters.categoryId === 'all' ? undefined : categoriesQuery.data?.find((category) => category.id === filters.categoryId);
+  const debouncedProductSearch = useDebouncedValue(filters.search);
   const effectiveFilters: ProductsFilter = {
     ...filters,
+    search: debouncedProductSearch,
     marketUserId: isMarket && currentUser ? currentUser.id : filters.marketUserId,
     marketName: isMarket ? '' : filters.marketName,
     categoryIds: selectedCategory ? [selectedCategory.id, ...(selectedCategory.descendantIds ?? [])] : undefined,

@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -28,7 +29,8 @@ export default function OrdersPage(): React.JSX.Element {
   const [acceptOrder, setAcceptOrder] = useState<Order | null>(null);
   const [rejectOrder, setRejectOrder] = useState<Order | null>(null);
 
-  const ordersQuery = useOrdersQuery(filters, pagination);
+  const debouncedSearch = useDebouncedValue(filters.search);
+  const ordersQuery = useOrdersQuery({ ...filters, search: debouncedSearch }, pagination);
   const acceptOrderMutation = useAcceptOrderMutation();
   const rejectOrderMutation = useRejectOrderMutation();
 
