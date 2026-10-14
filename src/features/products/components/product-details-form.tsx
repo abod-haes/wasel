@@ -40,6 +40,14 @@ interface ProductDetailsFormProps {
   categories: CategoryOption[];
   brands: Brand[];
   markets: MarketOption[];
+  brandSearch?: string;
+  marketSearch?: string;
+  onBrandSearchChange?: (search: string) => void;
+  onMarketSearchChange?: (search: string) => void;
+  brandsLoading?: boolean;
+  marketsLoading?: boolean;
+  brandsError?: boolean;
+  marketsError?: boolean;
   fixedMarketUserId?: string;
   fixedMarketName?: string;
   variants?: ProductVariantInput[];
@@ -104,6 +112,14 @@ export function ProductDetailsForm({
   categories,
   brands,
   markets,
+  brandSearch = '',
+  marketSearch = '',
+  onBrandSearchChange,
+  onMarketSearchChange,
+  brandsLoading = false,
+  marketsLoading = false,
+  brandsError = false,
+  marketsError = false,
   fixedMarketUserId,
   fixedMarketName,
   variants,
@@ -112,7 +128,25 @@ export function ProductDetailsForm({
   onBack,
 }: ProductDetailsFormProps): React.JSX.Element {
   const navigate = useNavigate();
-  const [values, setValues] = useState<ProductDetailsValues>(defaultValues);
+  const [values, setValues] = useState<ProductDetailsValues>(() =>
+    mode === 'edit' && product
+      ? {
+          name: product.name,
+          code: product.code,
+          brandId: normalizeSelectId(product.brandId) || NONE_VALUE,
+          marketUserId: normalizeSelectId(fixedMarketUserId ?? product.marketUserId) || NONE_VALUE,
+          type: product.type ?? '',
+          weight: product.weight != null ? String(product.weight) : '',
+          weightUnit: product.weightUnit ?? 'none',
+          description: product.description ?? '',
+          price: String(product.basePrice ?? product.prices?.basePrice ?? product.price),
+          imageFile: undefined,
+          categoryIds: product.categories.map((category) => category.id),
+        }
+      : { ...defaultValues, marketUserId: fixedMarketUserId ?? NONE_VALUE }
+  );
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [selectedMarketOption, setSelectedMarketOption] = useState<MarketOption | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof ProductDetailsValues, string>>>({});
   const [categorySearch, setCategorySearch] = useState('');
 
@@ -132,6 +166,8 @@ export function ProductDetailsForm({
         imageFile: undefined,
         categoryIds: product.categories.map((category) => category.id),
       });
+      setSelectedBrand(null);
+      setSelectedMarketOption(null);
       setErrors({});
       setCategorySearch('');
       return;
@@ -142,39 +178,38 @@ export function ProductDetailsForm({
         ...defaultValues,
         marketUserId: fixedMarketUserId ?? NONE_VALUE,
       });
+      setSelectedBrand(null);
+      setSelectedMarketOption(null);
       setErrors({});
       setCategorySearch('');
     }
   }, [fixedMarketUserId, mode, product]);
 
   const brandOptions = useMemo(() => {
-    if (!product?.brandId || brands.some((brand) => brand.id === product.brandId)) {
-      return brands;
+    const options = new Map(brands.map((brand) => [brand.id, brand]));
+    if (product?.brandId && !options.has(product.brandId)) {
+      options.set(product.brandId, { id: product.brandId, name: product.brand || 'العلامة التجارية الحالية' });
     }
-
-    return [
-      {
-        id: product.brandId,
-        name: product.brand || 'العلامة التجارية الحالية',
-      },
-      ...brands,
-    ];
-  }, [brands, product?.brand, product?.brandId]);
+    if (selectedBrand && !options.has(selectedBrand.id)) {
+      options.set(selectedBrand.id, selectedBrand);
+    }
+    return [...options.values()];
+  }, [brands, product?.brand, product?.brandId, selectedBrand]);
 
   const marketOptions = useMemo(() => {
-    if (!product?.marketUserId || markets.some((market) => market.id === product.marketUserId)) {
-      return markets;
-    }
-
-    return [
-      {
+    const options = new Map(markets.map((market) => [market.id, market]));
+    if (product?.marketUserId && !options.has(product.marketUserId)) {
+      options.set(product.marketUserId, {
         id: product.marketUserId,
         name: product.marketName || 'السوق الحالي',
         location: '',
-      },
-      ...markets,
-    ];
-  }, [markets, product?.marketName, product?.marketUserId]);
+      });
+    }
+    if (selectedMarketOption && !options.has(selectedMarketOption.id)) {
+      options.set(selectedMarketOption.id, selectedMarketOption);
+    }
+    return [...options.values()];
+  }, [markets, product?.marketName, product?.marketUserId, selectedMarketOption]);
 
   const categoryOptions = useMemo(() => {
     const knownIds = new Set(categories.map((category) => category.id));
@@ -309,12 +344,29 @@ export function ProductDetailsForm({
             </FormField>
 
             <FormField labelKey="العلامة التجارية" error={errors.brandId}>
-              <Select
-                value={values.brandId}
-                onValueChange={(brandId) => setValues((previous) => ({ ...previous, brandId }))}
-              >
+              <div className="space-y-2">
+                {onBrandSearchChange ? (
+                  <Input
+                    type="search"
+                    value={brandSearch}
+                    placeholder="ابحث عن العلامة التجارية..."
+                    aria-label="البحث عن العلامة التجارية"
+                    onChange={(event) => onBrandSearchChange(event.target.value)}
+                  />
+                ) : null}
+                <Select
+                  value={values.brandId}
+                  onValueChange={(brandId) => {
+                    setSelectedBrand(brandOptions.find((brand) => brand.id === brandId) ?? null);
+                    setValues((previous) => ({ ...previous, brandId }));
+                  }}
+                >
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر البراند" />
+                  <SelectValue placeholder="اختر البراند">
+                    {values.brandId === NONE_VALUE
+                      ? 'بدون براند'
+                      : brandOptions.find((brand) => brand.id === values.brandId)?.name ?? 'العلامة التجارية المختارة'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={NONE_VALUE}>بدون براند</SelectItem>
@@ -325,6 +377,10 @@ export function ProductDetailsForm({
                   ))}
                 </SelectContent>
               </Select>
+              {brandsLoading ? <p role="status" className="text-xs text-muted-foreground">جاري تحميل البراندات...</p> : null}
+              {brandsError ? <p className="text-xs text-destructive">تعذّر تحميل البراندات. جرّب البحث من جديد.</p> : null}
+              {!brandsLoading && !brandsError && brandOptions.length === 0 ? <p className="text-xs text-muted-foreground">لا توجد نتائج.</p> : null}
+              </div>
             </FormField>
 
             <FormField labelKey="السوق" required={mode === 'create'} error={errors.marketUserId}>
@@ -339,14 +395,29 @@ export function ProductDetailsForm({
                 </div>
               ) : (
                 <>
+                  {onMarketSearchChange ? (
+                    <Input
+                      type="search"
+                      value={marketSearch}
+                      placeholder="ابحث عن السوق..."
+                      aria-label="البحث عن السوق"
+                      className="mb-2"
+                      onChange={(event) => onMarketSearchChange(event.target.value)}
+                    />
+                  ) : null}
                   <Select
                     value={values.marketUserId}
-                    onValueChange={(marketUserId) =>
-                      setValues((previous) => ({ ...previous, marketUserId }))
-                    }
+                    onValueChange={(marketUserId) => {
+                      setSelectedMarketOption(marketOptions.find((market) => market.id === marketUserId) ?? null);
+                      setValues((previous) => ({ ...previous, marketUserId }));
+                    }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="اختر السوق المسؤول عن المنتج" />
+                      <SelectValue placeholder="اختر السوق المسؤول عن المنتج">
+                        {values.marketUserId === NONE_VALUE
+                          ? 'اختر السوق المسؤول عن المنتج'
+                          : marketOptions.find((market) => market.id === values.marketUserId)?.name ?? 'السوق المختار'}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
@@ -357,6 +428,11 @@ export function ProductDetailsForm({
                       ))}
                     </SelectContent>
                   </Select>
+                  {marketsLoading ? <p role="status" className="mt-1 text-xs text-muted-foreground">جاري تحميل الأسواق...</p> : null}
+                  {marketsError ? <p className="mt-1 text-xs text-destructive">تعذّر تحميل الأسواق. جرّب البحث من جديد.</p> : null}
+                  {!marketsLoading && !marketsError && marketOptions.length === 0 ? (
+                    <p className="mt-1 text-xs text-muted-foreground">لا توجد أسواق مطابقة.</p>
+                  ) : null}
                   {selectedMarket ? (
                     <p className="mt-1 text-xs text-muted-foreground">
                       {selectedMarket.location || selectedMarket.name}

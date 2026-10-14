@@ -12,6 +12,7 @@ import {
   type PendingProductVariant,
 } from '@/features/products/components/product-variants-manager';
 import { useCreateProductMutation } from '@/features/products/hooks/use-products-query';
+import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
 import type { CreateProductInput } from '@/features/products/types/product-types';
 import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
@@ -20,19 +21,21 @@ export default function ProductCreatePage(): React.JSX.Element {
   const navigate = useNavigate();
   const currentUser = useAuthStore((state) => state.user);
   const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
+  const [brandSearch, setBrandSearch] = useState('');
+  const [marketSearch, setMarketSearch] = useState('');
+  const debouncedBrandSearch = useDebouncedSelectSearch(brandSearch);
+  const debouncedMarketSearch = useDebouncedSelectSearch(marketSearch);
   const categoriesQuery = useCategoryOptionsQuery();
-  const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery(!isMarket);
+  const brandsQuery = useBrandOptionsQuery(debouncedBrandSearch);
+  const marketsQuery = useMarketOptionsQuery(!isMarket, debouncedMarketSearch);
   const createProductMutation = useCreateProductMutation();
   const [variants, setVariants] = useState<PendingProductVariant[]>([]);
 
-  if (categoriesQuery.isError || brandsQuery.isError || marketsQuery.isError) {
+  if (categoriesQuery.isError) {
     return (
       <ErrorState
         onRetry={() => {
           void categoriesQuery.refetch();
-          void brandsQuery.refetch();
-          void marketsQuery.refetch();
         }}
       />
     );
@@ -65,15 +68,21 @@ export default function ProductCreatePage(): React.JSX.Element {
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        brandSearch={brandSearch}
+        marketSearch={marketSearch}
+        onBrandSearchChange={setBrandSearch}
+        onMarketSearchChange={setMarketSearch}
+        brandsLoading={brandsQuery.isFetching}
+        marketsLoading={marketsQuery.isFetching}
+        brandsError={brandsQuery.isError}
+        marketsError={marketsQuery.isError}
         fixedMarketUserId={isMarket ? currentUser?.id : undefined}
         fixedMarketName={isMarket ? currentUser?.name : undefined}
         variants={variants}
         onSubmit={submitProduct}
         isSubmitting={
           createProductMutation.isPending ||
-          categoriesQuery.isLoading ||
-          brandsQuery.isLoading ||
-          marketsQuery.isLoading
+          categoriesQuery.isLoading
         }
       />
 

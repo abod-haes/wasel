@@ -13,10 +13,11 @@ export const useBrandsQuery = (filters: BrandsFilter, pagination: PaginationPara
     placeholderData: keepPreviousData,
   });
 
-export const useBrandOptionsQuery = () =>
+export const useBrandOptionsQuery = (search = '') =>
   useQuery({
-    queryKey: queryKeys.brands.options(),
-    queryFn: brandsApi.getOptions,
+    queryKey: [...queryKeys.brands.options(), search.trim()] as const,
+    queryFn: () => brandsApi.getOptions(search),
+    refetchOnMount: false,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });

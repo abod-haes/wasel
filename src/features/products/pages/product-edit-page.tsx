@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
@@ -8,6 +9,7 @@ import { ProductDetailsForm } from '@/features/products/components/product-detai
 import { ProductImagesManager } from '@/features/products/components/product-images-manager';
 import { ProductOffersManager } from '@/features/products/components/product-offers-manager';
 import { ProductVariantsManager } from '@/features/products/components/product-variants-manager';
+import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
 import { useProductQuery, useUpdateProductMutation } from '@/features/products/hooks/use-products-query';
 import { buildProductsListRoute } from '@/features/products/lib/product-list-url';
 import type { CreateProductInput } from '@/features/products/types/product-types';
@@ -22,30 +24,24 @@ export default function ProductEditPage(): React.JSX.Element {
   const productsListRoute = buildProductsListRoute(searchParams);
   const currentUser = useAuthStore((state) => state.user);
   const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
+  const [brandSearch, setBrandSearch] = useState('');
+  const [marketSearch, setMarketSearch] = useState('');
+  const debouncedBrandSearch = useDebouncedSelectSearch(brandSearch);
+  const debouncedMarketSearch = useDebouncedSelectSearch(marketSearch);
   const productQuery = useProductQuery(productId);
   const categoriesQuery = useCategoryOptionsQuery();
-  const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery(!isMarket);
+  const brandsQuery = useBrandOptionsQuery(debouncedBrandSearch);
+  const marketsQuery = useMarketOptionsQuery(!isMarket, debouncedMarketSearch);
   const updateProductMutation = useUpdateProductMutation();
 
   if (!productId) return <Navigate to={productsListRoute} replace />;
   if (
     productQuery.isLoading ||
-    categoriesQuery.isLoading ||
-    brandsQuery.isLoading ||
-    marketsQuery.isLoading
+    categoriesQuery.isLoading
   ) return <LoadingScreen />;
   if (productQuery.isError) return <ErrorState onRetry={() => void productQuery.refetch()} />;
-  if (categoriesQuery.isError || brandsQuery.isError || marketsQuery.isError) {
-    return (
-      <ErrorState
-        onRetry={() => {
-          void categoriesQuery.refetch();
-          void brandsQuery.refetch();
-          void marketsQuery.refetch();
-        }}
-      />
-    );
+  if (categoriesQuery.isError) {
+    return <ErrorState onRetry={() => void categoriesQuery.refetch()} />;
   }
 
   const product = productQuery.data;
@@ -74,11 +70,20 @@ export default function ProductEditPage(): React.JSX.Element {
     <PageContainer>
       <SectionHeader titleKey="تعديل المنتج" descriptionKey="تعديل بيانات المنتج والتصنيفات والصور والنكهات من مكان واحد." />
       <ProductDetailsForm
+        key={product.id}
         mode="edit"
         product={product}
         categories={categoriesQuery.data ?? []}
         brands={brandsQuery.data ?? []}
         markets={marketsQuery.data ?? []}
+        brandSearch={brandSearch}
+        marketSearch={marketSearch}
+        onBrandSearchChange={setBrandSearch}
+        onMarketSearchChange={setMarketSearch}
+        brandsLoading={brandsQuery.isFetching}
+        marketsLoading={marketsQuery.isFetching}
+        brandsError={brandsQuery.isError}
+        marketsError={marketsQuery.isError}
         fixedMarketUserId={isMarket ? currentUser?.id : undefined}
         fixedMarketName={isMarket ? currentUser?.name : undefined}
         onSubmit={submitProduct}
