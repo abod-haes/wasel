@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,8 @@ export default function UsersPage(): React.JSX.Element {
   const [unblockUser, setUnblockUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
 
-  const usersQuery = useUsersQuery(filters, pagination);
+  const debouncedSearch = useDebouncedValue(filters.search);
+  const usersQuery = useUsersQuery({ ...filters, search: debouncedSearch }, pagination);
   const rolesQuery = useRolesQuery();
   const createUserMutation = useCreateUserMutation();
   const updateUserMutation = useUpdateUserMutation();

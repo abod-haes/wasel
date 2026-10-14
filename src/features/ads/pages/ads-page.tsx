@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
@@ -12,16 +13,30 @@ import {
   useUpdateAdMutation,
 } from '@/features/ads/hooks/use-ads-query';
 import type { Ad, AdFormPayload } from '@/features/ads/types/ad-types';
-import { useProductsBriefQuery } from '@/features/products/hooks/use-products-query';
+import { productsDashboardApi } from '@/features/products/api/products-dashboard-api';
+import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
 
 export default function AdsPage(): React.JSX.Element {
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedAd, setSelectedAd] = useState<Ad | undefined>();
   const [deleteAd, setDeleteAd] = useState<Ad | null>(null);
+  const [productSearch, setProductSearch] = useState('');
+  const debouncedProductSearch = useDebouncedSelectSearch(productSearch);
 
   const adsQuery = useAdsQuery();
-  const productsQuery = useProductsBriefQuery();
+  const productsQuery = useQuery({
+    queryKey: ['ads', 'product-search', debouncedProductSearch] as const,
+    queryFn: ({ signal }) => productsDashboardApi.getProducts(
+      { search: debouncedProductSearch, categoryId: 'all' },
+      { page: 1, pageSize: 50 },
+      signal
+    ),
+    enabled: isFormOpen,
+    staleTime: 60_000,
+    refetchOnMount: false,
+    retry: 1,
+  });
   const createMutation = useCreateAdMutation();
   const updateMutation = useUpdateAdMutation();
   const deleteMutation = useDeleteAdMutation();
@@ -31,12 +46,14 @@ export default function AdsPage(): React.JSX.Element {
   const openCreate = (): void => {
     setDialogMode('create');
     setSelectedAd(undefined);
+    setProductSearch('');
     setIsFormOpen(true);
   };
 
   const openEdit = (ad: Ad): void => {
     setDialogMode('edit');
     setSelectedAd(ad);
+    setProductSearch('');
     setIsFormOpen(true);
   };
 
@@ -94,8 +111,16 @@ export default function AdsPage(): React.JSX.Element {
         open={isFormOpen}
         mode={dialogMode}
         defaultAd={selectedAd}
-        products={productsQuery.data ?? []}
-        isSubmitting={isSubmitting || productsQuery.isLoading}
+        products={(productsQuery.data?.items ?? []).map((product) => ({
+          id: product.id,
+          name: product.name,
+          parCode: product.code,
+        }))}
+        productSearch={productSearch}
+        onProductSearchChange={setProductSearch}
+        productsLoading={productsQuery.isFetching}
+        productsError={productsQuery.isError}
+        isSubmitting={isSubmitting}
         onOpenChange={setIsFormOpen}
         onSubmit={submitAd}
       />

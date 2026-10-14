@@ -51,7 +51,7 @@ export const marketsApi = {
     }
   },
 
-  async getOptions(search = ''): Promise<MarketOption[]> {
+  async getOptions(search = '', signal?: AbortSignal): Promise<MarketOption[]> {
     // Fetch only one page; search is server-side instead of eagerly paging
     // through every account while the product form is opening.
     const { data } = await apiClient.get<MarketUsersResponse | MarketUserApiResponse[]>('/api/Users', {
@@ -62,6 +62,7 @@ export const marketsApi = {
         roleName: 'Market',
         search: search.trim() || undefined,
       },
+      signal,
     });
     const users = Array.isArray(data) ? data : getPaginatedItems(data);
     const markets = new Map<string, MarketOption>();

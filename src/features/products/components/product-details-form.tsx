@@ -351,17 +351,9 @@ export function ProductDetailsForm({
 
             <FormField labelKey="العلامة التجارية" error={errors.brandId}>
               <div className="space-y-2">
-                {onBrandSearchChange ? (
-                  <Input
-                    type="search"
-                    value={brandSearch}
-                    placeholder="ابحث عن العلامة التجارية..."
-                    aria-label="البحث عن العلامة التجارية"
-                    onChange={(event) => onBrandSearchChange(event.target.value)}
-                  />
-                ) : null}
                 <Select
                   value={values.brandId}
+                  onOpenChange={(open) => { if (!open) onBrandSearchChange?.(''); }}
                   onValueChange={(brandId) => {
                     setSelectedBrand(brandOptions.find((brand) => brand.id === brandId) ?? null);
                     setValues((previous) => ({ ...previous, brandId }));
@@ -374,7 +366,14 @@ export function ProductDetailsForm({
                       : brandOptions.find((brand) => brand.id === values.brandId)?.name ?? 'العلامة التجارية المختارة'}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  searchMode={onBrandSearchChange ? 'remote' : 'local'}
+                  searchValue={onBrandSearchChange ? brandSearch : undefined}
+                  onSearchChange={onBrandSearchChange}
+                  searchPlaceholder="ابحث عن العلامة التجارية..."
+                  isLoading={brandsLoading}
+                  isError={brandsError}
+                >
                   <SelectItem value={NONE_VALUE}>بدون براند</SelectItem>
                   {brandOptions.map((brand) => (
                     <SelectItem key={brand.id} value={brand.id}>
@@ -383,9 +382,6 @@ export function ProductDetailsForm({
                   ))}
                 </SelectContent>
               </Select>
-              {brandsLoading ? <p role="status" className="text-xs text-muted-foreground">جاري تحميل البراندات...</p> : null}
-              {brandsError ? <p className="text-xs text-destructive">تعذّر تحميل البراندات. جرّب البحث من جديد.</p> : null}
-              {!brandsLoading && !brandsError && brandOptions.length === 0 ? <p className="text-xs text-muted-foreground">لا توجد نتائج.</p> : null}
               </div>
             </FormField>
 
@@ -401,18 +397,9 @@ export function ProductDetailsForm({
                 </div>
               ) : (
                 <>
-                  {onMarketSearchChange ? (
-                    <Input
-                      type="search"
-                      value={marketSearch}
-                      placeholder="ابحث عن السوق..."
-                      aria-label="البحث عن السوق"
-                      className="mb-2"
-                      onChange={(event) => onMarketSearchChange(event.target.value)}
-                    />
-                  ) : null}
                   <Select
                     value={values.marketUserId}
+                    onOpenChange={(open) => { if (!open) onMarketSearchChange?.(''); }}
                     onValueChange={(marketUserId) => {
                       setSelectedMarketOption(marketOptions.find((market) => market.id === marketUserId) ?? null);
                       setValues((previous) => ({ ...previous, marketUserId }));
@@ -425,7 +412,14 @@ export function ProductDetailsForm({
                           : marketOptions.find((market) => market.id === values.marketUserId)?.name ?? 'السوق المختار'}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                      searchMode={onMarketSearchChange ? 'remote' : 'local'}
+                      searchValue={onMarketSearchChange ? marketSearch : undefined}
+                      onSearchChange={onMarketSearchChange}
+                      searchPlaceholder="ابحث عن السوق..."
+                      isLoading={marketsLoading}
+                      isError={marketsError}
+                    >
                       <SelectItem value={NONE_VALUE}>اختر السوق</SelectItem>
                       {marketOptions.map((market) => (
                         <SelectItem key={market.id} value={market.id}>
@@ -434,11 +428,6 @@ export function ProductDetailsForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  {marketsLoading ? <p role="status" className="mt-1 text-xs text-muted-foreground">جاري تحميل الأسواق...</p> : null}
-                  {marketsError ? <p className="mt-1 text-xs text-destructive">تعذّر تحميل الأسواق. جرّب البحث من جديد.</p> : null}
-                  {!marketsLoading && !marketsError && marketOptions.length === 0 ? (
-                    <p className="mt-1 text-xs text-muted-foreground">لا توجد أسواق مطابقة.</p>
-                  ) : null}
                   {selectedMarket ? (
                     <p className="mt-1 text-xs text-muted-foreground">
                       {selectedMarket.location || selectedMarket.name}

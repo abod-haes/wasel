@@ -11,7 +11,7 @@ import type { PaginationParams } from '@/types/api';
 
 export const useProductsQuery = (filters: ProductsFilter, pagination: PaginationParams) => useQuery({
   queryKey: queryKeys.products.list({ filters, pagination }),
-  queryFn: () => productsDashboardApi.getProducts(filters, pagination),
+  queryFn: ({ signal }) => productsDashboardApi.getProducts(filters, pagination, signal),
   placeholderData: keepPreviousData,
 });
 

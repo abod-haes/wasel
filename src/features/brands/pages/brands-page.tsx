@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -78,7 +79,8 @@ export default function BrandsPage(): React.JSX.Element {
   const [formOpen, setFormOpen] = useState(false);
   const [deleteBrand, setDeleteBrand] = useState<Brand | null>(null);
 
-  const query = useBrandsQuery(filters, pagination);
+  const debouncedSearch = useDebouncedValue(filters.search);
+  const query = useBrandsQuery({ ...filters, search: debouncedSearch }, pagination);
   const createMutation = useCreateBrandMutation();
   const updateMutation = useUpdateBrandMutation();
   const deleteMutation = useDeleteBrandMutation();

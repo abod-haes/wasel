@@ -16,9 +16,19 @@ export const useBrandsQuery = (filters: BrandsFilter, pagination: PaginationPara
 export const useBrandOptionsQuery = (search = '') =>
   useQuery({
     queryKey: [...queryKeys.brands.options(), search.trim()] as const,
-    queryFn: () => brandsApi.getOptions(search),
+    queryFn: ({ signal }) => brandsApi.getOptions(search, signal),
     refetchOnMount: false,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+export const useBrandByIdQuery = (brandId?: string, enabled = true) =>
+  useQuery({
+    queryKey: ['brands', 'detail', brandId] as const,
+    queryFn: () => brandsApi.getById(brandId!),
+    enabled: enabled && Boolean(brandId),
+    staleTime: 5 * 60 * 1000,
+    refetchOnMount: false,
     retry: 1,
   });
 

@@ -488,7 +488,7 @@ export const usersApi = {
       .filter((role): role is UserRoleAssignment => role !== null);
   },
 
-  async getUsers(filters: UsersFilter, pagination: PaginationParams): Promise<PaginatedData<User>> {
+  async getUsers(filters: UsersFilter, pagination: PaginationParams, signal?: AbortSignal): Promise<PaginatedData<User>> {
     if (env.enableMockApi) {
       await delay(450);
       const filteredUsers = applyFilters(usersDb.map(cloneUser), filters);
@@ -504,6 +504,7 @@ export const usersApi = {
         roleName: filters.role === 'all' ? undefined : ROLE_NAME_BY_KEY[filters.role],
         status: filters.status === 'all' ? undefined : filters.status,
       },
+      signal,
     });
 
     const paginatedUsers = toPaginatedData(data, pagination);

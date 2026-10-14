@@ -1,5 +1,7 @@
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { Send } from 'lucide-react';
 import { useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorState, PageContainer, SectionHeader } from '@/components/shared';
@@ -16,6 +18,9 @@ import type {
   SendNotificationInput,
 } from '@/features/notifications/types/notification-types';
 import { useUsersQuery } from '@/features/users/hooks/use-users-query';
+import { usersApi } from '@/features/users/api/users-api';
+import { queryKeys } from '@/constants/query-keys';
+import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
 import type { UsersFilter } from '@/features/users/types/user-types';
 import { useUiStore } from '@/store/use-ui-store';
 import type { PaginationParams } from '@/types/api';
@@ -36,9 +41,23 @@ export default function NotificationsPage(): React.JSX.Element {
   const [filters, setFilters] = useState<NotificationsFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [recipientSearch, setRecipientSearch] = useState('');
+  const debouncedRecipientSearch = useDebouncedSelectSearch(recipientSearch);
 
-  const notificationsQuery = useNotificationsQuery(filters, pagination);
+  const debouncedListSearch = useDebouncedValue(filters.search);
+  const notificationsQuery = useNotificationsQuery({ ...filters, search: debouncedListSearch }, pagination);
   const usersQuery = useUsersQuery(usersFilters, { page: 1, pageSize: 100 });
+  const recipientFilters: UsersFilter = { ...usersFilters, search: debouncedRecipientSearch };
+  const recipientPagination = { page: 1, pageSize: 100 };
+  const recipientQuery = useQuery({
+    queryKey: queryKeys.users.list({ filters: recipientFilters, pagination: recipientPagination }),
+    queryFn: ({ signal }) => usersApi.getUsers(recipientFilters, recipientPagination, signal),
+    enabled: isDialogOpen,
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
+    refetchOnMount: false,
+    retry: 1,
+  });
   const sendNotificationMutation = useSendNotificationMutation();
   const markNotificationsAsRead = useUiStore((state) => state.markNotificationsAsRead);
 
@@ -91,11 +110,16 @@ export default function NotificationsPage(): React.JSX.Element {
 
       <SendNotificationDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setRecipientSearch('');
+        }}
         isSubmitting={sendNotificationMutation.isPending}
-        users={usersQuery.data?.items ?? []}
-        isUsersLoading={usersQuery.isLoading || usersQuery.isFetching}
-        isUsersError={usersQuery.isError}
+        users={recipientQuery.data?.items ?? []}
+        userSearch={recipientSearch}
+        onUserSearchChange={setRecipientSearch}
+        isUsersLoading={recipientQuery.isFetching}
+        isUsersError={recipientQuery.isError}
         onSubmit={sendNotification}
       />
     </PageContainer>

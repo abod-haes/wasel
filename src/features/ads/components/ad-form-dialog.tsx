@@ -27,6 +27,10 @@ interface AdFormDialogProps {
   mode: 'create' | 'edit';
   defaultAd?: Ad;
   products: ProductBrief[];
+  productSearch?: string;
+  onProductSearchChange?: (search: string) => void;
+  productsLoading?: boolean;
+  productsError?: boolean;
   isSubmitting?: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (payload: AdFormPayload) => void;
@@ -53,16 +57,22 @@ export function AdFormDialog({
   mode,
   defaultAd,
   products,
+  productSearch = '',
+  onProductSearchChange,
+  productsLoading = false,
+  productsError = false,
   isSubmitting = false,
   onOpenChange,
   onSubmit,
 }: AdFormDialogProps): React.JSX.Element {
   const [values, setValues] = useState<FormValues>(emptyValues);
   const [errors, setErrors] = useState<Partial<Record<keyof FormValues, string>>>({});
+  const [pickedProduct, setPickedProduct] = useState<ProductBrief | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setErrors({});
+    setPickedProduct(null);
     if (mode === 'edit' && defaultAd) {
       setValues({
         title: defaultAd.title ?? '',
@@ -76,10 +86,17 @@ export function AdFormDialog({
     setValues(emptyValues);
   }, [defaultAd, mode, open]);
 
-  const currentProductMissing = useMemo(() => {
-    if (!defaultAd?.productId) return false;
-    return !products.some((product) => product.id === defaultAd.productId);
-  }, [defaultAd?.productId, products]);
+  const productOptions = useMemo(() => {
+    const options = new Map(products.map((product) => [product.id, product]));
+    if (defaultAd?.productId && !options.has(defaultAd.productId)) {
+      options.set(defaultAd.productId, {
+        id: defaultAd.productId,
+        name: defaultAd.product?.name || 'المنتج المرتبط حاليًا',
+      });
+    }
+    if (pickedProduct) options.set(pickedProduct.id, pickedProduct);
+    return [...options.values()];
+  }, [products, defaultAd?.productId, defaultAd?.product?.name, pickedProduct]);
 
   const submitHandler = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -171,17 +188,29 @@ export function AdFormDialog({
           <FormField labelKey="المنتج المرتبط" error={errors.productId}>
             <Select
               value={values.productId}
-              onValueChange={(productId) => setValues((previous) => ({ ...previous, productId }))}
+              onOpenChange={(open) => { if (!open) onProductSearchChange?.(''); }}
+              onValueChange={(productId) => {
+                setPickedProduct(productOptions.find((product) => product.id === productId) ?? null);
+                setValues((previous) => ({ ...previous, productId }));
+              }}
             >
-              <SelectTrigger><SelectValue placeholder="اختر منتجًا" /></SelectTrigger>
-              <SelectContent>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر منتجًا">
+                  {values.productId === 'none'
+                    ? 'بدون ربط بمنتج'
+                    : productOptions.find((product) => product.id === values.productId)?.name ?? 'المنتج المختار'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent
+                searchMode={onProductSearchChange ? 'remote' : 'local'}
+                searchValue={onProductSearchChange ? productSearch : undefined}
+                onSearchChange={onProductSearchChange}
+                searchPlaceholder="ابحث باسم المنتج أو الكود..."
+                isLoading={productsLoading}
+                isError={productsError}
+              >
                 {canChooseNoProduct ? <SelectItem value="none">بدون ربط بمنتج</SelectItem> : null}
-                {currentProductMissing && defaultAd?.productId ? (
-                  <SelectItem value={defaultAd.productId}>
-                    {defaultAd.product?.name || 'المنتج المرتبط حاليًا'}
-                  </SelectItem>
-                ) : null}
-                {products.map((product) => (
+                {productOptions.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}{product.parCode ? ` — ${product.parCode}` : ''}
                   </SelectItem>

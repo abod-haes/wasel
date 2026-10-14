@@ -180,19 +180,6 @@ const appendCategoryFormData = (
   }
 };
 
-const filterCurrentPage = (categories: Category[], search: string): Category[] => {
-  const normalizedSearch = search.trim().toLowerCase();
-  if (!normalizedSearch) {
-    return categories;
-  }
-
-  return categories.filter((category) =>
-    [category.name, category.description, category.parentCategory?.name]
-      .filter(Boolean)
-      .some((value) => value?.toLowerCase().includes(normalizedSearch))
-  );
-};
-
 const getCategoryTreeData = async (): Promise<CategoryTreeNode[]> => {
   if (env.enableMockApi) {
     const options = await legacyCategoriesApi.getCategoryOptions();
@@ -227,6 +214,7 @@ export const categoriesDashboardApi = {
         page: pagination.page,
         pageSize: pagination.pageSize,
         includeProducts: true,
+        search: filters.search.trim() || undefined,
         byParentId: filters.byParentId || undefined,
       },
     });
@@ -236,7 +224,7 @@ export const categoriesDashboardApi = {
 
     return {
       ...paginated,
-      items: filterCurrentPage(mappedItems, filters.search),
+      items: mappedItems,
     };
   },
 
