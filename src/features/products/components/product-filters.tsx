@@ -13,6 +13,16 @@ interface ProductFiltersProps {
   brands: Brand[];
   markets: MarketOption[];
   showMarketFilters?: boolean;
+  brandSearch?: string;
+  marketSearch?: string;
+  onBrandSearchChange?: (search: string) => void;
+  onMarketSearchChange?: (search: string) => void;
+  onBrandSelected?: (brand: Brand | null) => void;
+  onMarketSelected?: (market: MarketOption | null) => void;
+  brandsLoading?: boolean;
+  marketsLoading?: boolean;
+  brandsError?: boolean;
+  marketsError?: boolean;
   onChange: (filters: ProductsFilter) => void;
   onReset: () => void;
 }
@@ -23,6 +33,16 @@ export function ProductFilters({
   brands,
   markets,
   showMarketFilters = true,
+  brandSearch = '',
+  marketSearch = '',
+  onBrandSearchChange,
+  onMarketSearchChange,
+  onBrandSelected,
+  onMarketSelected,
+  brandsLoading = false,
+  marketsLoading = false,
+  brandsError = false,
+  marketsError = false,
   onChange,
   onReset,
 }: ProductFiltersProps): React.JSX.Element {
@@ -33,7 +53,7 @@ export function ProductFilters({
       className={cn(
         'grid gap-3 rounded-xl border bg-card p-4 xl:items-end',
         showMarketFilters
-          ? 'xl:grid-cols-[1fr_200px_200px_200px_200px_auto]'
+          ? 'xl:grid-cols-[1fr_200px_200px_200px_auto]'
           : 'xl:grid-cols-[1fr_220px_220px_auto]'
       )}
     >
@@ -63,12 +83,26 @@ export function ProductFilters({
 
       <Select
         value={filters.brandId ?? 'all'}
-        onValueChange={(brandId) => onChange({ ...filters, brandId })}
+        onValueChange={(brandId) => {
+          onBrandSelected?.(brands.find((brand) => brand.id === brandId) ?? null);
+          onChange({ ...filters, brandId });
+        }}
       >
         <SelectTrigger>
-          <SelectValue placeholder="البراند" />
+          <SelectValue placeholder="البراند">
+            {filters.brandId && filters.brandId !== 'all'
+              ? brands.find((brand) => brand.id === filters.brandId)?.name ?? 'البراند المحدد'
+              : 'كل البراندات'}
+          </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent
+          searchMode={onBrandSearchChange ? 'remote' : 'local'}
+          searchValue={onBrandSearchChange ? brandSearch : undefined}
+          onSearchChange={onBrandSearchChange}
+          searchPlaceholder="ابحث عن علامة تجارية..."
+          isLoading={brandsLoading}
+          isError={brandsError}
+        >
           <SelectItem value="all">كل البراندات</SelectItem>
           {brands.map((brand) => (
             <SelectItem key={brand.id} value={brand.id}>
@@ -80,20 +114,28 @@ export function ProductFilters({
 
       {showMarketFilters ? (
         <>
-          <Input
-            value={filters.marketName ?? ''}
-            placeholder="اسم السوق"
-            onChange={(event) => onChange({ ...filters, marketName: event.target.value })}
-          />
-
           <Select
             value={filters.marketUserId ?? 'all'}
-            onValueChange={(marketUserId) => onChange({ ...filters, marketUserId })}
+            onValueChange={(marketUserId) => {
+              onMarketSelected?.(markets.find((market) => market.id === marketUserId) ?? null);
+              onChange({ ...filters, marketUserId, marketName: '' });
+            }
           >
             <SelectTrigger>
-              <SelectValue placeholder="السوق" />
+              <SelectValue placeholder="السوق">
+                {filters.marketUserId && filters.marketUserId !== 'all'
+                  ? markets.find((market) => market.id === filters.marketUserId)?.name ?? 'السوق المحدد'
+                  : 'كل الأسواق'}
+              </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              searchMode={onMarketSearchChange ? 'remote' : 'local'}
+              searchValue={onMarketSearchChange ? marketSearch : undefined}
+              onSearchChange={onMarketSearchChange}
+              searchPlaceholder="ابحث عن سوق..."
+              isLoading={marketsLoading}
+              isError={marketsError}
+            >
               <SelectItem value="all">كل الأسواق</SelectItem>
               {markets.map((market) => (
                 <SelectItem key={market.id} value={market.id}>

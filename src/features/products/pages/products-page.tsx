@@ -5,13 +5,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Button } from '@/components/ui';
-import { useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
+import { useBrandByIdQuery, useBrandOptionsQuery } from '@/features/brands/hooks/use-brands-query';
 import { ROUTES } from '@/constants/routes';
 import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useCategoryOptionsQuery } from '@/features/categories/hooks/use-categories-query';
-import { useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
+import { useMarketByIdQuery, useMarketOptionsQuery } from '@/features/markets/hooks/use-markets-query';
 import { ProductFilters } from '@/features/products/components/product-filters';
+import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
+import type { Brand } from '@/features/brands/types/brand-types';
+import type { MarketOption } from '@/features/markets/types/market-types';
 import { ProductsTable } from '@/features/products/components/products-table';
 import { useDeleteProductMutation, useImportProductsMutation, useProductsQuery } from '@/features/products/hooks/use-products-query';
 import {
@@ -33,12 +36,36 @@ export default function ProductsPage(): React.JSX.Element {
   const importInputRef = useRef<HTMLInputElement>(null);
   const { filters, pagination } = readProductListUrlState(searchParams);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const [brandSearch, setBrandSearch] = useState('');
+  const [marketSearch, setMarketSearch] = useState('');
+  const [pickedBrand, setPickedBrand] = useState<Brand | null>(null);
+  const [pickedMarket, setPickedMarket] = useState<MarketOption | null>(null);
+  const debouncedBrandSearch = useDebouncedSelectSearch(brandSearch);
+  const debouncedMarketSearch = useDebouncedSelectSearch(marketSearch);
   const currentUser = useAuthStore((state) => state.user);
   const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
 
   const categoriesQuery = useCategoryOptionsQuery();
-  const brandsQuery = useBrandOptionsQuery();
-  const marketsQuery = useMarketOptionsQuery(!isMarket);
+  const brandsQuery = useBrandOptionsQuery(debouncedBrandSearch);
+  const marketsQuery = useMarketOptionsQuery(!isMarket, debouncedMarketSearch);
+  const selectedBrandId = filters.brandId && filters.brandId !== 'all' ? filters.brandId : undefined;
+  const selectedMarketId = filters.marketUserId && filters.marketUserId !== 'all' ? filters.marketUserId : undefined;
+  const brandDetailsQuery = useBrandByIdQuery(
+    selectedBrandId,
+    Boolean(selectedBrandId) && !brandsQuery.data?.some((brand) => brand.id === selectedBrandId) && pickedBrand?.id !== selectedBrandId
+  );
+  const marketDetailsQuery = useMarketByIdQuery(
+    selectedMarketId,
+    !isMarket && Boolean(selectedMarketId) && !marketsQuery.data?.some((market) => market.id === selectedMarketId) && pickedMarket?.id !== selectedMarketId
+  );
+  const brandOptions = Array.from(new Map(
+    [...(brandsQuery.data ?? []), ...(brandDetailsQuery.data ? [brandDetailsQuery.data] : []), ...(pickedBrand ? [pickedBrand] : [])]
+      .map((brand) => [brand.id, brand])
+  ).values());
+  const marketOptions = Array.from(new Map(
+    [...(marketsQuery.data ?? []), ...(marketDetailsQuery.data ? [marketDetailsQuery.data] : []), ...(pickedMarket ? [pickedMarket] : [])]
+      .map((market) => [market.id, market])
+  ).values());
   const selectedCategory = filters.categoryId === 'all' ? undefined : categoriesQuery.data?.find((category) => category.id === filters.categoryId);
   const effectiveFilters: ProductsFilter = {
     ...filters,
@@ -115,8 +142,18 @@ export default function ProductsPage(): React.JSX.Element {
       <ProductFilters
         filters={filters}
         categories={categoriesQuery.data ?? []}
-        brands={brandsQuery.data ?? []}
-        markets={marketsQuery.data ?? []}
+        brands={brandOptions}
+        markets={marketOptions}
+        brandSearch={brandSearch}
+        marketSearch={marketSearch}
+        onBrandSearchChange={setBrandSearch}
+        onMarketSearchChange={setMarketSearch}
+        brandsLoading={brandsQuery.isFetching}
+        marketsLoading={marketsQuery.isFetching}
+        brandsError={brandsQuery.isError}
+        marketsError={marketsQuery.isError}
+        onBrandSelected={setPickedBrand}
+        onMarketSelected={setPickedMarket}
         showMarketFilters={!isMarket}
         onChange={(nextFilters) => updateListUrl(nextFilters, { ...pagination, page: defaultProductPagination.page })}
         onReset={() => updateListUrl(defaultProductFilters, defaultProductPagination)}
