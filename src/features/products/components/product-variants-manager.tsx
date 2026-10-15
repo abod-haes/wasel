@@ -29,6 +29,7 @@ import {
 } from '@/features/products/hooks/use-products-query';
 import type { ProductVariantInput } from '@/features/products/types/product-types';
 import { resolveMediaPath } from '@/lib/utils';
+import { ProductPreviewImage } from '@/features/products/components/product-preview-image';
 
 export interface PendingProductVariant extends ProductVariantInput {
   localId: string;
@@ -55,6 +56,7 @@ interface DisplayVariant {
   id?: string;
   name: string;
   imagePath?: string | null;
+  thumbnailPath?: string | null;
   imageFile?: File;
   sortOrder: number;
   isDefault: boolean;
@@ -125,7 +127,9 @@ const getVariantImagePreview = (variant: DisplayVariant): string | undefined => 
     return URL.createObjectURL(variant.imageFile);
   }
 
-  return variant.imagePath ? resolveMediaPath(variant.imagePath) : undefined;
+  return variant.thumbnailPath
+    ? resolveMediaPath(variant.thumbnailPath)
+    : variant.imagePath ? resolveMediaPath(variant.imagePath) : undefined;
 };
 
 export function ProductVariantsManager({
@@ -162,6 +166,7 @@ export function ProductVariantsManager({
       id: variant.id,
       name: variant.name,
       imagePath: variant.imagePath,
+      thumbnailPath: variant.thumbnailPath,
       sortOrder: variant.sortOrder,
       isDefault: variant.isDefault,
     }));
@@ -327,20 +332,20 @@ export function ProductVariantsManager({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button type="button" className="h-14 w-14 overflow-hidden rounded-lg border bg-muted">
-                            <img
-                              src={imagePreview}
+                            <ProductPreviewImage
+                              thumbnailPath={variant.imageFile ? undefined : variant.thumbnailPath}
+                              originalPath={variant.imageFile ? imagePreview : variant.imagePath}
                               alt={variant.name}
-                              className="h-full w-full object-cover"
-                              loading="lazy"
+                              className="h-full w-full object-contain"
                             />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent className="w-56 rounded-xl border-border/70 bg-card p-2 shadow-lg">
-                          <img
-                            src={imagePreview}
+                          <ProductPreviewImage
+                            thumbnailPath={variant.imageFile ? undefined : variant.thumbnailPath}
+                            originalPath={variant.imageFile ? imagePreview : variant.imagePath}
                             alt={variant.name}
-                            className="h-44 w-full rounded-lg object-cover"
-                            loading="lazy"
+                            className="h-44 w-full rounded-lg object-contain"
                           />
                         </TooltipContent>
                       </Tooltip>

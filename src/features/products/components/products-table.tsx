@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DataTable } from '@/components/shared';
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import type { Product, ProductVariant } from '@/features/products/types/product-types';
-import { resolveMediaPath } from '@/lib/utils';
+import { ProductPreviewImage } from '@/features/products/components/product-preview-image';
 import type { PaginatedData } from '@/types/api';
 
 interface ProductsTableProps {
@@ -37,14 +37,14 @@ const formatWeight = (value?: number): string => {
 };
 
 const renderVariantBadge = (variant: ProductVariant): React.JSX.Element => {
-  const variantImage = variant.imagePath ? resolveMediaPath(variant.imagePath) : undefined;
+  const variantImage = variant.thumbnailPath || variant.imagePath;
 
   return (
     <Tooltip key={variant.id || variant.name}>
       <TooltipTrigger asChild>
         <span className="inline-flex cursor-default items-center gap-1 rounded-full border bg-background px-2 py-1 text-xs text-foreground">
           {variantImage ? (
-            <img src={variantImage} alt={variant.name} className="h-4 w-4 rounded-full object-cover" loading="lazy" />
+            <ProductPreviewImage thumbnailPath={variant.thumbnailPath} originalPath={variant.imagePath} alt={variant.name} className="h-4 w-4 rounded-full object-cover" />
           ) : null}
           <span>{variant.name}</span>
           {variant.isDefault ? <span className="text-[10px] text-primary">افتراضي</span> : null}
@@ -53,7 +53,7 @@ const renderVariantBadge = (variant: ProductVariant): React.JSX.Element => {
       <TooltipContent className="rounded-xl border-border/70 bg-card p-2 shadow-lg">
         <div className="space-y-2 text-sm">
           {variantImage ? (
-            <img src={variantImage} alt={variant.name} className="h-28 w-40 rounded-lg object-cover" loading="lazy" />
+            <ProductPreviewImage thumbnailPath={variant.thumbnailPath} originalPath={variant.imagePath} alt={variant.name} className="h-28 w-40 rounded-lg object-cover" />
           ) : null}
           <div>
             <p className="font-medium">{variant.name}</p>
@@ -85,7 +85,7 @@ export function ProductsTable({
         header: 'المنتج',
         renderCell: (product: Product) => {
           const mainImage = product.images.find((image) => image.isMain) ?? product.images[0];
-          const productImage = mainImage?.imagePath ? resolveMediaPath(mainImage.imagePath) : undefined;
+          const productImage = product.thumbnailPath || mainImage?.thumbnailPath || mainImage?.imagePath;
 
           return (
             <div className="flex min-w-72 items-center gap-3">
@@ -96,16 +96,16 @@ export function ProductsTable({
                       type="button"
                       className="h-14 w-14 cursor-zoom-in overflow-hidden rounded-xl border bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
-                      <img
-                        src={productImage}
+                      <ProductPreviewImage
+                        thumbnailPath={product.thumbnailPath || mainImage?.thumbnailPath}
+                        originalPath={mainImage?.imagePath}
                         alt={product.name}
-                        className="h-full w-full object-cover transition-transform duration-200 hover:scale-110"
-                        loading="lazy"
+                        className="h-full w-full object-contain transition-transform duration-200 hover:scale-110"
                       />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" align="start" className="w-60 rounded-xl border-border/70 bg-card p-2 shadow-lg">
-                    <img src={productImage} alt={product.name} className="h-44 w-full rounded-lg object-cover" loading="lazy" />
+                    <ProductPreviewImage thumbnailPath={product.thumbnailPath || mainImage?.thumbnailPath} originalPath={mainImage?.imagePath} alt={product.name} className="h-44 w-full rounded-lg object-contain" />
                   </TooltipContent>
                 </Tooltip>
               ) : (

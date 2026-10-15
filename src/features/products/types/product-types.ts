@@ -4,6 +4,7 @@ export type ProductCurrency = 'USD' | 'SYP' | 'TRY';
 export interface ProductImage {
   id: string;
   imagePath: string;
+  thumbnailPath?: string | null;
   isMain: boolean;
 }
 
@@ -11,6 +12,7 @@ export interface ProductVariant {
   id: string;
   name: string;
   imagePath?: string | null;
+  thumbnailPath?: string | null;
   sortOrder: number;
   isDefault: boolean;
 }
@@ -50,6 +52,7 @@ export interface Product {
   originalPrice?: number;
   originalBasePrice?: number;
   hasActiveOffer?: boolean;
+  thumbnailPath?: string | null;
   images: ProductImage[];
   variants: ProductVariant[];
   categories: ProductCategorySummary[];

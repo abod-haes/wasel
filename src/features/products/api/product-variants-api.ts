@@ -10,6 +10,8 @@ interface ProductVariantApiResponse {
   name?: string;
   ImagePath?: string | null;
   imagePath?: string | null;
+  ThumbnailPath?: string | null;
+  thumbnailPath?: string | null;
   SortOrder?: number;
   sortOrder?: number;
   IsDefault?: boolean;
@@ -37,6 +39,7 @@ const mapProductVariantResponse = (variant: ProductVariantApiResponse, index = 0
     id: variant.Id ?? variant.id ?? '',
     name: variant.Name ?? variant.name ?? '',
     imagePath: variant.ImagePath ?? variant.imagePath ?? null,
+    thumbnailPath: variant.ThumbnailPath ?? variant.thumbnailPath ?? null,
     sortOrder: variant.SortOrder ?? variant.sortOrder ?? index,
     isDefault: variant.IsDefault ?? variant.isDefault ?? false,
   };
