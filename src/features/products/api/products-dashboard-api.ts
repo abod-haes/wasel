@@ -17,8 +17,8 @@ import { apiClient } from '@/services/api/client';
 import { toPaginatedData } from '@/services/api/pagination';
 import type { ApiPaginatedResult, PaginatedData, PaginationParams } from '@/types/api';
 
-interface ProductImageApiResponse { id?: string; Id?: string; imagePath?: string; ImagePath?: string; isMain?: boolean; IsMain?: boolean; }
-interface ProductVariantApiResponse { id?: string; Id?: string; name?: string; Name?: string; imagePath?: string | null; ImagePath?: string | null; sortOrder?: number; SortOrder?: number; isDefault?: boolean; IsDefault?: boolean; }
+interface ProductImageApiResponse { id?: string; Id?: string; imagePath?: string; ImagePath?: string; thumbnailPath?: string | null; ThumbnailPath?: string | null; isMain?: boolean; IsMain?: boolean; }
+interface ProductVariantApiResponse { id?: string; Id?: string; name?: string; Name?: string; imagePath?: string | null; ImagePath?: string | null; thumbnailPath?: string | null; ThumbnailPath?: string | null; sortOrder?: number; SortOrder?: number; isDefault?: boolean; IsDefault?: boolean; }
 interface ProductCategoryApiResponse { id?: string; Id?: string; name?: string; Name?: string; }
 interface ProductPriceInfoApiResponse {
   basePrice?: number; BasePrice?: number; baseCurrency?: string; BaseCurrency?: string;
@@ -35,6 +35,7 @@ interface ProductApiResponse {
   hasActiveOffer?: boolean; HasActiveOffer?: boolean;
   baseCurrency?: string; BaseCurrency?: string; priceCurrency?: string; PriceCurrency?: string;
   prices?: ProductPriceInfoApiResponse; Prices?: ProductPriceInfoApiResponse;
+  thumbnailPath?: string | null; ThumbnailPath?: string | null;
   images?: ProductImageApiResponse[]; Images?: ProductImageApiResponse[];
   variants?: ProductVariantApiResponse[]; Variants?: ProductVariantApiResponse[]; categories?: ProductCategoryApiResponse[]; Categories?: ProductCategoryApiResponse[];
   isFavourite?: boolean; IsFavourite?: boolean; isInCart?: boolean; IsInCart?: boolean; cartQuantity?: number; CartQuantity?: number;
@@ -125,9 +126,10 @@ const mapProduct = (product: ProductApiResponse): Product => {
     originalPrice: product.originalPrice ?? product.OriginalPrice,
     originalBasePrice: product.originalBasePrice ?? product.OriginalBasePrice,
     hasActiveOffer: product.hasActiveOffer ?? product.HasActiveOffer ?? false,
-    images: images.map((image) => ({ id: image.id ?? image.Id ?? '', imagePath: image.imagePath ?? image.ImagePath ?? '', isMain: image.isMain ?? image.IsMain ?? false })),
+    thumbnailPath: product.thumbnailPath ?? product.ThumbnailPath ?? null,
+    images: images.map((image) => ({ id: image.id ?? image.Id ?? '', imagePath: image.imagePath ?? image.ImagePath ?? '', thumbnailPath: image.thumbnailPath ?? image.ThumbnailPath ?? null, isMain: image.isMain ?? image.IsMain ?? false })),
     variants: variants.map((variant, index) => ({
-      id: variant.id ?? variant.Id ?? '', name: variant.name ?? variant.Name ?? '', imagePath: variant.imagePath ?? variant.ImagePath ?? null,
+      id: variant.id ?? variant.Id ?? '', name: variant.name ?? variant.Name ?? '', imagePath: variant.imagePath ?? variant.ImagePath ?? null, thumbnailPath: variant.thumbnailPath ?? variant.ThumbnailPath ?? null,
       sortOrder: variant.sortOrder ?? variant.SortOrder ?? index, isDefault: variant.isDefault ?? variant.IsDefault ?? false,
     })).sort((first, second) => first.sortOrder - second.sortOrder),
     categories: categories.map((category) => ({ id: category.id ?? category.Id ?? '', name: category.name ?? category.Name ?? '' })),

@@ -10,7 +10,8 @@ import {
   useSetMainProductImageMutation,
 } from '@/features/products/hooks/use-products-query';
 import type { Product } from '@/features/products/types/product-types';
-import { cn, resolveMediaPath } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { ProductPreviewImage } from '@/features/products/components/product-preview-image';
 
 interface ProductImagesManagerProps {
   product: Product;
@@ -164,11 +165,11 @@ export function ProductImagesManager({ product }: ProductImagesManagerProps): Re
             {product.images.map((image) => (
               <div key={image.id} className="overflow-hidden rounded-xl border bg-card">
                 <div className="relative aspect-square bg-muted">
-                  <img
-                    src={resolveMediaPath(image.imagePath)}
+                  <ProductPreviewImage
+                    thumbnailPath={image.thumbnailPath}
+                    originalPath={image.imagePath}
                     alt={product.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+                    className="h-full w-full object-contain"
                   />
                   {image.isMain ? (
                     <span className="absolute start-2 top-2 inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-xs font-medium shadow-sm">

@@ -17,6 +17,11 @@ export interface OrderItem {
   productId: string;
   productName: string;
   productImagePath?: string;
+  productThumbnailPath?: string | null;
+  variantId?: string;
+  variantName?: string;
+  variantImagePath?: string | null;
+  variantThumbnailPath?: string | null;
   unitPrice: number;
   quantity: number;
   lineTotal: number;

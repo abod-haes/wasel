@@ -18,6 +18,8 @@ interface ProductImageApiResponse {
   id?: string;
   ImagePath?: string;
   imagePath?: string;
+  ThumbnailPath?: string | null;
+  thumbnailPath?: string | null;
   IsMain?: boolean;
   isMain?: boolean;
 }
@@ -29,6 +31,8 @@ interface ProductVariantApiResponse {
   name?: string;
   ImagePath?: string | null;
   imagePath?: string | null;
+  ThumbnailPath?: string | null;
+  thumbnailPath?: string | null;
   SortOrder?: number;
   sortOrder?: number;
   IsDefault?: boolean;
@@ -65,6 +69,8 @@ interface ProductApiResponse {
   description?: string;
   Price?: number;
   price?: number;
+  ThumbnailPath?: string | null;
+  thumbnailPath?: string | null;
   Images?: ProductImageApiResponse[];
   images?: ProductImageApiResponse[];
   Variants?: ProductVariantApiResponse[];
@@ -231,9 +237,11 @@ const mapProductResponse = (product: ProductApiResponse): Product => {
     weight: product.Weight ?? product.weight,
     description: product.Description ?? product.description,
     price: product.Price ?? product.price ?? 0,
+    thumbnailPath: product.ThumbnailPath ?? product.thumbnailPath ?? null,
     images: images.map((image) => ({
       id: image.Id ?? image.id ?? '',
       imagePath: image.ImagePath ?? image.imagePath ?? '',
+      thumbnailPath: image.ThumbnailPath ?? image.thumbnailPath ?? null,
       isMain: image.IsMain ?? image.isMain ?? false,
     })),
     variants: variants
@@ -241,6 +249,7 @@ const mapProductResponse = (product: ProductApiResponse): Product => {
         id: variant.Id ?? variant.id ?? '',
         name: variant.Name ?? variant.name ?? '',
         imagePath: variant.ImagePath ?? variant.imagePath ?? null,
+        thumbnailPath: variant.ThumbnailPath ?? variant.thumbnailPath ?? null,
         sortOrder: variant.SortOrder ?? variant.sortOrder ?? index,
         isDefault: variant.IsDefault ?? variant.isDefault ?? false,
       }))
