@@ -13,4 +13,5 @@ export const env = {
   apiBaseUrl: getActiveApiBaseUrl(),
   enableMockApi: toBoolean(import.meta.env.VITE_ENABLE_MOCK_API, false),
   supportEmail: import.meta.env.VITE_SUPPORT_EMAIL?.trim() || undefined,
+  googleMapsBrowserApiKey: import.meta.env.VITE_GOOGLE_MAPS_BROWSER_API_KEY?.trim() || '',
 } as const;

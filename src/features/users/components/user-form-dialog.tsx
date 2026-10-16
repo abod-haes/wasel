@@ -488,7 +488,9 @@ export function UserFormDialog({
                   title="اختيار الموقع من الخريطة"
                 >
                   <MapPin className="h-4 w-4" />
-                  <span className="hidden sm:inline">الخريطة</span>
+                  <span className="hidden sm:inline">
+                    {formValues.latitude && formValues.longitude ? 'تعديل الموقع' : 'تحديد الموقع'}
+                  </span>
                 </Button>
               </div>
 
@@ -518,13 +520,14 @@ export function UserFormDialog({
             open={isMapOpen}
             latitude={formValues.latitude ? Number(formValues.latitude) : undefined}
             longitude={formValues.longitude ? Number(formValues.longitude) : undefined}
+            address={formValues.location}
             onOpenChange={setIsMapOpen}
-            onConfirm={({ latitude, longitude }) => {
+            onConfirm={({ latitude, longitude, address }) => {
               setFormValues((previous) => ({
                 ...previous,
                 latitude: String(latitude),
                 longitude: String(longitude),
-                location: previous.location.trim() || 'موقع محدد على الخريطة',
+                location: address,
               }));
               setErrors((previous) => ({
                 ...previous,
