@@ -66,6 +66,7 @@ interface GoogleMaps {
 type GoogleMapsWindow = Window & {
   google?: { maps?: GoogleMaps };
   __rodoGoogleMapsReady?: () => void;
+  gm_authFailure?: () => void;
 };
 
 const ALEPPO: Coordinate = { latitude: 36.2021, longitude: 37.1343 };
@@ -114,6 +115,14 @@ function loadGoogleMaps(key: string): Promise<GoogleMaps> {
       () => finish(undefined, new Error('تأخر تحميل Google Maps. تأكد من اتصال الإنترنت.')),
       20_000,
     );
+
+    googleWindow.gm_authFailure = () => {
+      const error = new Error(
+        'رفضت Google Maps مفتاح الداشبورد. تأكد من تفعيل Maps JavaScript API ومن إضافة رابط الداشبورد ضمن Website restrictions.',
+      );
+      finish(undefined, error);
+      window.dispatchEvent(new Event('rodo-google-maps-auth-failure'));
+    };
 
     googleWindow.__rodoGoogleMapsReady = () => {
       const maps = googleWindow.google?.maps;
@@ -169,6 +178,18 @@ export function UserLocationMapDialog({
   const [mapError, setMapError] = useState('');
   const [addressHint, setAddressHint] = useState('');
   const apiKey = env.googleMapsBrowserApiKey;
+
+  useEffect(() => {
+    if (!open) return;
+    const onAuthFailure = () => {
+      setLoading(false);
+      setMapError(
+        'مفتاح Google Maps للويب غير مصرح له بعرض الخرائط على هذا الموقع. تحقق من رابط الداشبورد في Website restrictions.',
+      );
+    };
+    window.addEventListener('rodo-google-maps-auth-failure', onAuthFailure);
+    return () => window.removeEventListener('rodo-google-maps-auth-failure', onAuthFailure);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
