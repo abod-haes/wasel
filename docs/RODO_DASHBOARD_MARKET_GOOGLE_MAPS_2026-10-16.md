@@ -25,3 +25,10 @@ Google Maps **website key is different** from Google Maps native Android and iOS
 - If maps say `RefererNotAllowedMapError`, correct the website restriction. If `ApiNotActivatedMapError`, enable the corresponding API.
 
 The legacy `VITE_GOOGLE_MAPS_BROWSER_API_KEY` environment variable is also accepted. If both are set, `GOOGLE_MAPS_BROWSER_API_KEY` takes priority. Vite injects only the resolved browser key at build time; changes to Vercel environment variables require a **new deployment**. The Google Maps JavaScript API key is publicly visible to users by design: restrict it in Google Cloud to the dashboard's website origins and required APIs.
+
+
+## Map dialog indefinitely showing loading (17 October 2026)
+
+The Google Maps picker lives inside a Radix Dialog portal, which can mount its DOM element **after the parent's effect has fired**. Previously the effect read `mapContainerRef.current` during `open` and returned early if it was still null, never retrying until another prop changed. The picker now uses a **stable callback ref** and stores the actual map node in state; initialization waits for that node. An independent 23-second watchdog and retry action prevent a persistent loading overlay if the network or Google API blocks the script.
+
+If the map times out or Google returns an authorization error, confirm the dashboard was redeployed **after** `GOOGLE_MAPS_BROWSER_API_KEY` was set in its selected Vercel environment. Ensure Google Cloud API restrictions allow Maps JavaScript API (and Geocoding API for address lookup), and Websites restrictions include the actual HTTPS dashboard domain. Inspect DevTools → Console / Network for `RefererNotAllowedMapError`, `ApiNotActivatedMapError`, blocked `maps.googleapis.com` scripts or content-security-policy failures. The key is a browser key, not the native Android/iOS key. Do not commit its literal value.

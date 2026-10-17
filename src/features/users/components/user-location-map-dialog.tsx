@@ -1,5 +1,5 @@
-import { Crosshair, LocateFixed, MapPin, Search } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Crosshair, LocateFixed, MapPin, RefreshCw, Search } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Button,
@@ -162,7 +162,12 @@ export function UserLocationMapDialog({
   onOpenChange,
   onConfirm,
 }: UserLocationMapDialogProps): React.JSX.Element {
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  // Radix Dialog portals mount after the parent effect in some render paths.
+  // A callback ref triggers initialization only once the actual map DOM node exists.
+  const [mapContainer, setMapContainer] = useState<HTMLDivElement | null>(null);
+  const attachMapContainer = useCallback((node: HTMLDivElement | null) => {
+    setMapContainer(node);
+  }, []);
   const mapRef = useRef<GoogleMap | null>(null);
   const markerRef = useRef<GoogleMarker | null>(null);
   const geocoderRef = useRef<GoogleGeocoder | null>(null);
@@ -176,6 +181,7 @@ export function UserLocationMapDialog({
   const [searching, setSearching] = useState(false);
   const [locating, setLocating] = useState(false);
   const [mapError, setMapError] = useState('');
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [addressHint, setAddressHint] = useState('');
   const apiKey = env.googleMapsBrowserApiKey;
 
@@ -209,17 +215,17 @@ export function UserLocationMapDialog({
   }, [address, apiKey, latitude, longitude, open]);
 
   useEffect(() => {
-    if (!open || !apiKey || !mapContainerRef.current) return;
+    if (!open || !apiKey || !mapContainer) return;
     let cancelled = false;
 
     void loadGoogleMaps(apiKey)
       .then((maps) => {
-        if (cancelled || !mapContainerRef.current) return;
+        if (cancelled) return;
         const hasExistingLocation = isValidLocation(latitude, longitude);
         const initial = hasExistingLocation
           ? { latitude: latitude!, longitude: longitude! }
           : ALEPPO;
-        const map = new maps.Map(mapContainerRef.current, {
+        const map = new maps.Map(mapContainer, {
           center: toGooglePoint(initial),
           zoom: hasExistingLocation ? 17 : 12,
           mapTypeControl: false,
@@ -298,7 +304,26 @@ export function UserLocationMapDialog({
       geocoderRef.current = null;
       googleMapsRef.current = null;
     };
-  }, [apiKey, latitude, longitude, open]);
+  }, [apiKey, latitude, longitude, mapContainer, open, loadAttempt]);
+
+  // Independent watchdog: a portal mount race, network block or stalled API
+  // must never leave the "loading" overlay up forever.
+  useEffect(() => {
+    if (!open || !apiKey || !loading) return;
+    const timer = window.setTimeout(() => {
+      setLoading(false);
+      setMapError(
+        'انتهت مهلة تحميل الخريطة. تأكد من اتصالك ومن صلاحية مفتاح Google Maps لهذا الموقع، ثم حاول مرة ثانية.',
+      );
+    }, 23_000);
+    return () => window.clearTimeout(timer);
+  }, [apiKey, loading, open, loadAttempt]);
+
+  const retryMapLoad = (): void => {
+    setMapError('');
+    setLoading(true);
+    setLoadAttempt((previous) => previous + 1);
+  };
 
   const searchAddress = (): void => {
     const term = searchText.trim();
@@ -429,7 +454,7 @@ export function UserLocationMapDialog({
           </div>
 
           <div className="relative overflow-hidden rounded-2xl border bg-muted">
-            <div ref={mapContainerRef} className="h-[330px] w-full sm:h-[400px]" aria-label="خريطة موقع السوبر ماركت" />
+            <div ref={attachMapContainer} className="h-[330px] w-full sm:h-[400px]" aria-label="خريطة موقع السوبر ماركت" />
             {loading && apiKey ? (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80 text-sm text-muted-foreground">
                 جاري تحميل Google Maps…
@@ -437,16 +462,24 @@ export function UserLocationMapDialog({
             ) : null}
             {!apiKey ? (
               <div className="absolute inset-0 flex items-center justify-center bg-background/95 px-6 text-center text-sm text-destructive">
-                Google Maps غير مُعدّة للداشبورد. أضف VITE_GOOGLE_MAPS_BROWSER_API_KEY في بيئة نشر الويب.
+                Google Maps غير مُعدّة للداشبورد. أضف GOOGLE_MAPS_BROWSER_API_KEY في إعدادات Vercel واعمل Redeploy.
+              </div>
+            ) : null}
+            {mapError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/95 px-6 text-center">
+                <p role="alert" className="max-w-lg text-sm leading-6 text-destructive">
+                  {mapError}
+                </p>
+                {apiKey ? (
+                  <Button type="button" variant="outline" onClick={retryMapLoad} className="gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    إعادة تحميل الخريطة
+                  </Button>
+                ) : null}
               </div>
             ) : null}
           </div>
 
-          {mapError ? (
-            <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-              {mapError} تأكد من تفعيل Maps JavaScript API ومن نطاق موقع الداشبورد المسموح بالمفتاح.
-            </p>
-          ) : null}
           <label htmlFor="rodo-market-map-address" className="block space-y-2 text-sm font-medium">
             <span>وصف موقع السوبر ماركت</span>
             <Input
