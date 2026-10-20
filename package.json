@@ -35,10 +35,11 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "npm run typecheck && vite build",
+    "build": "npm run typecheck && vite build && node scripts/generate-store-pages.mjs",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "store:pages:build": "node scripts/generate-store-pages.mjs"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
