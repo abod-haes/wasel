@@ -60,6 +60,11 @@ export const appRoutes: RouteObject[] = [
     element: <AccountDeletionPage />,
   },
   {
+    // Web deletion form loaded by the crawlable public /account-deletion page.
+    path: '/account-deletion/submit',
+    element: <AccountDeletionPage />,
+  },
+  {
     path: ROUTES.support,
     element: <SupportPage />,
   },
