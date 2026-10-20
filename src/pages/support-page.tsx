@@ -31,7 +31,7 @@ export default function SupportPage(): React.JSX.Element {
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">كيف فينا نساعدك؟</h1>
             <p className="text-base leading-8 text-muted-foreground">
-              للدعم المتعلق بالحساب أو الطلبات أو الخصوصية، ترودو معنا عبر قناة الدعم الرسمية أدناه.
+              للدعم المتعلق بالحساب أو الطلبات أو الخصوصية، تواصل معنا عبر قناة الدعم الرسمية أدناه.
             </p>
           </div>
         </header>
