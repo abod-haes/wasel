@@ -73,6 +73,17 @@ interface ProductDetailsValues {
 
 const NONE_VALUE = 'none';
 
+// Keep the API enum values unchanged; use readable labels in the dashboard.
+const WEIGHT_UNIT_OPTIONS: ReadonlyArray<{
+  value: ProductDetailsValues['weightUnit'];
+  label: string;
+}> = [
+  { value: 'none', label: 'بدون وحدة' },
+  { value: 'g', label: 'غرام (g)' },
+  { value: 'Kg', label: 'كيلوغرام (Kg)' },
+  { value: 'L', label: 'لتر (L)' },
+];
+
 const defaultValues: ProductDetailsValues = {
   name: '',
   code: '',
@@ -441,7 +452,7 @@ export function ProductDetailsForm({
               />
             </FormField>
 
-            <div className="grid grid-cols-[1fr_120px] gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_156px] gap-3">
               <FormField labelKey="الوزن" htmlFor="product-weight" error={errors.weight}>
                 <Input
                   id="product-weight"
@@ -462,12 +473,17 @@ export function ProductDetailsForm({
                     }))
                   }
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">بدون</SelectItem>
-                    <SelectItem value="g">g</SelectItem>
-                    <SelectItem value="Kg">Kg</SelectItem>
-                    <SelectItem value="L">L</SelectItem>
+                  <SelectTrigger aria-label="وحدة الوزن">
+                    <SelectValue placeholder="اختر الوحدة">
+                      {WEIGHT_UNIT_OPTIONS.find((option) => option.value === values.weightUnit)?.label ?? 'اختر الوحدة'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent searchable={false}>
+                    {WEIGHT_UNIT_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormField>
