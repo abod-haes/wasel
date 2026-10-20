@@ -6,10 +6,11 @@
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { loadEnv } from 'vite';
 
 const out = resolve(process.cwd(), 'dist');
 if (!existsSync(out)) throw new Error('Run vite build before generating store pages.');
-const email = (process.env.VITE_SUPPORT_EMAIL || '').trim();
+const email = (process.env.VITE_SUPPORT_EMAIL || loadEnv('production', process.cwd(), 'VITE_').VITE_SUPPORT_EMAIL || '').trim();
 const validEmail = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email);
 const escape = (value) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
