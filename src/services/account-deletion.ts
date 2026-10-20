@@ -1,4 +1,5 @@
 import { getActiveApiBaseUrl } from '@/config/api-environment';
+import { normalizeCountryCallingCode, normalizeNationalPhoneNumber } from '@/constants/phone';
 
 export interface WebAccountDeletionCredentials {
   countryCallingCode: string;
@@ -37,8 +38,8 @@ export async function deleteAccountViaWeb(input: WebAccountDeletionCredentials):
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
-        countryCallingCode: input.countryCallingCode.trim(),
-        phoneNumber: input.phoneNumber.trim(),
+        countryCallingCode: normalizeCountryCallingCode(input.countryCallingCode),
+        phoneNumber: normalizeNationalPhoneNumber(input.phoneNumber),
         password: input.password,
       }),
       credentials: 'omit',
