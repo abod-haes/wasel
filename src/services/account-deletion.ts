@@ -56,7 +56,7 @@ export async function deleteAccountViaWeb(input: WebAccountDeletionCredentials):
 
   const token =
     loginBody && typeof loginBody === 'object' && 'token' in loginBody
-      ? (loginBody as { token: unknown }).token
+      ? ((loginBody as { token?: unknown; Token?: unknown }).token ?? (loginBody as { Token?: unknown }).Token)
       : undefined;
   if (typeof token !== 'string' || !token) {
     throw new Error('تعذر التحقق من الحساب. حاول مرة ثانية أو تواصل مع الدعم.');
