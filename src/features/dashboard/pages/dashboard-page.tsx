@@ -40,7 +40,7 @@ export default function DashboardPage(): React.JSX.Element {
         descriptionKey={isMarket ? 'dashboard.marketDescription' : 'dashboard.description'}
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {summaryQuery.data.kpis.map((kpi) => (
           <KpiCard key={kpi.id} labelKey={kpi.labelKey} value={kpi.value} delta={kpi.delta} />
         ))}
@@ -60,11 +60,11 @@ export default function DashboardPage(): React.JSX.Element {
         </Card>
       ) : (
         <Card>
-          <CardHeader>
+          <CardHeader className="border-b border-border/70">
             <CardTitle>{t('dashboard.activity.title')}</CardTitle>
             <CardDescription>{t('dashboard.activity.description')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 pb-0">
             <Table>
               <TableHeader>
                 <TableRow>
