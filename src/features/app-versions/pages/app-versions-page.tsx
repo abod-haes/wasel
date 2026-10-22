@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import axios from 'axios';
 import { AlertTriangle, ExternalLink, LoaderCircle, Plus, Search, Save, Smartphone, Info } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
@@ -444,7 +445,7 @@ export default function AppVersionsPage(): React.JSX.Element {
                   {selected.createdAt ? (
                     <div className="flex items-center justify-between gap-2">
                       <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
-                      <dd className="text-start" dir="ltr">{new Date(selected.createdAt).toLocaleString('ar-SY')}</dd>
+                      <dd className="text-start" dir="ltr">{formatDateTime(selected.createdAt)}</dd>
                     </div>
                   ) : null}
                 </dl>
