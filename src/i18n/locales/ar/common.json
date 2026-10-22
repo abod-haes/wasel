@@ -680,6 +680,7 @@
     "fallbackName": "المستخدم"
   },
   "marketFinance": {
+    "variant": "النوع",
     "title": "مالية المحلات",
     "adminDescription": "حسابات المحلات، الطلبات المسلّمة والتسويات",
     "marketDescription": "مستحقات محلك لدى الإدارة وسجل الحركات",
