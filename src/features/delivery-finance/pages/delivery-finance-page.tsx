@@ -1,16 +1,14 @@
 import {
-  ArrowLeft,
-  ArrowRight,
   Banknote,
   Eye,
   HandCoins,
   ReceiptText,
-  RefreshCw,
   WalletCards,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { generatePath, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
+import { formatDateTime as dateTime } from '@/lib/date-time';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorState, PageContainer, SectionHeader } from '@/components/shared';
@@ -52,9 +50,6 @@ import type { PaginationParams } from '@/types/api';
 
 const money = (value: number): string =>
   new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
-
-const dateTime = (value?: string | null): string =>
-  value ? new Date(value).toLocaleString() : '-';
 
 function paymentWayLabel(value: 0 | 1, t: (key: string) => unknown): string {
   return String(value === 0 ? t('deliveryFinance.direct') : t('deliveryFinance.shamCash'));
@@ -169,12 +164,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   }
 
   if (selectedDeliveryId && summaryQuery.isError) {
-    return <PageContainer>
-      <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.deliveryFinance)}>
-        {t('deliveryFinance.backToList')}
-      </Button>
-      <ErrorState onRetry={() => void summaryQuery.refetch()} />
-    </PageContainer>;
+    return <PageContainer><ErrorState onRetry={() => void summaryQuery.refetch()} /></PageContainer>;
   }
 
   const selectedSummary = summaryQuery.data;
@@ -202,26 +192,9 @@ export default function DeliveryFinancePage(): React.JSX.Element {
 
   return (
     <PageContainer className={i18n.dir() === 'rtl' ? '[direction:rtl]' : '[direction:ltr]'}>
-      {selectedDeliveryId && (
-        <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.deliveryFinance)} className="gap-2">
-          {i18n.dir() === 'rtl' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
-          {t('deliveryFinance.backToList')}
-        </Button>
-      )}
       <SectionHeader
         titleKey="deliveryFinance.title"
         descriptionKey="deliveryFinance.description"
-        actions={
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => void (selectedDeliveryId ? summaryQuery.refetch() : listQuery.refetch())}
-            disabled={selectedDeliveryId ? summaryQuery.isFetching : listQuery.isFetching}
-          >
-            <RefreshCw className="h-4 w-4" />
-            {t('deliveryFinance.refresh')}
-          </Button>
-        }
       />
 
       {!selectedDeliveryId && <Card>
@@ -389,6 +362,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                     icon={<WalletCards className="h-5 w-5" />}
                     label={t('deliveryFinance.lastSettlement')}
                     value={dateTime(selectedSummary.lastSettlementAt)}
+                     valueDirection="ltr"
                   />
                 </div>
               </div>
@@ -514,6 +488,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                 <MiniValue
                   label={t('deliveryFinance.deliveredAt')}
                   value={dateTime(orderQuery.data.order.deliveredAt)}
+                   valueDirection="ltr"
                 />
                 <MiniValue
                   label={t('deliveryFinance.appliedMode')}
@@ -590,10 +565,12 @@ function SummaryCard({
   icon,
   label,
   value,
+  valueDirection,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
+  valueDirection?: 'ltr';
 }): React.JSX.Element {
   return (
     <div className="rounded-xl border bg-muted/20 p-4">
@@ -601,16 +578,16 @@ function SummaryCard({
         {icon}
       </div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-semibold">{value}</p>
+      <p className="mt-1 font-semibold">{valueDirection ? <span dir={valueDirection} className="inline-block tabular-nums">{value}</span> : value}</p>
     </div>
   );
 }
 
-function MiniValue({ label, value }: { label: string; value: string }): React.JSX.Element {
+function MiniValue({ label, value, valueDirection }: { label: string; value: string; valueDirection?: 'ltr' }): React.JSX.Element {
   return (
     <div className="rounded-xl border bg-muted/20 p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-medium">{value}</p>
+      <p className="mt-1 font-medium">{valueDirection ? <span dir={valueDirection} className="inline-block tabular-nums">{value}</span> : value}</p>
     </div>
   );
 }
@@ -659,7 +636,7 @@ function FinanceOrdersTable({
           orders.map((order) => (
             <TableRow key={order.orderId}>
               <TableCell className="text-start"><span dir="ltr" className="inline-block font-mono text-xs tabular-nums">#{order.orderId.slice(-3)}</span></TableCell>
-              <TableCell>{dateTime(order.deliveredAt)}</TableCell>
+              <TableCell><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{dateTime(order.deliveredAt)}</span></TableCell>
               <TableCell>{paymentWayLabel(order.paymentWay, t)}</TableCell>
               <TableCell>{money(order.itemsTotal)}</TableCell>
               <TableCell>{money(order.distanceBasedDeliveryFee)}</TableCell>
@@ -717,7 +694,7 @@ function TransactionsTable({
         ) : (
           transactions.map((transaction) => (
             <TableRow key={transaction.id}>
-              <TableCell>{dateTime(transaction.createdAt)}</TableCell>
+              <TableCell><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{dateTime(transaction.createdAt)}</span></TableCell>
               <TableCell>
                 <Badge variant={transaction.type === 0 ? 'success' : 'secondary'}>
                   {transaction.type === 0
