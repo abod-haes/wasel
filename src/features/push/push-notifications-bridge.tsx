@@ -25,8 +25,9 @@ export function PushNotificationsBridge(): null {
 
   useEffect(() => {
     const reset = () => {
-      // Begin revocation while the authenticated API request still has a JWT.
-      void revokeBrowserPush();
+      // Capture the JWT before the auth store synchronously clears it.
+      const authToken = useAuthStore.getState().token;
+      void revokeBrowserPush(authToken ?? undefined);
       usePushInboxStore.getState().bindUser(null);
     };
     window.addEventListener('rodo:logout', reset);
