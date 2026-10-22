@@ -60,7 +60,7 @@ export function OrdersTable({
         header: t('orders.table.order'),
         renderCell: (order: Order) => (
           <div>
-            <p className="font-medium">{order.id}</p>
+            <p className="font-medium">#{order.id.slice(-3)}</p>
             <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
           </div>
         ),
