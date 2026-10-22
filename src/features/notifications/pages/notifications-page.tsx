@@ -75,7 +75,7 @@ export default function NotificationsPage(): React.JSX.Element {
   };
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="notifications.title"
         descriptionKey="notifications.description"
