@@ -33,6 +33,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('rodo:logout'));
       clearStoredAuthSession();
 
       if (typeof window !== 'undefined') {
