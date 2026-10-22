@@ -51,7 +51,7 @@ export function OrdersTable({
   onPageChange,
   onPageSizeChange,
 }: OrdersTableProps): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const columns = useMemo(
     () => [
@@ -59,9 +59,9 @@ export function OrdersTable({
         key: 'id',
         header: t('orders.table.order'),
         renderCell: (order: Order) => (
-          <div>
-            <p className="font-medium">#{order.id.slice(-3)}</p>
-            <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+          <div dir={i18n.dir()} className="text-start">
+            <p className="font-medium"><span className="inline-block font-mono tabular-nums" dir="ltr">#{order.id.slice(-3)}</span></p>
+            <p className="text-xs text-muted-foreground"><span className="inline-block" dir="ltr">{new Date(order.createdAt).toLocaleString(i18n.language)}</span></p>
           </div>
         ),
       },
@@ -74,8 +74,8 @@ export function OrdersTable({
           return (
             <div>
               <p className="font-medium">{customerName || t('orders.unknownCustomer')}</p>
-              <p className="text-xs text-muted-foreground" dir="ltr">
-                {formatFullPhoneNumber(order.userCountryCallingCode, order.userPhoneNumber) || '-'}
+              <p className="text-xs text-muted-foreground text-start">
+                <span className="inline-block" dir="ltr">{formatFullPhoneNumber(order.userCountryCallingCode, order.userPhoneNumber) || '-'}</span>
               </p>
             </div>
           );
@@ -165,7 +165,7 @@ export function OrdersTable({
         },
       },
     ],
-    [canManage, isMutating, onAccept, onReject, t]
+    [canManage, isMutating, onAccept, onReject, t, i18n]
   );
 
   return (
