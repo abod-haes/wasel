@@ -680,6 +680,7 @@
     "fallbackName": "User"
   },
   "marketFinance": {
+    "variant": "Variant",
     "title": "Market Finance",
     "adminDescription": "Market accounts, delivered orders, and settlements",
     "marketDescription": "Your market's payable balance and transaction history",
