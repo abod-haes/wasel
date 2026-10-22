@@ -52,13 +52,19 @@ export function SidebarNav({
   }, [activeParents]);
 
   const toggleGroup = (key: string, depth: number): void => {
+    if (collapsed) {
+      // Icon-only mode: reveal the full sidebar with the selected group open.
+      setExpandedKeys(new Set([key]));
+      onExpand?.();
+      return;
+    }
+
     setExpandedKeys((previous) => {
       // Only one main section stays open: long sidebars remain easy to scan.
       const next = depth === 0 ? new Set<string>() : new Set(previous);
       if (!previous.has(key)) next.add(key);
       return next;
     });
-    if (collapsed) onExpand?.();
   };
 
   const navItemClass = (active: boolean, depth: number) =>
