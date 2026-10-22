@@ -9,7 +9,7 @@ import {
   WalletCards,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { generatePath, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { generatePath, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
 import { useTranslation } from 'react-i18next';
 
@@ -156,8 +156,25 @@ export default function DeliveryFinancePage(): React.JSX.Element {
     }
   }, [deepLinkedDeliveryId, navigate, selectedDeliveryId]);
 
+  useEffect(() => {
+    setActiveTab('orders');
+    setDetailPagination({ page: 1, pageSize: 10 });
+    setSelectedOrderId(undefined);
+    setSettleOpen(false);
+    setSettleNote('');
+  }, [selectedDeliveryId]);
+
   if (listQuery.isError && !selectedDeliveryId) {
     return <ErrorState onRetry={() => void listQuery.refetch()} />;
+  }
+
+  if (selectedDeliveryId && summaryQuery.isError) {
+    return <PageContainer>
+      <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.deliveryFinance)}>
+        {t('deliveryFinance.backToList')}
+      </Button>
+      <ErrorState onRetry={() => void summaryQuery.refetch()} />
+    </PageContainer>;
   }
 
   const selectedSummary = summaryQuery.data;
@@ -248,7 +265,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                         : undefined
                     }
                   >
-                    <TableCell className="font-medium">{delivery.deliveryPersonName}</TableCell>
+                    <TableCell className="font-medium"><Link className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40" to={generatePath(ROUTES.deliveryFinancePerson, { deliveryPersonId: delivery.deliveryPersonId })}>{delivery.deliveryPersonName}</Link></TableCell>
                     <TableCell className="text-start"><span dir="ltr" className="inline-block tabular-nums">{delivery.phoneNumber}</span></TableCell>
                     <TableCell>{delivery.deliveredOrdersCount}</TableCell>
                     <TableCell className="font-semibold">
