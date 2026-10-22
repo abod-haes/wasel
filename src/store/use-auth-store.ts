@@ -119,6 +119,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await get().refreshMe();
   },
   logout: () => {
+    // Invalidate this browser's FCM registration before removing JWT access.
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('rodo:logout'));
     // Keep data from one account from appearing when another account signs in.
     // React Query cache may contain profile, orders, financial and user records.
     clearStoredAuthSession();
