@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/date-time';
 import { Ban, KeyRound, LockOpen, Pencil, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,7 +105,7 @@ export function UsersTable({
         className: 'min-w-[150px]',
         renderCell: (user: User) => (
           <span className="whitespace-nowrap text-sm tabular-nums text-muted-foreground">
-            {new Date(user.lastLogin).toLocaleDateString()}
+            <span dir="ltr" className="inline-block">{formatDate(user.lastLogin)}</span>
           </span>
         ),
       },
