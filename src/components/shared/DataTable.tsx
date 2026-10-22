@@ -43,8 +43,8 @@ export function DataTable<TData>({
   const pageSizeOptions = ['10', '20', '50', '100'];
   const isRtl = i18n.dir() === 'rtl';
 
-  const startItem = pagination ? (pagination.page - 1) * pagination.pageSize + 1 : 0;
-  const endItem = pagination ? startItem + safeData.length - 1 : 0;
+  const startItem = pagination && safeData.length > 0 ? (pagination.page - 1) * pagination.pageSize + 1 : 0;
+  const endItem = pagination && safeData.length > 0 ? startItem + safeData.length - 1 : 0;
   const pageNumbers = pagination
     ? (() => {
         const pages = new Set<number>([1, pagination.totalPages, pagination.page - 1, pagination.page, pagination.page + 1]);
