@@ -43,22 +43,6 @@ export function DataTable<TData>({
   const pageSizeOptions = ['10', '20', '50', '100'];
   const isRtl = i18n.dir() === 'rtl';
 
-  if (isLoading) {
-    return (
-      <div role="status" aria-label={t('common.loading')} className="rounded-xl border bg-card">
-        <div className="space-y-3 p-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      </div>
-    );
-  }
-
-  if (safeData.length === 0) {
-    return <EmptyState titleKey={emptyTitleKey} descriptionKey={emptyDescriptionKey} />;
-  }
-
   const startItem = pagination ? (pagination.page - 1) * pagination.pageSize + 1 : 0;
   const endItem = pagination ? startItem + safeData.length - 1 : 0;
   const pageNumbers = pagination
@@ -71,8 +55,25 @@ export function DataTable<TData>({
     : [];
 
   return (
-    <div dir={i18n.dir()} className="min-w-0 overflow-hidden rounded-xl border border-border/75 bg-card">
-      <Table dir={i18n.dir()} className="min-w-[640px]">
+    <div dir={i18n.dir()} className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/75 bg-card">
+      <div className="min-h-0 flex-1 overflow-hidden" aria-busy={isLoading}>
+        {isLoading ? (
+          <div role="status" aria-label={t('common.loading')} className="flex h-full flex-col gap-3 overflow-hidden p-4">
+            <Skeleton className="h-10 shrink-0 w-full" />
+            <Skeleton className="h-10 shrink-0 w-full" />
+            <Skeleton className="h-10 shrink-0 w-full" />
+          </div>
+        ) : safeData.length === 0 ? (
+          <div className="flex h-full min-h-[160px] items-center justify-center overflow-auto p-4">
+            <EmptyState titleKey={emptyTitleKey} descriptionKey={emptyDescriptionKey} />
+          </div>
+        ) : (
+          <Table
+            dir={i18n.dir()}
+            stickyHeader
+            containerClassName="h-full min-h-0 w-full overscroll-contain overflow-auto"
+            className="min-w-[640px]"
+          >
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
@@ -93,10 +94,12 @@ export function DataTable<TData>({
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+          </Table>
+        )}
+      </div>
 
       {pagination ? (
-        <div className="flex flex-col gap-3 border-t border-border/70 bg-card px-3 py-3 md:flex-row md:items-center md:justify-between sm:px-4">
+        <div className="z-10 flex shrink-0 flex-col gap-3 border-t border-border/70 bg-card px-3 py-3 shadow-[0_-5px_18px_-14px_hsl(var(--foreground)/0.35)] md:flex-row md:items-center md:justify-between sm:px-4">
           <div className={cn('text-sm text-muted-foreground', isRtl ? 'text-right' : 'text-left')}>
             {t('common.pagination.summary', {
               from: startItem,
