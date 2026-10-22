@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import { useMemo, useState } from 'react';
 import { BadgePercent, CalendarRange, Pencil, Plus, Tag, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -102,12 +103,6 @@ const formatMoney = (value: number): string =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
-
-const formatDate = (value: string): string =>
-  new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
 
 export function ProductOffersManager({
   product,
@@ -288,8 +283,8 @@ export function ProductOffersManager({
                     {formatMoney(offer.finalBasePrice)} USD
                   </td>
                   <td className="px-4 py-3">{formatMoney(offer.savingsBasePrice)} USD</td>
-                  <td className="px-4 py-3 whitespace-nowrap">{formatDate(offer.startsAt)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">{formatDate(offer.endsAt)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap"><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{formatDateTime(offer.startsAt)}</span></td>
+                  <td className="px-4 py-3 whitespace-nowrap"><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{formatDateTime(offer.endsAt)}</span></td>
                   <td className="px-4 py-3">
                     <Badge variant={statusVariant(offer.status)}>{statusLabel[offer.status]}</Badge>
                   </td>
