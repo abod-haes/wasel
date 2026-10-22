@@ -1,0 +1,185 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
+
+import { marketFinanceApi } from '@/features/market-finance/api/market-finance-api';
+import type { MarketFinanceOrder, MarketPayableTransaction } from '@/features/market-finance/types/market-finance-types';
+import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
+import { useAuthStore } from '@/store/use-auth-store';
+import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@/components/ui';
+
+const currency = (amount: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(amount);
+const date = (value?: string | null) => value ? new Date(value).toLocaleString() : '—';
+const shortOrder = (id: string) => `#${id.slice(-3)}`;
+const errorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const message: unknown = error.response?.data?.message;
+    if (typeof message === 'string' && message.trim()) return message;
+  }
+  return error instanceof Error ? error.message : 'تعذّر تحميل البيانات';
+};
+const pageParams = (page: number) => ({ page, pageSize: 20 });
+const financeKey = ['market-finance'] as const;
+
+function Pagination({ page, totalCount, onChange }: { page: number; totalCount: number; onChange: (page: number) => void }) {
+  const lastPage = Math.max(1, Math.ceil(totalCount / 20));
+  return <div className="flex items-center justify-between gap-3 pt-3">
+    <span className="text-sm text-muted-foreground">صفحة {page} من {lastPage}</span>
+    <div className="flex gap-2">
+      <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => onChange(page - 1)}>السابق</Button>
+      <Button size="sm" variant="outline" disabled={page >= lastPage} onClick={() => onChange(page + 1)}>التالي</Button>
+    </div>
+  </div>;
+}
+
+export default function MarketFinancePage(): React.JSX.Element {
+  const user = useAuthStore((state) => state.user);
+  const admin = isAdminRole(user?.roles ?? []);
+  const allowed = admin || isMarketRole(user?.roles ?? []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedId = admin ? (searchParams.get('marketUserId') ?? '') : '';
+  const [marketPage, setMarketPage] = useState(1);
+  const [orderPage, setOrderPage] = useState(1);
+  const [transactionPage, setTransactionPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<'orders' | 'transactions'>('orders');
+  const [orderId, setOrderId] = useState('');
+  const [confirmSettlement, setConfirmSettlement] = useState(false);
+  const [note, setNote] = useState('');
+  const queryClient = useQueryClient();
+
+  const markets = useQuery({
+    queryKey: [...financeKey, 'markets', marketPage],
+    queryFn: () => marketFinanceApi.listMarkets(pageParams(marketPage)),
+    enabled: admin,
+  });
+  const summary = useQuery({
+    queryKey: [...financeKey, admin ? 'admin-summary' : 'own-summary', selectedId],
+    queryFn: () => admin ? marketFinanceApi.getMarket(selectedId) : marketFinanceApi.getMine(),
+    enabled: allowed && (!admin || Boolean(selectedId)),
+  });
+  const orders = useQuery({
+    queryKey: [...financeKey, 'orders', admin ? selectedId : 'me', orderPage],
+    queryFn: () => admin ? marketFinanceApi.getMarketOrders(selectedId, pageParams(orderPage)) : marketFinanceApi.getMyOrders(pageParams(orderPage)),
+    enabled: allowed && (!admin || Boolean(selectedId)),
+  });
+  const transactions = useQuery({
+    queryKey: [...financeKey, 'transactions', admin ? selectedId : 'me', transactionPage],
+    queryFn: () => admin ? marketFinanceApi.getMarketTransactions(selectedId, pageParams(transactionPage)) : marketFinanceApi.getMyTransactions(pageParams(transactionPage)),
+    enabled: allowed && (!admin || Boolean(selectedId)),
+  });
+  const detail = useQuery({
+    queryKey: [...financeKey, 'order', admin ? selectedId : 'me', orderId],
+    queryFn: () => admin ? marketFinanceApi.getMarketOrder(selectedId, orderId) : marketFinanceApi.getMyOrder(orderId),
+    enabled: allowed && Boolean(orderId) && (!admin || Boolean(selectedId)),
+  });
+  const settlement = useMutation({
+    mutationFn: () => marketFinanceApi.settleMarket(selectedId, note),
+    onSuccess: async (receipt) => {
+      setConfirmSettlement(false);
+      setNote('');
+      toast.success(`تم تسجيل تسوية ${currency(receipt.settledAmount)}؛ رقم العملية ${receipt.transactionId}`);
+      await queryClient.invalidateQueries({ queryKey: financeKey });
+    },
+    onError: async (error) => {
+      toast.error(errorMessage(error));
+      await queryClient.invalidateQueries({ queryKey: financeKey });
+    },
+  });
+  const chooseMarket = (id: string) => {
+    setSearchParams(id ? { marketUserId: id } : {});
+    setOrderPage(1);
+    setTransactionPage(1);
+    setOrderId('');
+    setConfirmSettlement(false);
+  };
+  const failed = (error: unknown, refetch: () => unknown) => <div className="rounded-xl border border-destructive/30 p-4 text-sm text-destructive">
+    <p>{errorMessage(error)}</p>
+    <Button className="mt-3" size="sm" variant="outline" onClick={() => void refetch()}>إعادة المحاولة</Button>
+  </div>;
+
+  if (!allowed) return <div className="p-6">ليس لديك صلاحية لعرض مالية المحلات.</div>;
+
+  return <div className="space-y-5 p-4 md:p-6" dir="rtl">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div><h1 className="text-2xl font-bold">مالية المحلات</h1><p className="text-sm text-muted-foreground">{admin ? 'حسابات المحلات والتسويات المالية' : 'مستحقات محلك لدى الإدارة وسجل المدفوعات'}</p></div>
+      <Button variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}>تحديث البيانات</Button>
+    </div>
+    {admin && <Card>
+      <CardHeader><CardTitle>اختر المحل</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        {markets.isPending ? <p>جاري تحميل المحلات...</p> : markets.isError ? failed(markets.error, markets.refetch) : <>
+          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} onClick={() => chooseMarket(market.marketUserId)} className={`rounded-xl border p-3 text-right transition-colors hover:bg-muted ${selectedId === market.marketUserId ? 'border-primary bg-primary/5' : ''}`}>
+              <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground" dir="ltr">{market.phoneNumber ?? '—'}</p>
+              <p className="mt-2 font-semibold">{currency(market.currentAmountDue)} <span className="text-xs font-normal">مستحق</span></p>
+            </button>)}
+          </div>
+          {!markets.data?.items.length && <p className="text-muted-foreground">لا توجد محلات لعرضها.</p>}
+          <Pagination page={marketPage} totalCount={markets.data?.totalCount ?? 0} onChange={setMarketPage} />
+        </>}
+      </CardContent>
+    </Card>}
+    {(!admin || selectedId) && <>
+      {summary.isPending ? <p>جاري تحميل ملخص الحساب...</p> : summary.isError ? failed(summary.error, summary.refetch) : summary.data && <>
+        <div className="grid gap-3 md:grid-cols-3">
+          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">المبلغ المستحق للمحل من الإدارة</p><p className="mt-2 text-2xl font-bold">{currency(summary.data.currentAmountDue)}</p><p className="text-xs text-muted-foreground">وفق رصيد دفتر الحسابات في السيرفر</p></CardContent></Card>
+          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">الطلبات المسلّمة</p><p className="mt-2 text-2xl font-bold">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
+          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">آخر تسوية</p><p className="mt-2 font-semibold">{date(summary.data.lastSettlementAt)}</p></CardContent></Card>
+        </div>
+        {admin && <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">المحل: {summary.data.marketName}</p>
+          <Button disabled={summary.data.currentAmountDue <= 0 || settlement.isPending} onClick={() => setConfirmSettlement(true)}>تسوية كامل المستحق</Button>
+        </div>}
+      </>}
+      <div className="flex gap-2">
+        <Button variant={activeTab === 'orders' ? 'default' : 'outline'} onClick={() => setActiveTab('orders')}>الطلبات المسلّمة</Button>
+        <Button variant={activeTab === 'transactions' ? 'default' : 'outline'} onClick={() => setActiveTab('transactions')}>سجل الحركات</Button>
+      </div>
+      {activeTab === 'orders' ? <Card><CardContent className="space-y-3 p-4">
+        {orders.isPending ? <p>جاري تحميل الطلبات...</p> : orders.isError ? failed(orders.error, orders.refetch) : <>
+          <div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>الطلب</TableHead><TableHead>تاريخ التسليم</TableHead><TableHead>قيمة منتجات المحل</TableHead><TableHead>خصم الطلب (للعرض فقط)</TableHead><TableHead>التفاصيل</TableHead></TableRow></TableHeader><TableBody>
+            {(orders.data?.items ?? []).map((order: MarketFinanceOrder) => <TableRow key={order.orderId}>
+              <TableCell dir="ltr">{shortOrder(order.orderId)}</TableCell><TableCell>{date(order.deliveredAt)}</TableCell><TableCell>{currency(order.productsAmount)}</TableCell><TableCell>{currency(order.orderDiscountAmount)}</TableCell>
+              <TableCell><Button size="sm" variant="outline" onClick={() => setOrderId(order.orderId)}>عرض</Button></TableCell>
+            </TableRow>)}
+          </TableBody></Table></div>
+          {!orders.data?.items.length && <p className="py-4 text-center text-muted-foreground">لا توجد طلبات مسلّمة.</p>}
+          <Pagination page={orderPage} totalCount={orders.data?.totalCount ?? 0} onChange={setOrderPage} />
+        </>}
+      </CardContent></Card> : <Card><CardContent className="space-y-3 p-4">
+        {transactions.isPending ? <p>جاري تحميل الحركات...</p> : transactions.isError ? failed(transactions.error, transactions.refetch) : <>
+          <div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>الطلب</TableHead><TableHead>ملاحظة</TableHead></TableRow></TableHeader><TableBody>
+            {(transactions.data?.items ?? []).map((item: MarketPayableTransaction) => <TableRow key={item.id}>
+              <TableCell>{date(item.createdAt)}</TableCell><TableCell>{item.type === 0 ? 'استحقاق +' : 'تسوية −'}</TableCell><TableCell>{currency(item.amount)}</TableCell><TableCell dir="ltr">{item.orderId ? shortOrder(item.orderId) : '—'}</TableCell><TableCell>{item.note ?? '—'}</TableCell>
+            </TableRow>)}
+          </TableBody></Table></div>
+          {!transactions.data?.items.length && <p className="py-4 text-center text-muted-foreground">لا توجد حركات مالية.</p>}
+          <Pagination page={transactionPage} totalCount={transactions.data?.totalCount ?? 0} onChange={setTransactionPage} />
+        </>}
+      </CardContent></Card>}
+    </>}
+    <Dialog open={Boolean(orderId)} onOpenChange={(open) => { if (!open) setOrderId(''); }}>
+      <DialogContent dir="rtl" className="max-w-2xl"><DialogHeader><DialogTitle>تفاصيل الطلب {orderId && shortOrder(orderId)}</DialogTitle><DialogDescription>تظهر فقط منتجات المحل المعني، دون بيانات حسابات المحلات الأخرى.</DialogDescription></DialogHeader>
+        {detail.isPending ? <p>جاري التحميل...</p> : detail.isError ? failed(detail.error, detail.refetch) : detail.data && <>
+          <p className="text-sm">تاريخ التسليم: {date(detail.data.order.deliveredAt)}</p>
+          <div className="max-h-80 overflow-auto"><Table><TableHeader><TableRow><TableHead>المنتج</TableHead><TableHead>النوع</TableHead><TableHead>الكمية</TableHead><TableHead>سعر الوحدة</TableHead><TableHead>المجموع</TableHead></TableRow></TableHeader><TableBody>
+            {detail.data.items.map((item, index) => <TableRow key={`${item.productId}-${item.variantId ?? ''}-${index}`}><TableCell>{item.productName}</TableCell><TableCell>{item.variantName ?? '—'}</TableCell><TableCell>{item.quantity}</TableCell><TableCell>{currency(item.unitPrice)}</TableCell><TableCell>{currency(item.lineTotal)}</TableCell></TableRow>)}
+          </TableBody></Table></div>
+          <p className="font-semibold">مستحق منتجات المحل: {currency(detail.data.order.productsAmount)}</p>
+          <p className="text-xs text-muted-foreground">خصم الطلب العام لا يُطرح من مستحق المحل.</p>
+        </>}
+      </DialogContent>
+    </Dialog>
+    {admin && <Dialog open={confirmSettlement} onOpenChange={(open) => { if (!settlement.isPending) setConfirmSettlement(open); }}>
+      <DialogContent dir="rtl"><DialogHeader><DialogTitle>تأكيد التسوية الكاملة</DialogTitle><DialogDescription>سيتم تسجيل دفع كامل المستحق الحالي للمحل من الإدارة. لا يمكن اختيار مبلغ جزئي. تحقّق من المبلغ قبل المتابعة.</DialogDescription></DialogHeader>
+        <p className="text-xl font-bold">{currency(summary.data?.currentAmountDue ?? 0)}</p>
+        <Textarea placeholder="ملاحظة اختيارية (500 حرف كحد أقصى)" maxLength={500} value={note} onChange={(event) => setNote(event.target.value)} />
+        <DialogFooter className="gap-2"><Button variant="outline" disabled={settlement.isPending} onClick={() => setConfirmSettlement(false)}>إلغاء</Button>
+          <Button disabled={settlement.isPending || !summary.data || summary.data.currentAmountDue <= 0} onClick={() => settlement.mutate()}>{settlement.isPending ? 'جاري تسجيل التسوية...' : 'تأكيد التسوية'}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>}
+  </div>;
+}
