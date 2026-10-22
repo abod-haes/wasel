@@ -1,4 +1,4 @@
-import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Menu, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -82,7 +82,7 @@ function SidebarInner({
 }
 
 export function DesktopSidebar(): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const isCollapsed = useUiStore((state) => state.isSidebarCollapsed);
   const toggleSidebarCollapse = useUiStore((state) => state.toggleSidebarCollapse);
@@ -101,7 +101,9 @@ export function DesktopSidebar(): React.JSX.Element {
         onClick={toggleSidebarCollapse}
         aria-label={isCollapsed ? t('layout.expand') : t('layout.collapse')}
       >
-        {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        {i18n.dir() === 'rtl'
+          ? (isCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />)
+          : (isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />)}
       </Button>
 
       <SidebarInner collapsed={isCollapsed} />
