@@ -21,6 +21,15 @@ const splitDateTime = (value: string): { date: string; time: string } => {
   };
 };
 
+/** Use the user's local calendar date (toISOString would use UTC). */
+const localToday = (): string => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 export function DateTimeField({
   value,
   onChange,
@@ -46,7 +55,7 @@ export function DateTimeField({
       return;
     }
 
-    const date = current.date || new Date().toISOString().slice(0, 10);
+    const date = current.date || localToday();
     onChange(`${date}T${time}`);
   };
 
