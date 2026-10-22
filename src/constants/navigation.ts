@@ -74,7 +74,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
           { key: 'settings-general', labelKey: 'nav.settingsGeneral', to: ROUTES.settings, icon: Settings, permission: PERMISSIONS.settingsView },
           { key: 'settings-pricing', labelKey: 'nav.settingsPricing', to: ROUTES.settingsPricing, icon: BadgeDollarSign, permission: PERMISSIONS.settingsView },
           { key: 'settings-preferences', labelKey: 'nav.settingsPreferences', to: ROUTES.settingsPreferences, icon: SlidersHorizontal, permission: PERMISSIONS.settingsView },
-          { key: 'product-image-stats', labelKey: 'إحصائيات صور المنتجات', to: ROUTES.productImageStats, icon: Images, permission: PERMISSIONS.settingsView },
+          { key: 'product-image-stats', labelKey: 'nav.productImageStats', to: ROUTES.productImageStats, icon: Images, permission: PERMISSIONS.settingsView },
           { key: 'app-versions', labelKey: 'nav.appVersions', to: ROUTES.appVersions, icon: Smartphone, permission: PERMISSIONS.settingsEdit },
         ],
       },
