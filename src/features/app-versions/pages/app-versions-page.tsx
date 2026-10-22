@@ -477,32 +477,3 @@ export default function AppVersionsPage(): React.JSX.Element {
     </PageContainer>
   );
 }
-}</dd></div>
-                  {selected.createdAt ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
-                      <dd className="text-start" dir="ltr">{new Date(selected.createdAt).toLocaleString('ar-SY')}</dd>
-                    </div>
-                  ) : null}
-                </dl>
-              ) : (
-                <p className="text-sm leading-6 text-muted-foreground">
-                  ما تم اختيار نسخة بعد. رح تظهر بيانات النسخة هون بعد إنشائها أو جلبها من السيرفر.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <div className="flex items-start gap-3 rounded-2xl border border-brand-border bg-brand-primary-soft/40 p-4 text-sm leading-6 dark:bg-primary/10">
-            <Info className="mt-1 h-5 w-5 shrink-0 text-primary" />
-            <div>
-              الإصدارات تستخدم نفس السيرفر المتصل بالداشبورد؛ ما في Backend منفصل إلها.
-              الـ API المتاح حالياً يدعم إنشاء إصدار، جلبه برقم النسخة وتعديله فقط.
-              عرض جميع الإصدارات أو حذف إصدار يحتاج Endpoint من الباك.
-            </div>
-          </div>
-        </div>
-      </div>
-    </PageContainer>
-  );
-}
