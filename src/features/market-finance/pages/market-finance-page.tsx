@@ -185,5 +185,5 @@ export default function MarketFinancePage(): React.JSX.Element {
         </DialogFooter>
       </DialogContent>
     </Dialog>}
-  </div>;
+  </PageContainer>;
 }
