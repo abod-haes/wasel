@@ -9,13 +9,13 @@ export function AppLayout(): React.JSX.Element {
   const isCollapsed = useUiStore((state) => state.isSidebarCollapsed);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <DesktopSidebar />
       <MobileSidebar />
 
       <div className={cn('transition-all duration-200 lg:ps-72', isCollapsed && 'lg:ps-20')}>
         <AppHeader />
-        <main className="pb-8">
+        <main className="min-w-0 pb-8">
           <Outlet />
         </main>
       </div>
