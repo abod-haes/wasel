@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { env } from '@/env';
+import { queryClient } from '@/lib/query-client';
 import { authApi } from '@/services/auth/auth-api';
 import {
   clearStoredAuthSession,
@@ -78,6 +79,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     const refreshedUser = await authApi.getMe(token);
+
+    // Ignore an old /me response after logout or a different user's login.
+    // An in-flight response must never restore the previous session.
+    if (get().token !== token || !get().isAuthenticated) return;
+
     const session: AuthSession = {
       token,
       expiresAt,
@@ -113,7 +119,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await get().refreshMe();
   },
   logout: () => {
+    // Keep data from one account from appearing when another account signs in.
+    // React Query cache may contain profile, orders, financial and user records.
     clearStoredAuthSession();
+    queryClient.clear();
     set({ ...anonymousSnapshot });
   },
   checkAuth: () => {
@@ -121,10 +130,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const isSessionValid = isAuthSessionValid(storedSession);
 
     if (!isSessionValid) {
-      clearStoredAuthSession();
-
       if (get().isAuthenticated) {
-        set({ ...anonymousSnapshot });
+        get().logout();
+      } else {
+        clearStoredAuthSession();
+        queryClient.clear();
       }
 
       return false;
