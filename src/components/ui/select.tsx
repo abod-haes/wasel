@@ -97,7 +97,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'group flex h-12 w-full min-w-0 items-center justify-between gap-3 rounded-[16px] border border-brand-border bg-card px-4 text-start text-sm font-medium text-foreground shadow-[inset_0_1px_0_hsl(var(--background)/0.45)] outline-none transition-[border-color,box-shadow,background-color] duration-200 data-[placeholder]:text-muted-foreground hover:border-border hover:bg-muted/50 focus:border-primary/50 focus:bg-card focus:ring-4 focus:ring-primary/10 data-[state=open]:border-primary/50 data-[state=open]:bg-card data-[state=open]:ring-4 data-[state=open]:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50',
+      'group flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-input bg-background px-3 text-start text-sm text-foreground outline-none transition-colors data-[placeholder]:text-muted-foreground hover:border-primary/30 focus-visible:border-primary/55 focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary/55 data-[state=open]:ring-2 data-[state=open]:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
       className
     )}
     {...props}
@@ -219,7 +219,7 @@ const SelectContent = React.forwardRef<
           position={position}
           sideOffset={sideOffset}
           className={cn(
-            'relative z-[100] flex max-h-80 min-w-[8rem] flex-col overflow-hidden rounded-2xl border border-brand-border bg-popover/98 text-popover-foreground shadow-[0_20px_55px_-22px_hsl(var(--foreground)/0.45)] backdrop-blur-xl',
+            'relative z-[100] flex max-h-80 min-w-[8rem] flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg',
             position === 'popper' && 'w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-0 data-[side=top]:-translate-y-0',
             className
           )}
@@ -238,7 +238,7 @@ const SelectContent = React.forwardRef<
                 placeholder={searchPlaceholder}
                 autoComplete="off"
                 spellCheck={false}
-                className="h-9 w-full min-w-0 rounded-xl border border-border bg-background px-3 pe-10 text-start text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
+                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-3 pe-10 text-start text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
               />
             </div>
           ) : null}
@@ -286,7 +286,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex min-h-10 w-full cursor-pointer select-none items-center rounded-xl py-2.5 ps-9 pe-3 text-start text-sm font-medium outline-none transition-colors data-[highlighted]:bg-brand-primary-soft data-[highlighted]:text-foreground data-[state=checked]:bg-brand-primary-soft data-[state=checked]:text-brand-primary-dark dark:data-[state=checked]:bg-primary/20 dark:data-[state=checked]:text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
+        'relative flex min-h-9 w-full cursor-pointer select-none items-center rounded-md py-2 ps-9 pe-3 text-start text-sm outline-none transition-colors data-[highlighted]:bg-accent data-[highlighted]:text-foreground data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
         className
       )}
       {...props}
