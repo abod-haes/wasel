@@ -16,6 +16,7 @@ export const ORDER_STATUS_VALUES = {
 export interface OrderItem {
   productId: string;
   productName: string;
+  marketUserId?: string | null;
   productImagePath?: string;
   productThumbnailPath?: string | null;
   variantId?: string;
@@ -57,6 +58,7 @@ export interface Order {
   discountScope?: 'ProductsOnly' | 'DeliveryOnly' | 'EntireOrder';
   discountValue?: number;
   marketStops?: MarketStop[];
+  marketUserIds?: string[];
   journeyPrice?: number;
   pricePerKilometer?: number;
   distanceKm?: number;
