@@ -73,7 +73,9 @@
     "myOrders": "طلباتي",
     "deliveryFinance": "مالية المندوبين",
     "marketFinance": "مالية المحلات",
-    "discountCodes": "أكواد الخصم"
+    "discountCodes": "أكواد الخصم",
+    "appVersions": "إصدارات التطبيق",
+    "productImageStats": "إحصائيات صور المنتجات"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
@@ -720,7 +722,6 @@
     "scopedItems": "تظهر منتجات هذا المحل فقط، دون حسابات المحلات الأخرى.",
     "loading": "جارٍ التحميل...",
     "product": "المنتج",
-    "variant": "النوع",
     "quantity": "الكمية",
     "unitPrice": "سعر الوحدة",
     "total": "المجموع",
