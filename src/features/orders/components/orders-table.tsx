@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import { Check, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +62,7 @@ export function OrdersTable({
         renderCell: (order: Order) => (
           <div dir={i18n.dir()} className="text-start">
             <p className="font-medium"><span className="inline-block font-mono tabular-nums" dir="ltr">#{order.id.slice(-3)}</span></p>
-            <p className="text-xs text-muted-foreground"><span className="inline-block" dir="ltr">{new Date(order.createdAt).toLocaleString(i18n.language)}</span></p>
+            <p className="text-xs text-muted-foreground"><span className="inline-block" dir="ltr">{formatDateTime(order.createdAt)}</span></p>
           </div>
         ),
       },
