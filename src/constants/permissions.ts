@@ -13,6 +13,7 @@ export const PERMISSIONS = {
   notificationsView: 'notifications:view',
   notificationsSend: 'notifications:send',
   otpAdminView: 'otp-admin:view',
+  marketFinanceView: 'market-finance:view',
   settingsView: 'settings:view',
   settingsEdit: 'settings:edit',
 } as const;
