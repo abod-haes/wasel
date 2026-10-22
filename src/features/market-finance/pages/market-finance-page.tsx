@@ -34,7 +34,7 @@ function Pagination({ page, totalCount, onChange }: { page: number; totalCount: 
       <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => onChange(page - 1)}>السابق</Button>
       <Button size="sm" variant="outline" disabled={page >= lastPage} onClick={() => onChange(page + 1)}>التالي</Button>
     </div>
-  </PageContainer>;
+  </div>;
 }
 
 export default function MarketFinancePage(): React.JSX.Element {
