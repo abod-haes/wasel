@@ -15,10 +15,10 @@ export function EmptyState({
   const { t } = useTranslation();
 
   return (
-    <Card className="border-dashed">
-      <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <div className="rounded-2xl bg-brand-primary-soft p-4 dark:bg-primary/15">
-          <Inbox className="h-6 w-6 text-brand-primary-dark dark:text-primary" />
+    <Card className="border-dashed bg-card/70">
+      <CardContent className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+        <div className="rounded-lg bg-primary/10 p-3">
+          <Inbox className="h-6 w-6 text-primary" />
         </div>
         <p className="text-base font-semibold">{t(titleKey)}</p>
         <p className="max-w-md text-sm text-muted-foreground">{t(descriptionKey)}</p>
