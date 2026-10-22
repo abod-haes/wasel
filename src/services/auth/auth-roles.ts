@@ -72,6 +72,7 @@ export const getPermissionsForRoles = (roles: string[]): Permission[] => {
       PERMISSIONS.dashboardView,
       PERMISSIONS.productsView,
       PERMISSIONS.ordersView,
+      PERMISSIONS.marketFinanceView,
     ];
   }
 
