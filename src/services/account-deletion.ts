@@ -76,7 +76,8 @@ export async function deleteAccountViaWeb(input: WebAccountDeletionCredentials):
   }
 
   const deletionBody = await parseResponseBody(response);
-  if (!response.ok || failedResponse(deletionBody)) {
-    throw new Error('السيرفر لم يؤكد حذف الحساب. تواصل مع الدعم إذا استمرت المشكلة.');
+  if (response.status !== 204) {
+    const message = deletionBody && typeof deletionBody === 'object' && 'message' in deletionBody && typeof deletionBody.message === 'string' ? deletionBody.message : 'السيرفر لم يؤكد حذف الحساب. تواصل مع الدعم إذا استمرت المشكلة.';
+    throw new Error(message);
   }
 }
