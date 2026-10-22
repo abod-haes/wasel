@@ -16,13 +16,13 @@ export function KpiCard({ labelKey, value, delta }: KpiCardProps): React.JSX.Ele
   const isPositive = delta >= 0;
 
   return (
-    <Card className="surface-grid relative overflow-hidden border-brand-border bg-card">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-l from-brand-primary via-brand-royal to-brand-secondary" />
-      <CardHeader className="pb-2 pt-7">
+    <Card className="relative overflow-hidden">
+      <div aria-hidden="true" className="absolute inset-y-4 start-0 w-0.5 rounded-full bg-primary" />
+      <CardHeader className="pb-1">
         <CardTitle className="text-sm font-medium text-muted-foreground">{t(labelKey)}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-brand-primary-dark dark:text-primary">{formatNumber(value)}</div>
+        <div className="text-2xl font-bold tabular-nums text-foreground">{formatNumber(value)}</div>
         <p className={isPositive ? 'mt-1 flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-300' : 'mt-1 flex items-center gap-1 text-xs text-red-600 dark:text-red-300'}>
           {isPositive ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
           {formatPercent(delta)}
