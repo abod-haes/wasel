@@ -24,7 +24,7 @@
   --border: 220 36.6% 92%;
   --input: 220 36.6% 92%;
   --ring: 224.6 72.4% 28.4%;
-  --radius: 1.25rem;
+  --radius: 0.75rem;
 }
 
 .dark {
@@ -65,9 +65,7 @@
     @apply bg-background text-foreground;
     font-family: 'Tajawal', 'Noto Sans Arabic', 'Manrope', sans-serif;
     text-align: start;
-    background-image:
-      radial-gradient(circle at 16% 16%, hsl(var(--primary) / 0.045), transparent 30%),
-      radial-gradient(circle at 84% 4%, hsl(var(--secondary) / 0.075), transparent 32%);
+    background-image: none;
   }
 
   input,
