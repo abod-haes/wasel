@@ -2,11 +2,29 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(({ className, ...props }, ref) => (
-  <div className="w-full overflow-auto">
-    <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-  </div>
-));
+type TableProps = React.HTMLAttributes<HTMLTableElement> & {
+  /** Independent scrolling area; keep filters and pagination outside this container. */
+  containerClassName?: string;
+  /** Keep column titles visible when the table rows scroll vertically. */
+  stickyHeader?: boolean;
+};
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassName, stickyHeader = false, ...props }, ref) => (
+    <div className={cn('w-full min-w-0 overflow-auto', containerClassName)}>
+      <table
+        ref={ref}
+        className={cn(
+          'w-full caption-bottom text-sm',
+          stickyHeader &&
+            '[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-10 [&_thead_th]:bg-muted [&_thead_th]:shadow-[inset_0_-1px_0_hsl(var(--border))]',
+          className,
+        )}
+        {...props}
+      />
+    </div>
+  ),
+);
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
