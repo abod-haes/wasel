@@ -75,7 +75,7 @@ export default function CategoriesPage(): React.JSX.Element {
   const isMutating = isSubmitting || deleteCategoryMutation.isPending;
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader titleKey="categories.title" descriptionKey="categories.description" actions={
         <Button onClick={openCreateDialog} className="gap-2"><Plus className="h-4 w-4" />{t('categories.createCategory')}</Button>
       } />
