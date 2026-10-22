@@ -78,7 +78,7 @@ function Pager({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-end gap-2 border-t pt-4">
+    <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border/70 bg-card pt-4">
       <Button
         variant="outline"
         size="sm"
@@ -229,7 +229,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
           <CardTitle>{t('deliveryFinance.deliveryList')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Table dir={i18n.dir()}>
+          <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain">
             <TableHeader>
               <TableRow>
                 <TableHead>{t('deliveryFinance.delivery')}</TableHead>
@@ -525,7 +525,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                 />
               </div>
 
-              <Table dir={i18n.dir()}>
+              <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain">
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('deliveryFinance.product')}</TableHead>
@@ -627,7 +627,7 @@ function FinanceOrdersTable({
   const { t, i18n } = useTranslation();
 
   return (
-    <Table dir={i18n.dir()}>
+    <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain">
       <TableHeader>
         <TableRow>
           <TableHead>{t('deliveryFinance.order')}</TableHead>
@@ -690,7 +690,7 @@ function TransactionsTable({
   const { t, i18n } = useTranslation();
 
   return (
-    <Table dir={i18n.dir()}>
+    <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain">
       <TableHeader>
         <TableRow>
           <TableHead>{t('deliveryFinance.date')}</TableHead>
