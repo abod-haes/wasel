@@ -16,6 +16,7 @@ export const ROUTES = {
   orders: '/orders',
   discountCodes: '/discount-codes',
   deliveryFinance: '/delivery-finance',
+  marketFinance: '/market-finance',
   notifications: '/notifications',
   otpAdmin: '/otp-whatsapp',
   settings: '/settings',
