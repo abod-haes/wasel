@@ -1,6 +1,7 @@
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { ConfirmDialog, ErrorState, PageContainer, SectionHeader } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui';
@@ -23,6 +24,14 @@ const defaultFilters: OrdersFilter = {
 
 export default function OrdersPage(): React.JSX.Element {
   const currentUser = useAuthStore((state) => state.user);
+  const [searchParams] = useSearchParams();
+  const notificationOrderId = searchParams.get('search') ?? '';
+  useEffect(() => {
+    const safeSearch = notificationOrderId.trim().slice(0, 128);
+    if (!safeSearch) return;
+    setFilters((current) => current.search === safeSearch ? current : { ...current, search: safeSearch });
+    setPagination((current) => current.page === 1 ? current : { ...current, page: 1 });
+  }, [notificationOrderId]);
   const isMarket = isMarketRole(currentUser?.roles ?? []) && !isAdminRole(currentUser?.roles ?? []);
   const [filters, setFilters] = useState<OrdersFilter>(defaultFilters);
   const [pagination, setPagination] = useState<PaginationParams>({ page: 1, pageSize: 10 });
