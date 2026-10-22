@@ -106,17 +106,17 @@ export default function MarketFinancePage(): React.JSX.Element {
 
   if (!allowed) return <div className="p-6">{t('marketFinance.noPermission')}</div>;
 
-  return <PageContainer className="space-y-5" >
+  return <PageContainer className="space-y-5">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="space-y-1"><p className="text-xs font-semibold text-primary">RODO / FINANCE</p><h1 className="text-xl font-bold tracking-tight sm:text-2xl">{t('marketFinance.title')}</h1><p className="text-sm text-muted-foreground">{admin ? t('marketFinance.adminDescription') : t('marketFinance.marketDescription')}</p></div>
-      <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}><RefreshCw className="me-2 h-4 w-4" /> تحديث البيانات</Button>
+      <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}><RefreshCw className="h-4 w-4" /> {t('marketFinance.refresh')}</Button>
     </div>
     {admin && <Card>
-      <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-4 w-4 text-primary" /> اختر المحل</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-4 w-4 text-primary" /> {t('marketFinance.selectMarket')}</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         {markets.isPending ? <p>{t('marketFinance.loadingMarkets')}</p> : markets.isError ? failed(markets.error, markets.refetch) : <>
-          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-            {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} onClick={() => chooseMarket(market.marketUserId)} className={`rounded-lg border p-3 text-start transition-colors hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${selectedId === market.marketUserId ? 'border-primary bg-primary/5' : 'border-border/70'}`}>
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3" role="group" aria-label={t('marketFinance.selectMarket')}>
+            {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} aria-pressed={selectedId === market.marketUserId} onClick={() => chooseMarket(market.marketUserId)} className={`rounded-lg border p-3 text-start transition-colors hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${selectedId === market.marketUserId ? 'border-primary bg-primary/5' : 'border-border/70'}`}>
               <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground" dir="ltr">{market.phoneNumber ?? '—'}</p>
               <p className="mt-2 font-semibold tabular-nums">{currency(market.currentAmountDue)} <span className="text-xs font-normal">{t('marketFinance.dueShort')}</span></p>
             </button>)}
@@ -130,7 +130,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       {summary.isPending ? <p>{t('marketFinance.loadingSummary')}</p> : summary.isError ? failed(summary.error, summary.refetch) : summary.data && <>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <Card><CardContent className="space-y-2 p-4 sm:p-5"><Wallet className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.amountDue')}</p><p className="mt-2 text-2xl font-bold tabular-nums">{currency(summary.data.currentAmountDue)}</p><p className="text-xs text-muted-foreground">{t('marketFinance.serverBalance')}</p></CardContent></Card>
-          <Card><CardContent className="space-y-2 p-4 sm:p-5"><CheckCircle2 className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.deliveredOrders')}</p><p className="mt-2 text-2xl font-bold">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
+          <Card><CardContent className="space-y-2 p-4 sm:p-5"><CheckCircle2 className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.deliveredOrders')}</p><p className="mt-2 text-2xl font-bold tabular-nums">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
           <Card><CardContent className="space-y-2 p-4 sm:p-5"><ArrowDownLeft className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.lastSettlement')}</p><p className="mt-2 font-semibold">{date(summary.data.lastSettlementAt)}</p></CardContent></Card>
         </div>
         {admin && <div className="flex flex-wrap items-center justify-between gap-3">
@@ -138,9 +138,9 @@ export default function MarketFinancePage(): React.JSX.Element {
           <Button disabled={summary.data.currentAmountDue <= 0 || settlement.isPending} onClick={() => setConfirmSettlement(true)}>{t('marketFinance.settleAll')}</Button>
         </div>}
       </>}
-      <div className="flex gap-2">
-        <Button variant={activeTab === 'orders' ? 'default' : 'outline'} onClick={() => setActiveTab('orders')}>{t('marketFinance.deliveredOrders')}</Button>
-        <Button size="sm" variant={activeTab === 'transactions' ? 'default' : 'outline'} onClick={() => setActiveTab('transactions')}>{t('marketFinance.transactionsTab')}</Button>
+      <div role="tablist" aria-label={t('marketFinance.title')} className="flex flex-wrap gap-2 border-b border-border/70 pb-3">
+        <Button role="tab" aria-selected={activeTab === 'orders'} size="sm" variant={activeTab === 'orders' ? 'default' : 'outline'} onClick={() => setActiveTab('orders')}>{t('marketFinance.deliveredOrders')}</Button>
+        <Button role="tab" aria-selected={activeTab === 'transactions'} size="sm" variant={activeTab === 'transactions' ? 'default' : 'outline'} onClick={() => setActiveTab('transactions')}>{t('marketFinance.transactionsTab')}</Button>
       </div>
       {activeTab === 'orders' ? <Card><CardContent className="space-y-3 p-3 sm:p-4">
         {orders.isPending ? <p>{t('marketFinance.loadingOrders')}</p> : orders.isError ? failed(orders.error, orders.refetch) : <>
@@ -169,7 +169,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       <DialogContent dir={i18n.dir()} className="max-w-2xl"><DialogHeader><DialogTitle>{t('marketFinance.orderDetailsTitle', { order: shortOrder(orderId) })}</DialogTitle><DialogDescription>{t('marketFinance.scopedItems')}</DialogDescription></DialogHeader>
         {detail.isPending ? <p>{t('marketFinance.loading')}</p> : detail.isError ? failed(detail.error, detail.refetch) : detail.data && <>
           <p className="text-sm">{t('marketFinance.deliveredAt')}: {date(detail.data.order.deliveredAt)}</p>
-          <div className="max-h-80 overflow-auto"><Table><TableHeader><TableRow><TableHead>{t('marketFinance.product')}</TableHead><TableHead>{t('marketFinance.transactionType')}</TableHead><TableHead>{t('marketFinance.quantity')}</TableHead><TableHead>{t('marketFinance.unitPrice')}</TableHead><TableHead>{t('marketFinance.total')}</TableHead></TableRow></TableHeader><TableBody>
+          <div className="max-h-80 overflow-auto"><Table><TableHeader><TableRow><TableHead>{t('marketFinance.product')}</TableHead><TableHead>{t('marketFinance.variant')}</TableHead><TableHead>{t('marketFinance.quantity')}</TableHead><TableHead>{t('marketFinance.unitPrice')}</TableHead><TableHead>{t('marketFinance.total')}</TableHead></TableRow></TableHeader><TableBody>
             {detail.data.items.map((item, index) => <TableRow key={`${item.productId}-${item.variantId ?? ''}-${index}`}><TableCell>{item.productName}</TableCell><TableCell>{item.variantName ?? '—'}</TableCell><TableCell>{item.quantity}</TableCell><TableCell>{currency(item.unitPrice)}</TableCell><TableCell>{currency(item.lineTotal)}</TableCell></TableRow>)}
           </TableBody></Table></div>
           <p className="font-semibold">{t('marketFinance.currentPayable')}: {currency(detail.data.order.productsAmount)}</p>
