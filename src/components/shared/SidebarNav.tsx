@@ -55,7 +55,7 @@ export function SidebarNav({ items, collapsed = false, onNavigate }: SidebarNavP
 
   const renderItems = (entryList: SidebarNavItem[], depth = 0): React.JSX.Element => {
     return (
-      <ul className={cn('space-y-1', depth > 0 && 'mt-1')}> 
+      <ul className={cn('space-y-0.5', depth > 0 && 'mt-1')}> 
         {entryList.map((entry) => {
           const Icon = entry.icon;
           const isParent = Boolean(entry.children && entry.children.length > 0);
@@ -72,9 +72,9 @@ export function SidebarNav({ items, collapsed = false, onNavigate }: SidebarNavP
                     onClick={onNavigate}
                     className={({ isActive }) =>
                       cn(
-                        'group flex items-center justify-center rounded-xl px-3 py-2.5 text-sm transition-colors',
+                        'group flex items-center justify-center rounded-lg px-3 py-2 text-sm transition-colors',
                         isActive
-                          ? 'bg-brand-primary-soft text-brand-primary-dark font-semibold ring-1 ring-brand-primary/10 dark:bg-primary/15 dark:text-primary'
+                          ? 'bg-primary/10 text-primary font-semibold dark:bg-primary/15 dark:text-primary'
                           : 'text-muted-foreground hover:bg-brand-primary-soft/70 hover:text-brand-primary-dark dark:hover:bg-primary/10 dark:hover:text-primary'
                       )
                     }
