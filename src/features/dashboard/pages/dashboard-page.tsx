@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorState, LoadingScreen, PageContainer, SectionHeader } from '@/components/shared';
@@ -79,7 +80,7 @@ export default function DashboardPage(): React.JSX.Element {
                     <TableCell className="font-medium">{activity.actor}</TableCell>
                     <TableCell>{t(activity.actionKey)}</TableCell>
                     <TableCell className="text-end text-muted-foreground">
-                      {new Date(activity.createdAt).toLocaleString()}
+                      <span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{formatDateTime(activity.createdAt)}</span>
                     </TableCell>
                   </TableRow>
                 ))}
