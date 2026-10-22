@@ -45,7 +45,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border/70 bg-card/95 p-1.5 text-popover-foreground shadow-[0_24px_48px_-24px_rgba(15,23,42,0.6)] backdrop-blur-md before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent",
+      "relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border/70 bg-popover p-1.5 text-popover-foreground shadow-[0_24px_48px_-24px_rgba(15,23,42,0.6)] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent",
       className
     )}
     {...props}
@@ -62,7 +62,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "relative z-50 min-w-[12rem] overflow-hidden rounded-xl border border-border/70 bg-card/95 p-1.5 text-popover-foreground shadow-[0_24px_48px_-24px_rgba(15,23,42,0.6)] backdrop-blur-md before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent",
+        "relative z-50 min-w-[12rem] overflow-hidden rounded-xl border border-border/70 bg-popover p-1.5 text-popover-foreground shadow-[0_24px_48px_-24px_rgba(15,23,42,0.6)] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/40 before:to-transparent",
         className
       )}
       {...props}
