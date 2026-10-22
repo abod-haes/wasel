@@ -237,7 +237,7 @@ export default function OtpAdminPage(): React.JSX.Element {
         key: 'createdAt',
         header: t('otpAdmin.audit.createdAt'),
         renderCell: (item: OtpAuditLog) => (
-          <span className="text-sm text-muted-foreground">{formatDateTime(item.createdAt)}</span>
+          <span dir="ltr" className="inline-block whitespace-nowrap text-sm tabular-nums text-muted-foreground">{formatDateTime(item.createdAt)}</span>
         ),
       },
     ],
