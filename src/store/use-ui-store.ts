@@ -12,7 +12,7 @@ interface UiState {
 export const useUiStore = create<UiState>((set) => ({
   isSidebarCollapsed: false,
   isMobileSidebarOpen: false,
-  unreadNotificationsCount: 3,
+  unreadNotificationsCount: 0,
   toggleSidebarCollapse: () => {
     set((state) => ({
       isSidebarCollapsed: !state.isSidebarCollapsed,
