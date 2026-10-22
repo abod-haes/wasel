@@ -47,6 +47,13 @@
     "dark": "Dark",
     "system": "System"
   },
+  "navGroups": {
+    "navigation": "Main navigation",
+    "overview": "Overview",
+    "management": "Operations",
+    "finance": "Finance",
+    "system": "System & settings"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "users": "Users",
