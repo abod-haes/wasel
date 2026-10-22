@@ -13,7 +13,7 @@ const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay ref={ref} className={cn('fixed inset-0 z-50 bg-black/35 backdrop-blur-[6px]', className)} {...props} />
+  <DialogPrimitive.Overlay ref={ref} className={cn('fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px]', className)} {...props} />
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
@@ -26,13 +26,13 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto overscroll-contain rounded-[28px] border border-border/70 bg-card p-6 shadow-[0_28px_90px_-34px_rgba(0,0,0,0.5)]',
+        'fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-xl border border-border bg-card p-5 shadow-xl sm:p-6',
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute end-5 top-5 flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-background/90 text-muted-foreground transition-all hover:border-primary/20 hover:bg-primary/5 hover:text-primary focus:outline-none focus:ring-4 focus:ring-primary/10">
+      <DialogPrimitive.Close className="absolute end-4 top-4 flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -42,11 +42,11 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div className={cn('-mx-6 -mt-6 flex flex-col space-y-1.5 border-b border-border/60 bg-muted/25 px-6 py-5 pe-16 text-center sm:text-start', className)} {...props} />
+  <div className={cn('-mx-5 -mt-5 flex flex-col space-y-1 border-b border-border/65 px-5 py-4 pe-14 text-start sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-5 sm:pe-16', className)} {...props} />
 );
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
-  <div className={cn('-mx-6 -mb-6 flex flex-col-reverse gap-2 border-t border-border/60 bg-muted/20 px-6 py-4 sm:flex-row sm:justify-end', className)} {...props} />
+  <div className={cn('-mx-5 -mb-5 flex flex-col-reverse gap-2 border-t border-border/65 px-5 py-4 sm:-mx-6 sm:-mb-6 sm:flex-row sm:justify-end sm:px-6', className)} {...props} />
 );
 
 const DialogTitle = React.forwardRef<
