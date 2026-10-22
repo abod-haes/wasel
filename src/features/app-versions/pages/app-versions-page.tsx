@@ -208,9 +208,9 @@ export default function AppVersionsPage(): React.JSX.Element {
         verified.needToUpdate === payload.needToUpdate &&
         verified.forceUpdate === payload.forceUpdate &&
         verified.isVisible === payload.isVisible &&
-        verified.googlePlayLink?.trim() === payload.googlePlayLink &&
-        verified.appStoreLink?.trim() === payload.appStoreLink &&
-        verified.websiteLink?.trim() === payload.websiteLink;
+        (verified.googlePlayLink ?? '').trim() === payload.googlePlayLink &&
+        (verified.appStoreLink ?? '').trim() === payload.appStoreLink &&
+        (verified.websiteLink ?? '').trim() === payload.websiteLink;
 
       if (!matchesSavedPolicy) {
         setSelected(verified);
