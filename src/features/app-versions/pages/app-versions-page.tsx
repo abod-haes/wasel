@@ -21,7 +21,6 @@ const emptyForm: FormValues = {
   needToUpdate: false,
   forceUpdate: false,
   isVisible: true,
-  isProduction: true,
   googlePlayLink: '',
   appStoreLink: '',
   websiteLink: '',
@@ -37,15 +36,11 @@ function isValidOptionalUrl(value: string): boolean {
   if (!value.trim()) return true;
   try {
     const url = new URL(value.trim());
-    return (url.protocol === 'https:' || url.protocol === 'http:') && Boolean(url.hostname);
+    return url.protocol === 'https:' && Boolean(url.hostname);
   } catch {
     return false;
   }
 }
-
-/** Missing backend flag is unknown; use the safe SYP/production fallback only in the editable form. */
-const readIsProduction = (version: AppVersion): boolean | undefined =>
-  version.isProduction ?? version.IsProduction;
 
 function normalize(form: FormValues): FormValues {
   const needToUpdate = form.needToUpdate || form.forceUpdate;
@@ -54,7 +49,6 @@ function normalize(form: FormValues): FormValues {
     needToUpdate,
     forceUpdate: needToUpdate && form.forceUpdate,
     isVisible: form.isVisible,
-    isProduction: form.isProduction,
     googlePlayLink: form.googlePlayLink.trim(),
     appStoreLink: form.appStoreLink.trim(),
     websiteLink: form.websiteLink.trim(),
@@ -136,7 +130,6 @@ export default function AppVersionsPage(): React.JSX.Element {
         needToUpdate: result.needToUpdate,
         forceUpdate: result.forceUpdate,
         isVisible: result.isVisible,
-        isProduction: readIsProduction(result) ?? true,
         googlePlayLink: result.googlePlayLink ?? '',
         appStoreLink: result.appStoreLink ?? '',
         websiteLink: result.websiteLink ?? '',
@@ -156,10 +149,7 @@ export default function AppVersionsPage(): React.JSX.Element {
       setSelected(null);
       setForm({ ...emptyForm });
     } else if (selected) {
-      setForm(normalize({
-        ...selected,
-        isProduction: readIsProduction(selected) ?? true,
-      }));
+      setForm(normalize(selected));
     }
   };
 
@@ -178,7 +168,19 @@ export default function AppVersionsPage(): React.JSX.Element {
 
     const invalidLink = linkFields.find((field) => !isValidOptionalUrl(payload[field.key]));
     if (invalidLink) {
-      setFormError(`تأكد من صحة ${invalidLink.label}. الرابط لازم يبدأ بـ https:// أو http://.`);
+      setFormError(`تأكد من صحة ${invalidLink.label}. الرابط لازم يبدأ بـ https://.`);
+      return;
+    }
+
+    const hasDownloadLink = Boolean(
+      payload.googlePlayLink || payload.appStoreLink || payload.websiteLink,
+    );
+    if (payload.needToUpdate && !hasDownloadLink) {
+      setFormError('قبل تفعيل تحديث التطبيق، أضف رابط تنزيل صالحاً على الأقل (المتجر أو رابط الموقع/ملف APK).');
+      return;
+    }
+    if (payload.forceUpdate && !payload.websiteLink && !(payload.googlePlayLink && payload.appStoreLink)) {
+      setFormError('التحديث الإجباري يحتاج رابط موقع يصلح كبديل لكل الأجهزة، أو روابط Google Play وApp Store معاً.');
       return;
     }
 
@@ -192,7 +194,6 @@ export default function AppVersionsPage(): React.JSX.Element {
           needToUpdate: payload.needToUpdate,
           forceUpdate: payload.forceUpdate,
           isVisible: payload.isVisible,
-          isProduction: payload.isProduction,
           googlePlayLink: payload.googlePlayLink,
           appStoreLink: payload.appStoreLink,
           websiteLink: payload.websiteLink,
@@ -200,21 +201,24 @@ export default function AppVersionsPage(): React.JSX.Element {
         await appVersionsApi.update(selected!.version, patch);
       }
 
-      // Never claim that the app switched modes until the same public GET
-      // used by the mobile app confirms the persisted production flag.
+      // Read back the exact version: verify the update policy and download links
+      // that the installed mobile client will receive from GET.
       const verified = await appVersionsApi.getByVersion(payload.version);
-      const savedFlag = readIsProduction(verified);
-      if (savedFlag !== payload.isProduction) {
-        // POST may already have created the version even if older backend
-        // ignores isProduction. Keep it selected to avoid a duplicate POST.
+      const matchesSavedPolicy =
+        verified.needToUpdate === payload.needToUpdate &&
+        verified.forceUpdate === payload.forceUpdate &&
+        verified.isVisible === payload.isVisible &&
+        verified.googlePlayLink?.trim() === payload.googlePlayLink &&
+        verified.appStoreLink?.trim() === payload.appStoreLink &&
+        verified.websiteLink?.trim() === payload.websiteLink;
+
+      if (!matchesSavedPolicy) {
         setSelected(verified);
         setLookupVersion(verified.version);
         setMode('edit');
-        throw new Error(
-          'قد تكون بيانات الإصدار الأخرى حُفظت، لكن الباك لم يؤكد isProduction عند إعادة القراءة. '
-          + 'يجب دعم هذا الحقل في GET وPOST وPATCH قبل اعتبار وضع التطبيق متغيراً.',
-        );
+        throw new Error('تم إرسال الحفظ، لكن بيانات التحديث أو روابط التنزيل لا تطابق استجابة GET. تحقق من دعم الباك للقيم قبل اعتماد النسخة.');
       }
+
 
       setSelected(verified);
       setLookupVersion(verified.version);
@@ -223,15 +227,14 @@ export default function AppVersionsPage(): React.JSX.Element {
         needToUpdate: verified.needToUpdate,
         forceUpdate: verified.forceUpdate,
         isVisible: verified.isVisible,
-        isProduction: savedFlag,
         googlePlayLink: verified.googlePlayLink ?? '',
         appStoreLink: verified.appStoreLink ?? '',
         websiteLink: verified.websiteLink ?? '',
       }));
       setMode('edit');
       toast.success(mode === 'create'
-        ? 'تم إنشاء النسخة وتأكيد وضع التطبيق من السيرفر.'
-        : 'تم حفظ التعديلات وتأكيد وضع التطبيق من السيرفر.');
+        ? 'تم إنشاء النسخة والتحقق من إعدادات التحديث وروابط التنزيل.'
+        : 'تم حفظ إعدادات التحديث وروابط التنزيل والتحقق منها.');
     } catch (error) {
       const message = error instanceof Error && !axios.isAxiosError(error)
         ? error.message
@@ -247,7 +250,7 @@ export default function AppVersionsPage(): React.JSX.Element {
     <PageContainer>
       <SectionHeader
         titleKey="nav.appVersions"
-        descriptionKey="أنشئ إصدار التطبيق، واعرض إعداداته برقم النسخة، وتحكّم بخيارات التحديث وروابط التحميل."
+        descriptionKey="إدارة تنبيهات التحديث الاختياري أو الإجباري وروابط التنزيل لكل رقم نسخة."
         actions={
           <div className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
             <Smartphone aria-hidden="true" className="h-4 w-4" />
@@ -357,31 +360,22 @@ export default function AppVersionsPage(): React.JSX.Element {
                       checked={form.isVisible}
                       onCheckedChange={(checked) => updateField('isVisible', checked)}
                     />
-                    <ConfigToggle
-                      id="version-production"
-                      title="وضع الإنتاج (Production)"
-                      description="مفعّل: التطبيق يعرض أسعار المنتجات بالسوري (ل.س). غير مفعّل: يعرض الأسعار بالدولار ($). هذا الإعداد خاص برقم النسخة ولا يغير عنوان API."
-                      checked={form.isProduction}
-                      onCheckedChange={(checked) => updateField('isProduction', checked)}
-                    />
-                    {mode === 'edit' && selected && readIsProduction(selected) === undefined ? (
-                      <p role="status" className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
-                        هذا الإصدار لا يرجع حقل isProduction من السيرفر حالياً. لن نعتبر التبديل ناجحاً حتى يرجعه GET بعد الحفظ.
-                      </p>
-                    ) : null}
-                    <p className="text-xs text-muted-foreground">
-                      هذه حالة إصدار التطبيق التي تقرأها النسخة المثبتة على الهاتف، وليست تبديل سيرفر الداشبورد أو نقل بيانات بين بيئتين.
+                    <p className="rounded-lg border border-border bg-muted/30 p-3 text-xs leading-6 text-muted-foreground">
+                      عملة أسعار التطبيق تتحكم فيها صفحة «التسعير وأسعار الصرف» فقط؛ إعدادات الإصدارات هنا مخصصة للتحديث والتنزيل، سواء كان التطبيق منشوراً بالمتاجر أم لا.
                     </p>
                     {form.forceUpdate ? (
                       <div className="flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-xs leading-6 text-foreground">
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                        تأكد إن رابط المتجر جاهز قبل تفعيل التحديث الإجباري؛ قد يتوقف المستخدم عن إكمال الطلب حتى يحدث التطبيق.
+                        التحديث الإجباري يحتاج رابط تنزيل صالحاً لنظام الجهاز. قبل النشر على المتاجر، يمكن استخدام رابط HTTPS مباشر لنسخة APK أو صفحة تنزيل مناسبة عبر رابط الموقع.
                       </div>
                     ) : null}
                   </div>
 
                   <div className="space-y-3">
                     <h3 className="text-sm font-bold">روابط تنزيل التطبيق</h3>
+                    <p className="text-xs leading-6 text-muted-foreground">
+                      رابط الموقع يقبل رابط HTTPS لصفحة التنزيل أو ملف APK قبل نشر التطبيق على المتجر. يُستخدم رابط المتجر المناسب أولاً عند توفره، ثم رابط الموقع كبديل.
+                    </p>
                     {linkFields.map((field) => (
                       <div key={field.key} className="space-y-2">
                         <Label htmlFor={field.key}>{field.label}</Label>
@@ -446,7 +440,7 @@ export default function AppVersionsPage(): React.JSX.Element {
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">رقم الإصدار</dt><dd dir="ltr" className="font-bold">{selected.version}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">التحديث</dt><dd className="font-semibold">{selected.forceUpdate ? 'إجباري' : selected.needToUpdate ? 'اختياري' : 'غير مطلوب'}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">الظهور</dt><dd className="font-semibold">{selected.isVisible ? 'ظاهر' : 'مخفي'}</dd></div>
-                  <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">وضع الإصدار</dt><dd className="font-semibold">{readIsProduction(selected) === undefined ? 'غير مؤكد من السيرفر' : readIsProduction(selected) ? 'Production • ل.س' : `Development • ${String.fromCharCode(36)}`}</dd></div>
+                  
                   {selected.createdAt ? (
                     <div className="flex items-center justify-between gap-2">
                       <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
