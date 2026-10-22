@@ -22,6 +22,7 @@ const emptyForm: FormValues = {
   needToUpdate: false,
   forceUpdate: false,
   isVisible: true,
+  isProduction: true,
   googlePlayLink: '',
   appStoreLink: '',
   websiteLink: '',
@@ -43,6 +44,10 @@ function isValidOptionalUrl(value: string): boolean {
   }
 }
 
+/** Missing backend flag is unknown; use the safe SYP/production fallback only in the editable form. */
+const readIsProduction = (version: AppVersion): boolean | undefined =>
+  version.isProduction ?? version.IsProduction;
+
 function normalize(form: FormValues): FormValues {
   const needToUpdate = form.needToUpdate || form.forceUpdate;
   return {
@@ -50,6 +55,7 @@ function normalize(form: FormValues): FormValues {
     needToUpdate,
     forceUpdate: needToUpdate && form.forceUpdate,
     isVisible: form.isVisible,
+    isProduction: form.isProduction,
     googlePlayLink: form.googlePlayLink.trim(),
     appStoreLink: form.appStoreLink.trim(),
     websiteLink: form.websiteLink.trim(),
@@ -133,6 +139,7 @@ export default function AppVersionsPage(): React.JSX.Element {
         needToUpdate: result.needToUpdate,
         forceUpdate: result.forceUpdate,
         isVisible: result.isVisible,
+        isProduction: readIsProduction(result) ?? true,
         googlePlayLink: result.googlePlayLink ?? '',
         appStoreLink: result.appStoreLink ?? '',
         websiteLink: result.websiteLink ?? '',
@@ -152,7 +159,10 @@ export default function AppVersionsPage(): React.JSX.Element {
       setSelected(null);
       setForm({ ...emptyForm });
     } else if (selected) {
-      setForm(normalize(selected));
+      setForm(normalize({
+        ...selected,
+        isProduction: readIsProduction(selected) ?? true,
+      }));
     }
   };
 
@@ -178,38 +188,54 @@ export default function AppVersionsPage(): React.JSX.Element {
     setSaving(true);
     setFormError('');
     try {
-      let result: AppVersion;
       if (mode === 'create') {
-        result = await appVersionsApi.create(payload);
-        toast.success('تم إنشاء نسخة التطبيق بنجاح.');
+        await appVersionsApi.create(payload);
       } else {
         const patch: UpdateAppVersionInput = {
           needToUpdate: payload.needToUpdate,
           forceUpdate: payload.forceUpdate,
           isVisible: payload.isVisible,
+          isProduction: payload.isProduction,
           googlePlayLink: payload.googlePlayLink,
           appStoreLink: payload.appStoreLink,
           websiteLink: payload.websiteLink,
         };
-        result = await appVersionsApi.update(selected!.version, patch);
-        toast.success('تم تعديل إعدادات النسخة بنجاح.');
+        await appVersionsApi.update(selected!.version, patch);
       }
 
-      setSelected(result);
-      setLookupVersion(result.version);
+      // Never claim that the app switched modes until the same public GET
+      // used by the mobile app confirms the persisted production flag.
+      const verified = await appVersionsApi.getByVersion(payload.version);
+      const savedFlag = readIsProduction(verified);
+      if (savedFlag !== payload.isProduction) {
+        throw new Error(
+          'تم إرسال الطلب، لكن الباك لم يؤكد حفظ isProduction في GET /api/AppVersions/{version}. '
+          + 'تحقق من دعم الحقل في الباك قبل اعتبار وضع التطبيق متغيراً.',
+        );
+      }
+
+      setSelected(verified);
+      setLookupVersion(verified.version);
       setForm(normalize({
-        version: result.version,
-        needToUpdate: result.needToUpdate,
-        forceUpdate: result.forceUpdate,
-        isVisible: result.isVisible,
-        googlePlayLink: result.googlePlayLink ?? '',
-        appStoreLink: result.appStoreLink ?? '',
-        websiteLink: result.websiteLink ?? '',
+        version: verified.version,
+        needToUpdate: verified.needToUpdate,
+        forceUpdate: verified.forceUpdate,
+        isVisible: verified.isVisible,
+        isProduction: savedFlag,
+        googlePlayLink: verified.googlePlayLink ?? '',
+        appStoreLink: verified.appStoreLink ?? '',
+        websiteLink: verified.websiteLink ?? '',
       }));
       setMode('edit');
+      toast.success(mode === 'create'
+        ? 'تم إنشاء النسخة وتأكيد وضع التطبيق من السيرفر.'
+        : 'تم حفظ التعديلات وتأكيد وضع التطبيق من السيرفر.');
     } catch (error) {
-      setFormError(errorMessage(error, 'save'));
-      toast.error('تعذّر حفظ إعدادات النسخة.');
+      const message = error instanceof Error && !axios.isAxiosError(error)
+        ? error.message
+        : errorMessage(error, 'save');
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -333,6 +359,21 @@ export default function AppVersionsPage(): React.JSX.Element {
                       checked={form.isVisible}
                       onCheckedChange={(checked) => updateField('isVisible', checked)}
                     />
+                    <ConfigToggle
+                      id="version-production"
+                      title="وضع الإنتاج (Production)"
+                      description="مفعّل: التطبيق يعرض أسعار المنتجات بالسوري (ل.س). غير مفعّل: يعرض الأسعار بالدولار ($). هذا الإعداد خاص برقم النسخة ولا يغير عنوان API."
+                      checked={form.isProduction}
+                      onCheckedChange={(checked) => updateField('isProduction', checked)}
+                    />
+                    {mode === 'edit' && selected && readIsProduction(selected) === undefined ? (
+                      <p role="status" className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                        هذا الإصدار لا يرجع حقل isProduction من السيرفر حالياً. لن نعتبر التبديل ناجحاً حتى يرجعه GET بعد الحفظ.
+                      </p>
+                    ) : null}
+                    <p className="text-xs text-muted-foreground">
+                      هذه حالة إصدار التطبيق التي تقرأها النسخة المثبتة على الهاتف، وليست تبديل سيرفر الداشبورد أو نقل بيانات بين بيئتين.
+                    </p>
                     {form.forceUpdate ? (
                       <div className="flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-xs leading-6 text-foreground">
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
@@ -407,6 +448,36 @@ export default function AppVersionsPage(): React.JSX.Element {
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">رقم الإصدار</dt><dd dir="ltr" className="font-bold">{selected.version}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">التحديث</dt><dd className="font-semibold">{selected.forceUpdate ? 'إجباري' : selected.needToUpdate ? 'اختياري' : 'غير مطلوب'}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">الظهور</dt><dd className="font-semibold">{selected.isVisible ? 'ظاهر' : 'مخفي'}</dd></div>
+                  <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">وضع الإصدار</dt><dd className="font-semibold">{readIsProduction(selected) === undefined ? 'غير مؤكد من السيرفر' : readIsProduction(selected) ? 'Production • ل.س' : 'Development • 
+                  {selected.createdAt ? (
+                    <div className="flex items-center justify-between gap-2">
+                      <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
+                      <dd className="text-start" dir="ltr">{new Date(selected.createdAt).toLocaleString('ar-SY')}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+              ) : (
+                <p className="text-sm leading-6 text-muted-foreground">
+                  ما تم اختيار نسخة بعد. رح تظهر بيانات النسخة هون بعد إنشائها أو جلبها من السيرفر.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex items-start gap-3 rounded-2xl border border-brand-border bg-brand-primary-soft/40 p-4 text-sm leading-6 dark:bg-primary/10">
+            <Info className="mt-1 h-5 w-5 shrink-0 text-primary" />
+            <div>
+              الإصدارات تستخدم نفس السيرفر المتصل بالداشبورد؛ ما في Backend منفصل إلها.
+              الـ API المتاح حالياً يدعم إنشاء إصدار، جلبه برقم النسخة وتعديله فقط.
+              عرض جميع الإصدارات أو حذف إصدار يحتاج Endpoint من الباك.
+            </div>
+          </div>
+        </div>
+      </div>
+    </PageContainer>
+  );
+}
+}</dd></div>
                   {selected.createdAt ? (
                     <div className="flex items-center justify-between gap-2">
                       <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
