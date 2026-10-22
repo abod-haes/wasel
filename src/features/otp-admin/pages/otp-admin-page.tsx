@@ -7,7 +7,6 @@ import {
   MessageCircleMore,
   Plus,
   Power,
-  RefreshCw,
   RotateCw,
   Smartphone,
   StopCircle,
@@ -19,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { ConfirmDialog, DataTable, PageContainer, SectionHeader } from '@/components/shared';
+import { formatDateTime } from '@/lib/date-time';
 import {
   Badge,
   Button,
@@ -89,12 +89,6 @@ const otpVariant: Record<OtpRequestStatus, BadgeVariant> = {
   UNKNOWN: 'warning',
 };
 
-const formatDateTime = (value?: string | null): string => {
-  if (!value) return '-';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
-};
-
 const totalPages = (totalCount: number, pageSize: number): number =>
   Math.max(1, Math.ceil(totalCount / pageSize));
 
@@ -160,15 +154,6 @@ export default function OtpAdminPage(): React.JSX.Element {
   const createApiKeyMutation = useCreateOtpApiKeyMutation();
   const revokeApiKeyMutation = useRevokeOtpApiKeyMutation();
 
-  const refreshAll = (): void => {
-    void summaryQuery.refetch();
-    void sessionQuery.refetch();
-    void otpRequestsQuery.refetch();
-    void auditLogsQuery.refetch();
-    void clientsQuery.refetch();
-    void apiKeysQuery.refetch();
-  };
-
   const runSessionAction = (action: 'start' | 'reconnect' | 'stop' | 'logout'): void => {
     sessionActionMutation.mutate(action, {
       onSuccess: () => {
@@ -208,7 +193,7 @@ export default function OtpAdminPage(): React.JSX.Element {
         key: 'createdAt',
         header: t('otpAdmin.otp.createdAt'),
         renderCell: (item: OtpRequest) => (
-          <span className="text-sm text-muted-foreground">{formatDateTime(item.createdAt)}</span>
+          <span dir="ltr" className="inline-block whitespace-nowrap text-sm tabular-nums text-muted-foreground">{formatDateTime(item.createdAt)}</span>
         ),
       },
       {
@@ -314,12 +299,6 @@ export default function OtpAdminPage(): React.JSX.Element {
       <SectionHeader
         titleKey="otpAdmin.title"
         descriptionKey="otpAdmin.description"
-        actions={
-          <Button variant="outline" onClick={refreshAll} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            {t('otpAdmin.refresh')}
-          </Button>
-        }
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -396,7 +375,7 @@ export default function OtpAdminPage(): React.JSX.Element {
                 </div>
                 <div className="rounded-xl border bg-muted/15 p-4">
                   <p className="text-xs text-muted-foreground">{t('otpAdmin.session.lastConnected')}</p>
-                  <p className="mt-1 text-sm font-medium">{formatDateTime(session.lastConnectedAt)}</p>
+                  <p className="mt-1 text-sm font-medium"><span dir="ltr" className="inline-block tabular-nums">{formatDateTime(session.lastConnectedAt)}</span></p>
                 </div>
                 <div className="rounded-xl border bg-muted/15 p-4">
                   <p className="text-xs text-muted-foreground">{t('otpAdmin.metrics.worker')}</p>
@@ -669,10 +648,10 @@ export default function OtpAdminPage(): React.JSX.Element {
                 [t('otpAdmin.otp.ipAddress'), otpRequestQuery.data.ipAddress || '-'],
                 [t('otpAdmin.otp.expiresAt'), formatDateTime(otpRequestQuery.data.expiresAt)],
                 [t('otpAdmin.otp.verifiedAt'), formatDateTime(otpRequestQuery.data.verifiedAt)],
-              ].map(([label, value]) => (
+              ].map(([label, value], index) => (
                 <div key={label} className="rounded-xl border bg-muted/15 p-3">
                   <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 break-all text-sm font-medium">{value}</p>
+                  <p className="mt-1 break-all text-sm font-medium">{index >= 6 ? <span dir="ltr" className="inline-block tabular-nums">{value}</span> : value}</p>
                 </div>
               ))}
               {otpRequestQuery.data.failureReason ? (
