@@ -20,11 +20,12 @@ function apiErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'تعذر تنفيذ العملية.';
 }
 
-export const useDeliveryFinanceListQuery = (pagination: PaginationParams) =>
+export const useDeliveryFinanceListQuery = (pagination: PaginationParams, enabled = true) =>
   useQuery({
     queryKey: queryKeys.deliveryFinance.list(pagination),
     queryFn: () => deliveryFinanceApi.getDeliveries(pagination),
     placeholderData: keepPreviousData,
+    enabled,
   });
 
 export const useDeliveryFinanceSummaryQuery = (deliveryPersonId?: string) =>
