@@ -3,9 +3,9 @@ import { ArrowDownLeft, ArrowLeft, ArrowRight, CheckCircle2, RefreshCw, Store, W
 import { useTranslation } from 'react-i18next';
 import { PageContainer } from '@/components/shared';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { ROUTES } from '@/constants/routes';
 import { marketFinanceApi } from '@/features/market-finance/api/market-finance-api';
@@ -46,6 +46,8 @@ export default function MarketFinancePage(): React.JSX.Element {
   const allowed = admin || isMarketRole(user?.roles ?? []);
   const navigate = useNavigate();
   const { marketUserId } = useParams<{ marketUserId?: string }>();
+  const [searchParams] = useSearchParams();
+  const previousMarketId = searchParams.get('marketUserId');
   const isMarketDetail = Boolean(marketUserId);
   const selectedId = admin ? (marketUserId ?? '') : '';
   const [marketPage, setMarketPage] = useState(1);
@@ -56,6 +58,22 @@ export default function MarketFinancePage(): React.JSX.Element {
   const [confirmSettlement, setConfirmSettlement] = useState(false);
   const [note, setNote] = useState('');
   const queryClient = useQueryClient();
+
+  // Old links selected a market via query string; redirect them to its own account page.
+  useEffect(() => {
+    if (admin && !marketUserId && previousMarketId) {
+      navigate(generatePath(ROUTES.marketFinanceMarket, { marketUserId: previousMarketId }), { replace: true });
+    }
+  }, [admin, marketUserId, navigate, previousMarketId]);
+
+  useEffect(() => {
+    setOrderPage(1);
+    setTransactionPage(1);
+    setActiveTab('orders');
+    setOrderId('');
+    setConfirmSettlement(false);
+    setNote('');
+  }, [selectedId]);
 
   const markets = useQuery({
     queryKey: [...financeKey, 'markets', marketPage],
@@ -113,7 +131,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       </Button>
     </div>}
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="space-y-1"><p className="text-xs font-semibold text-primary">RODO / FINANCE</p><h1 className="text-xl font-bold tracking-tight sm:text-2xl">{t('marketFinance.title')}</h1><p className="text-sm text-muted-foreground">{admin ? t('marketFinance.adminDescription') : t('marketFinance.marketDescription')}</p></div>
+      <div className="space-y-1"><p className="text-xs font-semibold text-primary">RODO / FINANCE</p><h1 className="text-xl font-bold tracking-tight sm:text-2xl">{admin && isMarketDetail ? (summary.data?.marketName ?? t('marketFinance.title')) : t('marketFinance.title')}</h1><p className="text-sm text-muted-foreground">{admin ? t('marketFinance.adminDescription') : t('marketFinance.marketDescription')}</p></div>
       <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}><RefreshCw className="h-4 w-4" /> {t('marketFinance.refresh')}</Button>
     </div>
     {admin && !isMarketDetail && <Card>
