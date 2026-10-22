@@ -174,10 +174,18 @@ const SelectContent = React.forwardRef<
   const setInputRef = React.useCallback((node: HTMLInputElement | null): void => {
     inputRef.current = node;
     if (node) {
-      // Focus after Radix has mounted its focus scope, without scrolling the page.
-      window.requestAnimationFrame(() => {
-        if (node.isConnected) node.focus({ preventScroll: true });
-      });
+      // Focusing a text input as soon as a mobile Select opens launches the
+      // software keyboard. Android visual viewport resizing can instantly
+      // dismiss Radix's popup before the user can pick any option.
+      // Desktop keeps the existing keyboard-first searchable experience.
+      const touchOrSmallScreen =
+        window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(max-width: 1023px)').matches;
+      if (!touchOrSmallScreen) {
+        window.requestAnimationFrame(() => {
+          if (node.isConnected) node.focus({ preventScroll: true });
+        });
+      }
     }
   }, []);
 
@@ -219,7 +227,7 @@ const SelectContent = React.forwardRef<
           position={position}
           sideOffset={sideOffset}
           className={cn(
-            'relative isolate z-[100] flex max-h-80 min-w-[8rem] flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-[0_12px_32px_-12px_rgba(15,23,42,0.28)] dark:shadow-[0_16px_36px_-16px_rgba(0,0,0,0.65)]',
+            'relative isolate z-[100] flex max-h-[70dvh] min-w-[8rem] flex-col overflow-hidden sm:max-h-80 rounded-lg border border-border bg-popover text-popover-foreground shadow-[0_12px_32px_-12px_rgba(15,23,42,0.28)] dark:shadow-[0_16px_36px_-16px_rgba(0,0,0,0.65)]',
             position === 'popper' && 'w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-0 data-[side=top]:-translate-y-0',
             className
           )}
@@ -234,11 +242,14 @@ const SelectContent = React.forwardRef<
                 value={searchValue ?? localSearch}
                 onChange={(event) => handleChange(event.target.value)}
                 onKeyDown={handleSearchKeyDown}
+                // Keep focus/taps on the search field inside the dropdown rather
+                // than leaking pointer events to Radix's option-selection logic.
+                onPointerDown={(event) => event.stopPropagation()}
                 aria-label={searchPlaceholder}
                 placeholder={searchPlaceholder}
                 autoComplete="off"
                 spellCheck={false}
-                className="h-9 w-full min-w-0 rounded-md border border-border bg-background px-3 pe-10 text-start text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
+                className="h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 pe-10 text-start text-base sm:text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
               />
             </div>
           ) : null}
