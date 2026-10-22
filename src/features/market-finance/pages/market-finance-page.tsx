@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowDownLeft, ArrowLeft, ArrowRight, CheckCircle2, RefreshCw, Store, Wallet } from 'lucide-react';
+import { ArrowDownLeft, CheckCircle2, Store, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer } from '@/components/shared';
 import axios from 'axios';
@@ -9,13 +9,14 @@ import { generatePath, useNavigate, useParams, useSearchParams } from 'react-rou
 
 import { ROUTES } from '@/constants/routes';
 import { marketFinanceApi } from '@/features/market-finance/api/market-finance-api';
+import { formatDateTime } from '@/lib/date-time';
 import type { MarketFinanceOrder, MarketPayableTransaction } from '@/features/market-finance/types/market-finance-types';
 import { isAdminRole, isMarketRole } from '@/services/auth/auth-roles';
 import { useAuthStore } from '@/store/use-auth-store';
 import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@/components/ui';
 
 const currency = (amount: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(amount);
-const date = (value?: string | null) => value ? new Date(value).toLocaleString() : '—';
+const date = formatDateTime;
 const shortOrder = (id: string) => `#${id.slice(-3)}`;
 const errorMessage = (error: unknown, fallback: string): string => {
   if (axios.isAxiosError(error)) {
@@ -124,15 +125,8 @@ export default function MarketFinancePage(): React.JSX.Element {
   if (!allowed || (isMarketDetail && !admin)) return <div className="p-6">{t('marketFinance.noPermission')}</div>;
 
   return <PageContainer className={i18n.dir() === 'rtl' ? 'space-y-5 [direction:rtl]' : 'space-y-5 [direction:ltr]'}>
-    {admin && isMarketDetail && <div>
-      <Button size="sm" variant="outline" onClick={() => navigate(ROUTES.marketFinance)}>
-        {i18n.dir() === 'rtl' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
-        {t('marketFinance.backToMarkets')}
-      </Button>
-    </div>}
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="space-y-1"><p className="text-xs font-semibold text-primary">RODO / FINANCE</p><h1 className="text-xl font-bold tracking-tight sm:text-2xl">{admin && isMarketDetail ? (summary.data?.marketName ?? t('marketFinance.title')) : t('marketFinance.title')}</h1><p className="text-sm text-muted-foreground">{admin ? t('marketFinance.adminDescription') : t('marketFinance.marketDescription')}</p></div>
-      <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}><RefreshCw className="h-4 w-4" /> {t('marketFinance.refresh')}</Button>
     </div>
     {admin && !isMarketDetail && <Card>
       <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-4 w-4 text-primary" /> {t('marketFinance.selectMarket')}</CardTitle></CardHeader>
@@ -154,7 +148,7 @@ export default function MarketFinancePage(): React.JSX.Element {
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <Card><CardContent className="space-y-2 p-4 sm:p-5"><Wallet className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.amountDue')}</p><p className="mt-2 text-2xl font-bold tabular-nums">{currency(summary.data.currentAmountDue)}</p><p className="text-xs text-muted-foreground">{t('marketFinance.serverBalance')}</p></CardContent></Card>
           <Card><CardContent className="space-y-2 p-4 sm:p-5"><CheckCircle2 className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.deliveredOrders')}</p><p className="mt-2 text-2xl font-bold tabular-nums">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
-          <Card><CardContent className="space-y-2 p-4 sm:p-5"><ArrowDownLeft className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.lastSettlement')}</p><p className="mt-2 font-semibold">{date(summary.data.lastSettlementAt)}</p></CardContent></Card>
+          <Card><CardContent className="space-y-2 p-4 sm:p-5"><ArrowDownLeft className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">{t('marketFinance.lastSettlement')}</p><p className="mt-2 font-semibold"><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{date(summary.data.lastSettlementAt)}</span></p></CardContent></Card>
         </div>
         {admin && <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">{t('marketFinance.market')}: {summary.data.marketName}</p>
@@ -169,7 +163,7 @@ export default function MarketFinancePage(): React.JSX.Element {
         {orders.isPending ? <p>{t('marketFinance.loadingOrders')}</p> : orders.isError ? failed(orders.error, orders.refetch) : <>
           <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.deliveredAt')}</TableHead><TableHead>{t('marketFinance.productsAmount')}</TableHead><TableHead>{t('marketFinance.orderDiscount')}</TableHead><TableHead>{t('marketFinance.details')}</TableHead></TableRow></TableHeader><TableBody>
             {(orders.data?.items ?? []).map((order: MarketFinanceOrder) => <TableRow key={order.orderId}>
-              <TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{shortOrder(order.orderId)}</span></TableCell><TableCell>{date(order.deliveredAt)}</TableCell><TableCell>{currency(order.productsAmount)}</TableCell><TableCell>{currency(order.orderDiscountAmount)}</TableCell>
+              <TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{shortOrder(order.orderId)}</span></TableCell><TableCell><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{date(order.deliveredAt)}</span></TableCell><TableCell>{currency(order.productsAmount)}</TableCell><TableCell>{currency(order.orderDiscountAmount)}</TableCell>
               <TableCell><Button size="sm" variant="outline" onClick={() => setOrderId(order.orderId)}>{t('marketFinance.details')}</Button></TableCell>
             </TableRow>)}
           </TableBody></Table>
@@ -180,7 +174,7 @@ export default function MarketFinancePage(): React.JSX.Element {
         {transactions.isPending ? <p>{t('marketFinance.loadingTransactions')}</p> : transactions.isError ? failed(transactions.error, transactions.refetch) : <>
           <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.transactionDate')}</TableHead><TableHead>{t('marketFinance.transactionType')}</TableHead><TableHead>{t('marketFinance.amount')}</TableHead><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.note')}</TableHead></TableRow></TableHeader><TableBody>
             {(transactions.data?.items ?? []).map((item: MarketPayableTransaction) => <TableRow key={item.id}>
-              <TableCell>{date(item.createdAt)}</TableCell><TableCell>{item.type === 0 ? t('marketFinance.accrual') : t('marketFinance.settlement')}</TableCell><TableCell>{currency(item.amount)}</TableCell><TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{item.orderId ? shortOrder(item.orderId) : '—'}</span></TableCell><TableCell>{item.note ?? '—'}</TableCell>
+              <TableCell><span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{date(item.createdAt)}</span></TableCell><TableCell>{item.type === 0 ? t('marketFinance.accrual') : t('marketFinance.settlement')}</TableCell><TableCell>{currency(item.amount)}</TableCell><TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{item.orderId ? shortOrder(item.orderId) : '—'}</span></TableCell><TableCell>{item.note ?? '—'}</TableCell>
             </TableRow>)}
           </TableBody></Table>
           {!transactions.data?.items.length && <p className="py-4 text-center text-muted-foreground">{t('marketFinance.emptyTransactions')}</p>}
@@ -191,7 +185,7 @@ export default function MarketFinancePage(): React.JSX.Element {
     <Dialog open={Boolean(orderId)} onOpenChange={(open) => { if (!open) setOrderId(''); }}>
       <DialogContent dir={i18n.dir()} className="max-w-2xl"><DialogHeader><DialogTitle>{t('marketFinance.orderDetailsTitle', { order: shortOrder(orderId) })}</DialogTitle><DialogDescription>{t('marketFinance.scopedItems')}</DialogDescription></DialogHeader>
         {detail.isPending ? <p>{t('marketFinance.loading')}</p> : detail.isError ? failed(detail.error, detail.refetch) : detail.data && <>
-          <p className="text-sm">{t('marketFinance.deliveredAt')}: {date(detail.data.order.deliveredAt)}</p>
+          <p className="text-sm">{t('marketFinance.deliveredAt')}: <span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{date(detail.data.order.deliveredAt)}</span></p>
           <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-80 overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.product')}</TableHead><TableHead>{t('marketFinance.variant')}</TableHead><TableHead>{t('marketFinance.quantity')}</TableHead><TableHead>{t('marketFinance.unitPrice')}</TableHead><TableHead>{t('marketFinance.total')}</TableHead></TableRow></TableHeader><TableBody>
             {detail.data.items.map((item, index) => <TableRow key={`${item.productId}-${item.variantId ?? ''}-${index}`}><TableCell>{item.productName}</TableCell><TableCell>{item.variantName ?? '—'}</TableCell><TableCell>{item.quantity}</TableCell><TableCell>{currency(item.unitPrice)}</TableCell><TableCell>{currency(item.lineTotal)}</TableCell></TableRow>)}
           </TableBody></Table>
