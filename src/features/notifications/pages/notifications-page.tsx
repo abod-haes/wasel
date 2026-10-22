@@ -22,7 +22,6 @@ import { usersApi } from '@/features/users/api/users-api';
 import { queryKeys } from '@/constants/query-keys';
 import { useDebouncedSelectSearch } from '@/features/products/hooks/use-debounced-select-search';
 import type { UsersFilter } from '@/features/users/types/user-types';
-import { useUiStore } from '@/store/use-ui-store';
 import type { PaginationParams } from '@/types/api';
 
 const defaultFilters: NotificationsFilter = {
@@ -59,7 +58,6 @@ export default function NotificationsPage(): React.JSX.Element {
     retry: 1,
   });
   const sendNotificationMutation = useSendNotificationMutation();
-  const markNotificationsAsRead = useUiStore((state) => state.markNotificationsAsRead);
 
   if (notificationsQuery.isError) {
     return <ErrorState onRetry={() => void notificationsQuery.refetch()} />;
@@ -69,7 +67,6 @@ export default function NotificationsPage(): React.JSX.Element {
     sendNotificationMutation.mutate(payload, {
       onSuccess: () => {
         setIsDialogOpen(false);
-        markNotificationsAsRead();
       },
     });
   };
