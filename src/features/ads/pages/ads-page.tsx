@@ -83,7 +83,7 @@ export default function AdsPage(): React.JSX.Element {
   const isMutating = isSubmitting || deleteMutation.isPending;
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="nav.ads"
         descriptionKey="إدارة بانرات وإعلانات التطبيق وترتيب ظهورها"
