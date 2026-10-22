@@ -1,85 +1,58 @@
-# RODO — Remote app production flag (2026-10-22)
+# RODO — App version update and download contract (revised 2026-10-22)
 
-## Purpose
+> **Supersedes the earlier `isProduction` proposal.** Currency is NOT controlled by AppVersions. The dashboard setting **Pricing & Exchange Rates → Product Display Currency** is authoritative.
 
-The dashboard's **App Versions → Production Mode** toggle configures the **installed mobile app version**. It does **not** change the admin dashboard's API host, switch production databases, or convert any stored billing amounts.
+## 1. Currency — independent of releases
 
-- `isProduction: true`: mobile **displays SYP** (`ل.س`).
-- `isProduction: false`: mobile **displays USD** (`$`).
-- **Missing/nonboolean flag, 404, or version API failure**: mobile falls back to **SYP**, avoiding an incorrect USD display in production.
+- Admin sets `productDisplayCurrency: 'SYP' | 'USD' | 'TRY'` using `PUT /api/Options/currency`.
+- Customer/courier/guest mobile app **reads** `GET /api/Options/currency`.
+- Response should contain the selected currency plus `usdToSypRate` and `usdToTryRate`.
+- Catalog displays each backend price from `prices.priceSyp`, `prices.priceUsd` or `prices.priceTry`, without making up figures.
+- Cart/order monetary totals remain SYP for real checkout and accounting; USD/TRY equivalents are UI-only conversions from the published rates.
+- If `GET /api/Options/currency` is inaccessible to anonymous/customer/courier users, the frontend cannot reliably apply the global setting. **Backend must allow read-only access** without opening `PUT` to non-admin roles.
+- On API failure or unknown currency, mobile falls back to SYP.
 
-## Backend required to make the toggle functional
+## 2. AppVersions — version-specific update policy
 
-Persist `isProduction: boolean` on each `AppVersion` record, separately from `isVisible`, `needToUpdate`, and `forceUpdate`.
+The dashboard **App Versions** form can POST, GET by exact version, and PATCH. It does not fabricate an all-versions list because the current backend contract has no list endpoint.
 
-### 1. POST `/api/AppVersions` (Admin-only)
-
-Accept `isProduction` (required boolean for new dashboard requests), plus existing version/update flags and links:
-
-```json
-{
-  "version": "1.0.0",
-  "needToUpdate": false,
-  "forceUpdate": false,
-  "isVisible": true,
-  "isProduction": true,
-  "googlePlayLink": "",
-  "appStoreLink": "",
-  "websiteLink": ""
-}
-```
-
-### 2. PATCH `/api/AppVersions/{version}` (Admin-only)
-
-Accept and persist `isProduction: boolean` alongside existing fields, without changing the version identifier.
-
-### 3. GET `/api/AppVersions/{version}` (readable by logged-out mobile clients)
-
-Always return the **persisted boolean** field. Example:
+**GET /api/AppVersions/{installedVersion}** must return, for logged-out and authenticated mobile clients:
 
 ```json
 {
-  "id": "<server-generated-id>",
+  "id": "server-id",
   "version": "1.0.0",
-  "needToUpdate": false,
+  "needToUpdate": true,
   "forceUpdate": false,
   "isVisible": true,
-  "isProduction": false,
   "googlePlayLink": "",
   "appStoreLink": "",
-  "websiteLink": "",
+  "websiteLink": "https://rodo.sy/download/rodo.apk",
   "createdAt": "2026-10-22T00:00:00Z"
 }
 ```
 
-The existing apps accept `IsProduction` on GET for backward compatibility, but standardize **camelCase `isProduction`**. Do not place it only in POST/PATCH models or omit it from GET.
+- `isVisible=false`: no update prompt.
+- `needToUpdate=false` and `forceUpdate=false`: no prompt.
+- `needToUpdate=true`, `forceUpdate=false`: optional, dismissible.
+- `forceUpdate=true`: mandatory only when a usable platform download link exists. Protect against misconfigured forced updates that trap users.
+- `googlePlayLink`: Play Store link when published.
+- `appStoreLink`: App Store link when published.
+- `websiteLink`: HTTPS fallback, including prerelease Android APK/approved distribution page. An `.apk` is not installable on iOS; provide an iOS-compatible link when distributing iOS versions.
+- Mobile checks the **installed** version, not an imagined newest release. To notify installed version `1.0.0`, configure that record's flags and links.
+- Dashboard reads back GET after POST/PATCH and verifies all supported update fields/links to avoid false success.
 
-**Migration**: existing versions should default to `isProduction: true` (SYP) unless explicitly configured otherwise. `false` is an intentional admin choice.
+**No deployment to Play/App Store is required** for prerelease Android tests if the HTTPS `websiteLink` points to a real downloadable signed APK. iOS needs TestFlight or a valid Apple distribution mechanism.
 
-## Dashboard behavior
+## 3. Scenarios to verify
 
-The editor sends the flag with POST/PATCH, then fetches GET for the *same version* and checks the returned boolean. It **does not claim success** if the backend omitted, ignored, or returned the wrong value. A POST may still have created the version before this warning; edit the resulting version rather than trying to create it again.
+1. Admin changes global display currency from SYP → USD → TRY; mobile catalog and totals follow on refetch/foreground.
+2. Dashboard saves update settings; GET for installed version returns same flags and URLs.
+3. Optional update shows a working link and a "Later" action.
+4. Forced update with a working platform link blocks ordinary navigation until app is updated.
+5. No usable platform link: app must NOT trap users; dashboard should validate the configuration.
+6. Before store publication, Android can open a real HTTPS APK via `websiteLink`.
+7. iPhone must not be sent an Android APK; use App Store or iOS-compatible website link.
+8. GET 404/error: do not invent an update or falsely switch money currency.
 
-## Mobile behavior
-
-The Expo app calls GET for its **installed** version (from `Constants.expoConfig?.version`), uses the version response for product display, and refreshes the version on foreground and at most a 5-minute periodic interval while the app is active.
-
-Product list: use the backend's separate `prices.priceSyp` / `prices.priceUsd`; **do not fabricate USD amounts** from catalog prices.
-
-Cart/order/quote: existing numeric ledger amounts stay in **SYP** for payment. When displaying USD equivalents, convert from the backend's read-only `GET /api/Options/currency` `usdToSypRate` (positive and finite). If the rate is not available to user/courier roles, show that display is unavailable; do not change cash, invoices, fee calculations or payload amounts.
-
-Backend must grant read permission for the currency rate to the mobile roles that need dollar displays, **without granting write/update permission**.
-
-## Verification checklist
-
-- [ ] GET the exact installed version as an anonymous mobile client; verify `isProduction` present as boolean.
-- [ ] POST new version with `isProduction=false`, GET it again, verify `false`.
-- [ ] PATCH version with `isProduction=true`, GET it again, verify `true`.
-- [ ] Ensure `isVisible` and `forceUpdate` do not control this currency flag.
-- [ ] Test mobile existing build with version flag true/false and a foreground refresh.
-- [ ] Test product USD prices, cart/order USD display and cash SYP settlement.
-- [ ] Confirm old records migrated to `true`, and unauthorized users cannot PATCH.
-
-## Deployment
-
-The backend repository and production Swagger were not accessible during this implementation, so these backend changes remain **unverified and must be implemented/deployed on the actual server** if absent. Frontend deployment alone cannot persist a field ignored by the API.
+**Deployment status**: This file is the frontend/backend API contract. The backend repository/server response could not be verified from the current runtime, so actual read permissions and persisted values require a live API test.
