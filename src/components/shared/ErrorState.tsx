@@ -18,8 +18,8 @@ export function ErrorState({
 
   return (
     <Card className="border-destructive/30">
-      <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <div className="rounded-full bg-destructive/10 p-3">
+      <CardContent className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+        <div className="rounded-lg bg-destructive/10 p-3">
           <AlertTriangle className="h-6 w-6 text-destructive" />
         </div>
         <p className="text-base font-semibold">{t(titleKey)}</p>
