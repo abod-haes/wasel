@@ -55,23 +55,23 @@ export function DataTable<TData>({
     : [];
 
   return (
-    <div dir={i18n.dir()} className="dashboard-data-table flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/75 bg-card">
-      <div className="min-h-0 flex-1 overflow-hidden" aria-busy={isLoading}>
+    <div dir={i18n.dir()} className="dashboard-data-table min-w-0 rounded-xl border border-border/75 bg-card lg:flex lg:h-full lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
+      <div className="min-w-0 lg:min-h-0 lg:flex-1 lg:overflow-hidden" aria-busy={isLoading}>
         {isLoading ? (
-          <div role="status" aria-label={t('common.loading')} className="flex h-full flex-col gap-3 overflow-hidden p-4">
+          <div role="status" aria-label={t('common.loading')} className="flex flex-col gap-3 p-4 lg:h-full lg:overflow-hidden">
             <Skeleton className="h-10 shrink-0 w-full" />
             <Skeleton className="h-10 shrink-0 w-full" />
             <Skeleton className="h-10 shrink-0 w-full" />
           </div>
         ) : safeData.length === 0 ? (
-          <div className="flex h-full min-h-[160px] items-center justify-center overflow-auto p-4">
+          <div className="flex min-h-[160px] items-center justify-center overflow-auto p-4 lg:h-full">
             <EmptyState titleKey={emptyTitleKey} descriptionKey={emptyDescriptionKey} />
           </div>
         ) : (
           <Table
             dir={i18n.dir()}
             stickyHeader
-            containerClassName="h-full min-h-0 w-full overscroll-contain overflow-auto"
+            containerClassName="w-full overflow-x-auto overscroll-x-contain lg:h-full lg:min-h-0 lg:overscroll-contain lg:overflow-auto"
             className="min-w-[640px]"
           >
         <TableHeader>
@@ -99,7 +99,7 @@ export function DataTable<TData>({
       </div>
 
       {pagination ? (
-        <div className="z-10 flex shrink-0 flex-col gap-3 border-t border-border/70 bg-card px-3 py-3 shadow-[0_-5px_18px_-14px_hsl(var(--foreground)/0.35)] md:flex-row md:items-center md:justify-between sm:px-4">
+        <div className="relative z-10 flex shrink-0 flex-col gap-3 border-t border-border/70 bg-card px-3 py-3 shadow-[0_-5px_18px_-14px_hsl(var(--foreground)/0.35)] md:flex-row md:items-center md:justify-between sm:px-4">
           <div className={cn('text-sm text-muted-foreground', isRtl ? 'text-right' : 'text-left')}>
             {t('common.pagination.summary', {
               from: startItem,
