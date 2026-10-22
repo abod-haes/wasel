@@ -1,5 +1,6 @@
 import { ExternalLink, ImageOff, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Badge,
@@ -87,10 +88,12 @@ export function AdsTable({
   onEdit,
   onDelete,
 }: AdsTableProps): React.JSX.Element {
+  const { i18n } = useTranslation();
+
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
-      <div className="overflow-x-auto">
-        <Table>
+    <div className="dashboard-data-table flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-card">
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <Table dir={i18n.dir()} stickyHeader containerClassName="h-full min-h-0 overflow-auto overscroll-contain" className="min-w-[720px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-36">الوسائط</TableHead>
