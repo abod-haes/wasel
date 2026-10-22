@@ -1,7 +1,7 @@
 import { ChevronDown, LogOut, UserCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   Avatar,
@@ -13,11 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui';
+import { formatFullPhoneNumber } from '@/constants/phone';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/store/use-auth-store';
 
-export function UserMenu(): React.JSX.Element {
-  const { t } = useTranslation();
+export function UserMenu(): React.JSX.Element | null {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const refreshMe = useAuthStore((state) => state.refreshMe);
   const logout = useAuthStore((state) => state.logout);
@@ -26,14 +29,13 @@ export function UserMenu(): React.JSX.Element {
     void refreshMe().catch(() => undefined);
   }, [refreshMe]);
 
-  if (!user) {
-    return <div />;
-  }
+  if (!user) return null;
 
   const displayName =
     `${user.firstName} ${user.lastName}`.trim() ||
     user.name ||
-    `${user.countryCallingCode}${user.phoneNumber}`;
+    formatFullPhoneNumber(user.countryCallingCode, user.phoneNumber) ||
+    t('profile.fallbackName');
 
   const initials =
     [user.firstName, user.lastName]
@@ -43,31 +45,66 @@ export function UserMenu(): React.JSX.Element {
       .slice(0, 2)
       .toUpperCase() || displayName.slice(0, 2).toUpperCase();
 
+  const phone = formatFullPhoneNumber(user.countryCallingCode, user.phoneNumber);
+
+  const handleLogout = (): void => {
+    // Logout revokes this browser's stored session and clears all account data
+    // from React Query before navigating to the public login page.
+    logout();
+    navigate(ROUTES.login, { replace: true });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-9 px-2">
-          <Avatar className="h-7 w-7">
-            <AvatarFallback>{initials}</AvatarFallback>
+        <Button
+          type="button"
+          variant="ghost"
+          aria-label={`${t('layout.profile')}: ${displayName}`}
+          className="h-10 max-w-[230px] gap-2 rounded-lg px-2 hover:bg-muted"
+        >
+          <Avatar className="h-8 w-8 border border-border/60">
+            <AvatarFallback className="text-xs font-semibold">{initials}</AvatarFallback>
           </Avatar>
-          <span className="hidden text-sm font-medium sm:inline">{displayName}</span>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <span className="hidden min-w-0 truncate text-sm font-medium sm:inline">
+            {displayName}
+          </span>
+          <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <div className="px-2 py-1.5">
-          <p className="text-sm font-medium">{displayName}</p>
+
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        dir={i18n.dir()}
+        className="w-60 border-border bg-popover p-1.5 text-popover-foreground"
+      >
+        <div className="space-y-1 border-b border-border/70 px-2.5 py-2.5">
+          <p className="truncate text-start text-sm font-semibold">{displayName}</p>
+          {phone ? (
+            <p className="text-start text-xs text-muted-foreground">
+              <span className="inline-block tabular-nums" dir="ltr">{phone}</span>
+            </p>
+          ) : null}
         </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to={ROUTES.profile}>
-            <UserCircle className="me-2 h-4 w-4" />
-            {t('layout.profile')}
+
+        <DropdownMenuItem asChild className="mt-1 min-h-10 cursor-pointer gap-2 rounded-md">
+          <Link
+            to={ROUTES.profile}
+            aria-current={location.pathname === ROUTES.profile ? 'page' : undefined}
+          >
+            <UserCircle aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span>{t('layout.profile')}</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={logout}>
-          <LogOut className="me-2 h-4 w-4" />
-          {t('layout.logout')}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="min-h-10 cursor-pointer gap-2 rounded-md text-destructive focus:text-destructive"
+          onSelect={handleLogout}
+        >
+          <LogOut aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <span>{t('layout.logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
