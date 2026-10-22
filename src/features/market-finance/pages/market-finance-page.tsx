@@ -30,7 +30,7 @@ const financeKey = ['market-finance'] as const;
 function Pagination({ page, totalCount, onChange }: { page: number; totalCount: number; onChange: (page: number) => void }) {
   const { t } = useTranslation();
   const lastPage = Math.max(1, Math.ceil(totalCount / 20));
-  return <div className="flex items-center justify-between gap-3 pt-3">
+  return <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border/70 bg-card pt-3">
     <span className="text-sm text-muted-foreground">{t('marketFinance.pageOf', { page, total: lastPage })}</span>
     <div className="flex gap-2">
       <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => onChange(page - 1)}>{t('marketFinance.previous')}</Button>
@@ -138,7 +138,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-4 w-4 text-primary" /> {t('marketFinance.selectMarket')}</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         {markets.isPending ? <p>{t('marketFinance.loadingMarkets')}</p> : markets.isError ? failed(markets.error, markets.refetch) : <>
-          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3" role="group" aria-label={t('marketFinance.selectMarket')}>
+          <div className="grid max-h-[min(55dvh,620px)] gap-2 overflow-y-auto overscroll-contain sm:grid-cols-2 xl:grid-cols-3" role="group" aria-label={t('marketFinance.selectMarket')}>
             {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} aria-label={`${t('marketFinance.openAccount')}: ${market.marketName}`} onClick={() => chooseMarket(market.marketUserId)} className="rounded-lg border border-border/70 p-3 text-start transition-colors hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
               <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground text-start"><span className="inline-block" dir="ltr">{market.phoneNumber ?? '—'}</span></p>
               <p className="mt-2 font-semibold tabular-nums">{currency(market.currentAmountDue)} <span className="text-xs font-normal">{t('marketFinance.dueShort')}</span></p>
@@ -167,22 +167,22 @@ export default function MarketFinancePage(): React.JSX.Element {
       </div>
       {activeTab === 'orders' ? <Card><CardContent className="space-y-3 p-3 sm:p-4">
         {orders.isPending ? <p>{t('marketFinance.loadingOrders')}</p> : orders.isError ? failed(orders.error, orders.refetch) : <>
-          <div className="overflow-x-auto"><Table dir={i18n.dir()}><TableHeader><TableRow><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.deliveredAt')}</TableHead><TableHead>{t('marketFinance.productsAmount')}</TableHead><TableHead>{t('marketFinance.orderDiscount')}</TableHead><TableHead>{t('marketFinance.details')}</TableHead></TableRow></TableHeader><TableBody>
+          <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.deliveredAt')}</TableHead><TableHead>{t('marketFinance.productsAmount')}</TableHead><TableHead>{t('marketFinance.orderDiscount')}</TableHead><TableHead>{t('marketFinance.details')}</TableHead></TableRow></TableHeader><TableBody>
             {(orders.data?.items ?? []).map((order: MarketFinanceOrder) => <TableRow key={order.orderId}>
               <TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{shortOrder(order.orderId)}</span></TableCell><TableCell>{date(order.deliveredAt)}</TableCell><TableCell>{currency(order.productsAmount)}</TableCell><TableCell>{currency(order.orderDiscountAmount)}</TableCell>
               <TableCell><Button size="sm" variant="outline" onClick={() => setOrderId(order.orderId)}>{t('marketFinance.details')}</Button></TableCell>
             </TableRow>)}
-          </TableBody></Table></div>
+          </TableBody></Table>
           {!orders.data?.items.length && <p className="py-4 text-center text-muted-foreground">{t('marketFinance.emptyOrders')}</p>}
           <Pagination page={orderPage} totalCount={orders.data?.totalCount ?? 0} onChange={setOrderPage} />
         </>}
       </CardContent></Card> : <Card><CardContent className="space-y-3 p-4">
         {transactions.isPending ? <p>{t('marketFinance.loadingTransactions')}</p> : transactions.isError ? failed(transactions.error, transactions.refetch) : <>
-          <div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>{t('marketFinance.transactionDate')}</TableHead><TableHead>{t('marketFinance.transactionType')}</TableHead><TableHead>{t('marketFinance.amount')}</TableHead><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.note')}</TableHead></TableRow></TableHeader><TableBody>
+          <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-[min(50dvh,560px)] overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.transactionDate')}</TableHead><TableHead>{t('marketFinance.transactionType')}</TableHead><TableHead>{t('marketFinance.amount')}</TableHead><TableHead>{t('marketFinance.order')}</TableHead><TableHead>{t('marketFinance.note')}</TableHead></TableRow></TableHeader><TableBody>
             {(transactions.data?.items ?? []).map((item: MarketPayableTransaction) => <TableRow key={item.id}>
               <TableCell>{date(item.createdAt)}</TableCell><TableCell>{item.type === 0 ? t('marketFinance.accrual') : t('marketFinance.settlement')}</TableCell><TableCell>{currency(item.amount)}</TableCell><TableCell className="text-start"><span dir="ltr" className="inline-block font-mono tabular-nums">{item.orderId ? shortOrder(item.orderId) : '—'}</span></TableCell><TableCell>{item.note ?? '—'}</TableCell>
             </TableRow>)}
-          </TableBody></Table></div>
+          </TableBody></Table>
           {!transactions.data?.items.length && <p className="py-4 text-center text-muted-foreground">{t('marketFinance.emptyTransactions')}</p>}
           <Pagination page={transactionPage} totalCount={transactions.data?.totalCount ?? 0} onChange={setTransactionPage} />
         </>}
@@ -192,9 +192,9 @@ export default function MarketFinancePage(): React.JSX.Element {
       <DialogContent dir={i18n.dir()} className="max-w-2xl"><DialogHeader><DialogTitle>{t('marketFinance.orderDetailsTitle', { order: shortOrder(orderId) })}</DialogTitle><DialogDescription>{t('marketFinance.scopedItems')}</DialogDescription></DialogHeader>
         {detail.isPending ? <p>{t('marketFinance.loading')}</p> : detail.isError ? failed(detail.error, detail.refetch) : detail.data && <>
           <p className="text-sm">{t('marketFinance.deliveredAt')}: {date(detail.data.order.deliveredAt)}</p>
-          <div className="max-h-80 overflow-auto"><Table dir={i18n.dir()}><TableHeader><TableRow><TableHead>{t('marketFinance.product')}</TableHead><TableHead>{t('marketFinance.variant')}</TableHead><TableHead>{t('marketFinance.quantity')}</TableHead><TableHead>{t('marketFinance.unitPrice')}</TableHead><TableHead>{t('marketFinance.total')}</TableHead></TableRow></TableHeader><TableBody>
+          <Table dir={i18n.dir()} stickyHeader containerClassName="max-h-80 overscroll-contain"><TableHeader><TableRow><TableHead>{t('marketFinance.product')}</TableHead><TableHead>{t('marketFinance.variant')}</TableHead><TableHead>{t('marketFinance.quantity')}</TableHead><TableHead>{t('marketFinance.unitPrice')}</TableHead><TableHead>{t('marketFinance.total')}</TableHead></TableRow></TableHeader><TableBody>
             {detail.data.items.map((item, index) => <TableRow key={`${item.productId}-${item.variantId ?? ''}-${index}`}><TableCell>{item.productName}</TableCell><TableCell>{item.variantName ?? '—'}</TableCell><TableCell>{item.quantity}</TableCell><TableCell>{currency(item.unitPrice)}</TableCell><TableCell>{currency(item.lineTotal)}</TableCell></TableRow>)}
-          </TableBody></Table></div>
+          </TableBody></Table>
           <p className="font-semibold">{t('marketFinance.currentPayable')}: {currency(detail.data.order.productsAmount)}</p>
           <p className="text-xs text-muted-foreground">{t('marketFinance.discountNote')}</p>
         </>}
