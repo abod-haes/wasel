@@ -1,9 +1,10 @@
 import axios from 'axios';
-import { AlertTriangle, ExternalLink, LoaderCircle, Plus, Search, Save, Smartphone, Info } from 'lucide-react';
+import { AlertTriangle, ExternalLink, LoaderCircle, Plus, Search, Save, Smartphone, Info, Server } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 
 import { PageContainer, SectionHeader } from '@/components/shared';
+import { getActiveApiBaseUrl } from '@/config/api-environment';
 import { Button, Card, CardContent, Input, Label, Switch } from '@/components/ui';
 import { appVersionsApi } from '@/features/app-versions/api/app-versions-api';
 import type {
@@ -98,6 +99,8 @@ function ConfigToggle({
 }
 
 export default function AppVersionsPage(): React.JSX.Element {
+  const connectedApiHost = new URL(getActiveApiBaseUrl()).host;
+  const connectedToDefaultProduction = connectedApiHost === 'prod.octoserv-comp.com';
   const [mode, setMode] = useState<Mode>('edit');
   const [lookupVersion, setLookupVersion] = useState('');
   const [selected, setSelected] = useState<AppVersion | null>(null);
@@ -217,6 +220,16 @@ export default function AppVersionsPage(): React.JSX.Element {
       <SectionHeader
         titleKey="nav.appVersions"
         descriptionKey="أنشئ إصدار التطبيق، واعرض إعداداته برقم النسخة، وتحكّم بخيارات التحديث وروابط التحميل."
+        actions={
+          <div
+            className="inline-flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground"
+            aria-label="السيرفر المتصل"
+          >
+            <Server aria-hidden="true" className="h-4 w-4 text-primary" />
+            <span>{connectedToDefaultProduction ? 'Production API' : 'Connected API'}</span>
+            <code dir="ltr" className="font-mono text-foreground">{connectedApiHost}</code>
+          </div>
+        }
       />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.72fr)]">
@@ -412,8 +425,9 @@ export default function AppVersionsPage(): React.JSX.Element {
           <div className="flex items-start gap-3 rounded-2xl border border-brand-border bg-brand-primary-soft/40 p-4 text-sm leading-6 dark:bg-primary/10">
             <Info className="mt-1 h-5 w-5 shrink-0 text-primary" />
             <div>
-              هاي الصفحة بتدير الإصدارات عبر POST وGET برقم الإصدار وPATCH فقط.
-              ما في Endpoint للقائمة أو الحذف بالعقد الحالي، لذلك ما أضفت جدولاً أو زر حذف غير مدعوم.
+              الإصدارات تستخدم نفس السيرفر المتصل بالداشبورد؛ ما في Backend منفصل إلها.
+              الـ API المتاح حالياً يدعم إنشاء إصدار، جلبه برقم النسخة وتعديله فقط.
+              عرض جميع الإصدارات أو حذف إصدار يحتاج Endpoint من الباك.
             </div>
           </div>
         </div>
