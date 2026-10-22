@@ -208,9 +208,14 @@ export default function AppVersionsPage(): React.JSX.Element {
       const verified = await appVersionsApi.getByVersion(payload.version);
       const savedFlag = readIsProduction(verified);
       if (savedFlag !== payload.isProduction) {
+        // POST may already have created the version even if older backend
+        // ignores isProduction. Keep it selected to avoid a duplicate POST.
+        setSelected(verified);
+        setLookupVersion(verified.version);
+        setMode('edit');
         throw new Error(
-          'تم إرسال الطلب، لكن الباك لم يؤكد حفظ isProduction في GET /api/AppVersions/{version}. '
-          + 'تحقق من دعم الحقل في الباك قبل اعتبار وضع التطبيق متغيراً.',
+          'قد تكون بيانات الإصدار الأخرى حُفظت، لكن الباك لم يؤكد isProduction عند إعادة القراءة. '
+          + 'يجب دعم هذا الحقل في GET وPOST وPATCH قبل اعتبار وضع التطبيق متغيراً.',
         );
       }
 
