@@ -71,8 +71,8 @@ export function DataTable<TData>({
     : [];
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-xl border border-border/75 bg-card">
-      <Table className="min-w-[640px]">
+    <div dir={i18n.dir()} className="min-w-0 overflow-hidden rounded-xl border border-border/75 bg-card">
+      <Table dir={i18n.dir()} className="min-w-[640px]">
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
