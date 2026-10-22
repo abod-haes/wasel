@@ -68,13 +68,13 @@ function SidebarInner({
     <>
       <div
         className={cn(
-          'flex h-16 items-center border-b border-brand-border/80 bg-gradient-to-l from-brand-secondary-soft/80 via-card to-card px-4 dark:from-primary/10',
+          'flex h-16 items-center border-b border-brand-border/80 bg-card px-4',
           collapsed ? 'justify-start px-2' : 'justify-start'
         )}
       >
         {collapsed ? null : <RodoBrandLogo className="h-10 w-36" />}
       </div>
-      <ScrollArea dir={direction} className="h-[calc(100vh-64px)] px-2 py-4">
+      <ScrollArea dir={direction} className="h-[calc(100vh-64px)] px-3 py-3">
         <SidebarNav items={items} collapsed={collapsed} onNavigate={onNavigate} />
       </ScrollArea>
     </>
@@ -90,7 +90,7 @@ export function DesktopSidebar(): React.JSX.Element {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 start-0 z-30 hidden border-e border-brand-border/80 bg-card/95 shadow-card backdrop-blur lg:block dark:border-border',
+        'fixed inset-y-0 start-0 z-30 hidden border-e border-brand-border/80 bg-card lg:block dark:border-border',
         isCollapsed ? 'w-20' : 'w-72'
       )}
     >
