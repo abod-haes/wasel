@@ -47,6 +47,13 @@
     "dark": "داكن",
     "system": "النظام"
   },
+  "navGroups": {
+    "navigation": "القائمة الرئيسية",
+    "overview": "نظرة عامة",
+    "management": "إدارة العمليات",
+    "finance": "المحاسبة",
+    "system": "النظام والإعدادات"
+  },
   "nav": {
     "dashboard": "لوحة التحكم",
     "users": "المستخدمون",
