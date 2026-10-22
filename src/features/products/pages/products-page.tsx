@@ -115,7 +115,7 @@ export default function ProductsPage(): React.JSX.Element {
   };
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="products.title"
         descriptionKey="products.description"
