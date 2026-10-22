@@ -101,7 +101,7 @@ const config: Config = {
         floating: '0 16px 42px -18px rgba(20, 47, 125, 0.22)',
       },
       fontFamily: {
-        sans: ['Tajawal', 'Noto Sans Arabic', 'Manrope', 'sans-serif'],
+        sans: ['Cairo', 'Noto Sans Arabic', 'Manrope', 'sans-serif'],
       },
     },
   },
