@@ -213,7 +213,25 @@ export const appRoutes: RouteObject[] = [
             },
           },
           {
+            path: ROUTES.deliveryFinancePerson,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsView}>
+                {withSuspense(<DeliveryFinancePage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.deliveryFinance' },
+          },
+          {
             path: ROUTES.marketFinance,
+            element: (
+              <PermissionGuard required={PERMISSIONS.marketFinanceView}>
+                {withSuspense(<MarketFinancePage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.marketFinance' },
+          },
+          {
+            path: ROUTES.marketFinanceMarket,
             element: (
               <PermissionGuard required={PERMISSIONS.marketFinanceView}>
                 {withSuspense(<MarketFinancePage />)}
