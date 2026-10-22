@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui';
 import type { Brand } from '@/features/brands/types/brand-types';
@@ -57,11 +58,12 @@ export function ProductFilters({
           : 'xl:grid-cols-[1fr_220px_220px_auto]'
       )}
     >
-      <Input
-        value={filters.search}
-        placeholder={t('products.searchPlaceholder')}
-        onChange={(event) => onChange({ ...filters, search: event.target.value })}
-      />
+      <div className="relative min-w-0">
+        <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input type="search" aria-label={t('products.searchPlaceholder')} className="ps-10" value={filters.search}
+          placeholder={t('products.searchPlaceholder')}
+          onChange={(event) => onChange({ ...filters, search: event.target.value })} />
+      </div>
 
       <Select
         value={filters.categoryId}
