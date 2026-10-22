@@ -483,7 +483,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <MiniValue
                   label={t('deliveryFinance.order')}
-                  value={orderQuery.data.order.orderId}
+                  value={`#${orderQuery.data.order.orderId.slice(-3)}`}
                 />
                 <MiniValue
                   label={t('deliveryFinance.paymentWay')}
@@ -636,7 +636,7 @@ function FinanceOrdersTable({
         ) : (
           orders.map((order) => (
             <TableRow key={order.orderId}>
-              <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
+              <TableCell className="font-mono text-xs">#{order.orderId.slice(-3)}</TableCell>
               <TableCell>{dateTime(order.deliveredAt)}</TableCell>
               <TableCell>{paymentWayLabel(order.paymentWay, t)}</TableCell>
               <TableCell>{money(order.itemsTotal)}</TableCell>
