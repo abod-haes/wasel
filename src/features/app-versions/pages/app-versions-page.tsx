@@ -448,7 +448,7 @@ export default function AppVersionsPage(): React.JSX.Element {
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">رقم الإصدار</dt><dd dir="ltr" className="font-bold">{selected.version}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">التحديث</dt><dd className="font-semibold">{selected.forceUpdate ? 'إجباري' : selected.needToUpdate ? 'اختياري' : 'غير مطلوب'}</dd></div>
                   <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">الظهور</dt><dd className="font-semibold">{selected.isVisible ? 'ظاهر' : 'مخفي'}</dd></div>
-                  <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">وضع الإصدار</dt><dd className="font-semibold">{readIsProduction(selected) === undefined ? 'غير مؤكد من السيرفر' : readIsProduction(selected) ? 'Production • ل.س' : 'Development • 
+                  <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">وضع الإصدار</dt><dd className="font-semibold">{readIsProduction(selected) === undefined ? 'غير مؤكد من السيرفر' : readIsProduction(selected) ? 'Production • ل.س' : `Development • ${String.fromCharCode(36)}`}</dd></div>
                   {selected.createdAt ? (
                     <div className="flex items-center justify-between gap-2">
                       <dt className="text-muted-foreground">تاريخ الإنشاء</dt>
