@@ -45,7 +45,7 @@ export function DataTable<TData>({
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border bg-card">
+      <div role="status" aria-label={t('common.loading')} className="rounded-xl border bg-card">
         <div className="space-y-3 p-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -71,8 +71,8 @@ export function DataTable<TData>({
     : [];
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
-      <Table>
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border/75 bg-card">
+      <Table className="min-w-[640px]">
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
@@ -96,7 +96,7 @@ export function DataTable<TData>({
       </Table>
 
       {pagination ? (
-        <div className="flex flex-col gap-3 border-t bg-muted/20 px-4 py-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 border-t border-border/70 bg-card px-3 py-3 md:flex-row md:items-center md:justify-between sm:px-4">
           <div className={cn('text-sm text-muted-foreground', isRtl ? 'text-right' : 'text-left')}>
             {t('common.pagination.summary', {
               from: startItem,
