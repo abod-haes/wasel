@@ -1,4 +1,6 @@
 import {
+  ArrowLeft,
+  ArrowRight,
   Banknote,
   Eye,
   HandCoins,
@@ -7,7 +9,8 @@ import {
   WalletCards,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ROUTES } from '@/constants/routes';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorState, PageContainer, SectionHeader } from '@/components/shared';
@@ -114,7 +117,9 @@ function LimitBadge({ delivery }: { delivery: DeliveryFinanceSummary }): React.J
 }
 
 export default function DeliveryFinancePage(): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { deliveryPersonId } = useParams<{ deliveryPersonId?: string }>();
   const [searchParams] = useSearchParams();
   const deepLinkedDeliveryId = searchParams.get('deliveryPersonId') || undefined;
   const [listPagination, setListPagination] = useState<PaginationParams>({
@@ -125,14 +130,13 @@ export default function DeliveryFinancePage(): React.JSX.Element {
     page: 1,
     pageSize: 10,
   });
-  const [selectedDeliveryId, setSelectedDeliveryId] =
-    useState<string | undefined>(deepLinkedDeliveryId);
+  const selectedDeliveryId = deliveryPersonId;
   const [activeTab, setActiveTab] = useState<'orders' | 'transactions'>('orders');
   const [selectedOrderId, setSelectedOrderId] = useState<string>();
   const [settleOpen, setSettleOpen] = useState(false);
   const [settleNote, setSettleNote] = useState('');
 
-  const listQuery = useDeliveryFinanceListQuery(listPagination);
+  const listQuery = useDeliveryFinanceListQuery(listPagination, !selectedDeliveryId);
   const summaryQuery = useDeliveryFinanceSummaryQuery(selectedDeliveryId);
   const ordersQuery = useDeliveryFinanceOrdersQuery(
     selectedDeliveryId,
@@ -145,15 +149,14 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   const orderQuery = useDeliveryFinanceOrderQuery(selectedOrderId);
   const settleMutation = useSettleDeliveryCashMutation();
 
+  // Support old deep links but always show settlement details in their own page.
   useEffect(() => {
-    if (deepLinkedDeliveryId) {
-      setSelectedDeliveryId(deepLinkedDeliveryId);
-      setActiveTab('orders');
-      setDetailPagination({ page: 1, pageSize: 10 });
+    if (deepLinkedDeliveryId && !selectedDeliveryId) {
+      navigate(generatePath(ROUTES.deliveryFinancePerson, { deliveryPersonId: deepLinkedDeliveryId }), { replace: true });
     }
-  }, [deepLinkedDeliveryId]);
+  }, [deepLinkedDeliveryId, navigate, selectedDeliveryId]);
 
-  if (listQuery.isError) {
+  if (listQuery.isError && !selectedDeliveryId) {
     return <ErrorState onRetry={() => void listQuery.refetch()} />;
   }
 
@@ -161,10 +164,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   const list = listQuery.data;
 
   const selectDelivery = (id: string): void => {
-    setSelectedDeliveryId(id);
-    setActiveTab('orders');
-    setDetailPagination({ page: 1, pageSize: 10 });
-    setSelectedOrderId(undefined);
+    navigate(generatePath(ROUTES.deliveryFinancePerson, { deliveryPersonId: id }));
   };
 
   const settle = (): void => {
@@ -176,7 +176,6 @@ export default function DeliveryFinancePage(): React.JSX.Element {
         onSuccess: () => {
           setSettleOpen(false);
           setSettleNote('');
-          void listQuery.refetch();
           void summaryQuery.refetch();
           void transactionsQuery.refetch();
         },
@@ -185,7 +184,13 @@ export default function DeliveryFinancePage(): React.JSX.Element {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className={i18n.dir() === 'rtl' ? '[direction:rtl]' : '[direction:ltr]'}>
+      {selectedDeliveryId && (
+        <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.deliveryFinance)} className="gap-2">
+          {i18n.dir() === 'rtl' ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+          {t('deliveryFinance.backToList')}
+        </Button>
+      )}
       <SectionHeader
         titleKey="deliveryFinance.title"
         descriptionKey="deliveryFinance.description"
@@ -193,8 +198,8 @@ export default function DeliveryFinancePage(): React.JSX.Element {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={() => void listQuery.refetch()}
-            disabled={listQuery.isFetching}
+            onClick={() => void (selectedDeliveryId ? summaryQuery.refetch() : listQuery.refetch())}
+            disabled={selectedDeliveryId ? summaryQuery.isFetching : listQuery.isFetching}
           >
             <RefreshCw className="h-4 w-4" />
             {t('deliveryFinance.refresh')}
@@ -202,12 +207,12 @@ export default function DeliveryFinancePage(): React.JSX.Element {
         }
       />
 
-      <Card>
+      {!selectedDeliveryId && <Card>
         <CardHeader>
           <CardTitle>{t('deliveryFinance.deliveryList')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Table>
+          <Table dir={i18n.dir()}>
             <TableHeader>
               <TableRow>
                 <TableHead>{t('deliveryFinance.delivery')}</TableHead>
@@ -244,7 +249,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                     }
                   >
                     <TableCell className="font-medium">{delivery.deliveryPersonName}</TableCell>
-                    <TableCell dir="ltr">{delivery.phoneNumber}</TableCell>
+                    <TableCell className="text-start"><span dir="ltr" className="inline-block tabular-nums">{delivery.phoneNumber}</span></TableCell>
                     <TableCell>{delivery.deliveredOrdersCount}</TableCell>
                     <TableCell className="font-semibold">
                       {money(delivery.currentCashHeld)} {t('deliveryFinance.currency')}
@@ -283,7 +288,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
             />
           ) : null}
         </CardContent>
-      </Card>
+      </Card>}
 
       {selectedDeliveryId ? (
         <Card className="border-primary/15">
@@ -503,7 +508,7 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                 />
               </div>
 
-              <Table>
+              <Table dir={i18n.dir()}>
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('deliveryFinance.product')}</TableHead>
@@ -602,10 +607,10 @@ function FinanceOrdersTable({
   loading: boolean;
   onOpen: (orderId: string) => void;
 }): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
-    <Table>
+    <Table dir={i18n.dir()}>
       <TableHeader>
         <TableRow>
           <TableHead>{t('deliveryFinance.order')}</TableHead>
@@ -636,7 +641,7 @@ function FinanceOrdersTable({
         ) : (
           orders.map((order) => (
             <TableRow key={order.orderId}>
-              <TableCell className="font-mono text-xs">#{order.orderId.slice(-3)}</TableCell>
+              <TableCell className="text-start"><span dir="ltr" className="inline-block font-mono text-xs tabular-nums">#{order.orderId.slice(-3)}</span></TableCell>
               <TableCell>{dateTime(order.deliveredAt)}</TableCell>
               <TableCell>{paymentWayLabel(order.paymentWay, t)}</TableCell>
               <TableCell>{money(order.itemsTotal)}</TableCell>
@@ -665,10 +670,10 @@ function TransactionsTable({
   transactions: DeliveryCashTransaction[];
   loading: boolean;
 }): React.JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
-    <Table>
+    <Table dir={i18n.dir()}>
       <TableHeader>
         <TableRow>
           <TableHead>{t('deliveryFinance.date')}</TableHead>
@@ -704,7 +709,7 @@ function TransactionsTable({
                 </Badge>
               </TableCell>
               <TableCell className="font-mono text-xs">
-                {transaction.orderId ?? '-'}
+                {transaction.orderId ? <span dir="ltr" className="inline-block">#{transaction.orderId.slice(-3)}</span> : '-'}
               </TableCell>
               <TableCell className="font-medium">{money(transaction.amount)}</TableCell>
               <TableCell className="font-mono text-xs">
