@@ -4,6 +4,7 @@ import {
   Bookmark,
   ClipboardList,
   HandCoins,
+  Wallet,
   LayoutDashboard,
   Megaphone,
   MessageCircleMore,
@@ -84,6 +85,13 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
     to: ROUTES.deliveryFinance,
     icon: HandCoins,
     permission: PERMISSIONS.settingsView,
+  },
+  {
+    key: 'market-finance',
+    labelKey: 'nav.marketFinance',
+    to: ROUTES.marketFinance,
+    icon: Wallet,
+    permission: PERMISSIONS.marketFinanceView,
   },
   {
     key: 'notifications',
