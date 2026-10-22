@@ -29,7 +29,9 @@ export function AppLayout(): React.JSX.Element {
       className={cn(
         'bg-background',
         fixedTableWorkspace
-          ? 'fixed inset-0 flex min-h-0 flex-col overflow-hidden'
+          // Keep table-only scrolling on desktop; smaller touch screens must
+          // scroll the full page so filters and pagination remain reachable.
+          ? 'min-h-dvh lg:fixed lg:inset-0 lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden'
           : 'min-h-screen',
       )}
     >
@@ -40,14 +42,14 @@ export function AppLayout(): React.JSX.Element {
         className={cn(
           'transition-all duration-200 lg:ps-72',
           isCollapsed && 'lg:ps-20',
-          fixedTableWorkspace && 'flex min-h-0 flex-1 flex-col overflow-hidden',
+          fixedTableWorkspace && 'lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden',
         )}
       >
         <AppHeader />
         <main
           className={cn(
             'min-w-0',
-            fixedTableWorkspace ? 'min-h-0 flex-1 overflow-hidden' : 'pb-8',
+            fixedTableWorkspace ? 'pb-8 lg:min-h-0 lg:flex-1 lg:overflow-hidden lg:pb-0' : 'pb-8',
           )}
         >
           <Outlet />
