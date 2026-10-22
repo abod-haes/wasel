@@ -153,7 +153,7 @@ export default function UsersPage(): React.JSX.Element {
     resetPasswordMutation.isPending;
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="users.title"
         descriptionKey="users.description"
