@@ -63,9 +63,13 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Tajawal', 'Noto Sans Arabic', 'Manrope', sans-serif;
+    font-family: 'Cairo', 'Noto Sans Arabic', 'Manrope', sans-serif;
     text-align: start;
     background-image: none;
+  }
+
+  html[dir='ltr'] body {
+    font-family: 'Manrope', 'Cairo', sans-serif;
   }
 
   input,
@@ -89,6 +93,12 @@
   }
 
   .animate-stagger {
-    animation: fade-in 0.4s ease-out both;
+    animation: fade-in 0.25s ease-out both;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-stagger { animation: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+
 }
