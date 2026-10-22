@@ -55,7 +55,7 @@ export function DataTable<TData>({
     : [];
 
   return (
-    <div dir={i18n.dir()} className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/75 bg-card">
+    <div dir={i18n.dir()} className="dashboard-data-table flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/75 bg-card">
       <div className="min-h-0 flex-1 overflow-hidden" aria-busy={isLoading}>
         {isLoading ? (
           <div role="status" aria-label={t('common.loading')} className="flex h-full flex-col gap-3 overflow-hidden p-4">
