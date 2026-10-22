@@ -5,26 +5,26 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-semibold tracking-[0.01em] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none',
+  'relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none',
   {
     variants: {
       variant: {
         default:
-          'border border-primary/25 bg-primary text-primary-foreground shadow-[0_12px_28px_-16px_rgba(20,47,125,0.50)] hover:-translate-y-0.5 hover:bg-brand-primary-dark hover:text-white hover:shadow-[0_18px_34px_-17px_rgba(20,47,125,0.42)] dark:hover:bg-primary/85 dark:hover:text-primary-foreground',
+          'border border-primary bg-primary text-primary-foreground shadow-sm hover:bg-primary/90',
         secondary:
-          'border border-brand-secondary/60 bg-brand-secondary-soft text-brand-primary-dark shadow-sm hover:-translate-y-0.5 hover:border-brand-secondary hover:bg-brand-secondary dark:border-brand-secondary/60 dark:bg-brand-secondary dark:text-brand-primary-dark',
+          'border border-secondary/60 bg-secondary text-secondary-foreground hover:bg-secondary/85',
         ghost:
-          'border border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/8 hover:text-primary',
+          'border border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
         outline:
-          'border border-brand-border bg-background/80 text-foreground backdrop-blur hover:border-primary/45 hover:bg-primary/5 dark:border-border',
+          'border border-border bg-background text-foreground hover:bg-muted hover:border-primary/35',
         destructive:
-          'border border-destructive/20 bg-destructive text-destructive-foreground shadow-sm hover:-translate-y-0.5 hover:bg-destructive/90',
+          'border border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/90',
       },
       size: {
-        default: 'h-11 px-5',
-        sm: 'h-9 rounded-xl px-3 text-xs',
-        lg: 'h-12 rounded-2xl px-8 text-base',
-        icon: 'h-11 w-11',
+        default: 'h-10 px-4',
+        sm: 'h-9 rounded-md px-3 text-xs',
+        lg: 'h-11 px-6 text-sm',
+        icon: 'h-10 w-10',
       },
     },
     defaultVariants: {
