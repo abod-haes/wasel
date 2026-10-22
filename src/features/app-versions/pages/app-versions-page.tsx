@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { AlertTriangle, ExternalLink, LoaderCircle, Plus, Search, Save, Smartphone, Info, Server } from 'lucide-react';
+import { AlertTriangle, ExternalLink, LoaderCircle, Plus, Search, Save, Smartphone, Info } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 
 import { PageContainer, SectionHeader } from '@/components/shared';
-import { getActiveApiBaseUrl } from '@/config/api-environment';
 import { Button, Card, CardContent, Input, Label, Switch } from '@/components/ui';
 import { appVersionsApi } from '@/features/app-versions/api/app-versions-api';
 import type {
@@ -105,8 +104,6 @@ function ConfigToggle({
 }
 
 export default function AppVersionsPage(): React.JSX.Element {
-  const connectedApiHost = new URL(getActiveApiBaseUrl()).host;
-  const connectedToDefaultProduction = connectedApiHost === 'prod.octoserv-comp.com';
   const [mode, setMode] = useState<Mode>('edit');
   const [lookupVersion, setLookupVersion] = useState('');
   const [selected, setSelected] = useState<AppVersion | null>(null);
@@ -252,13 +249,9 @@ export default function AppVersionsPage(): React.JSX.Element {
         titleKey="nav.appVersions"
         descriptionKey="أنشئ إصدار التطبيق، واعرض إعداداته برقم النسخة، وتحكّم بخيارات التحديث وروابط التحميل."
         actions={
-          <div
-            className="inline-flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground"
-            aria-label="السيرفر المتصل"
-          >
-            <Server aria-hidden="true" className="h-4 w-4 text-primary" />
-            <span>{connectedToDefaultProduction ? 'Production API' : 'Connected API'}</span>
-            <code dir="ltr" className="font-mono text-foreground">{connectedApiHost}</code>
+          <div className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+            <Smartphone aria-hidden="true" className="h-4 w-4" />
+            إعدادات إصدار تطبيق RODO
           </div>
         }
       />
