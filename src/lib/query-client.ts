@@ -9,7 +9,9 @@ export const queryClient = new QueryClient({
       retry: 1,
       staleTime: 0,
       refetchOnMount: 'always',
-      refetchOnWindowFocus: false,
+      // The dashboard does not expose manual refresh buttons.
+      // Revalidate stale data automatically when the user returns to this tab.
+      refetchOnWindowFocus: true,
     },
     mutations: {
       retry: 0,
