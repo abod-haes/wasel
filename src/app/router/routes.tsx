@@ -29,6 +29,7 @@ const DiscountCodesPage = lazyRoute(() => import('@/features/discount-codes/page
 const DeliveryFinancePage = lazyRoute(
   () => import('@/features/delivery-finance/pages/delivery-finance-page')
 );
+const MarketFinancePage = lazyRoute(() => import('@/features/market-finance/pages/market-finance-page'));
 const NotificationsPage = lazyRoute(() => import('@/features/notifications/pages/notifications-page'));
 const OtpAdminPage = lazyRoute(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazyRoute(() => import('@/features/settings/pages/settings-page'));
@@ -210,6 +211,15 @@ export const appRoutes: RouteObject[] = [
             handle: {
               breadcrumbKey: 'nav.deliveryFinance',
             },
+          },
+          {
+            path: ROUTES.marketFinance,
+            element: (
+              <PermissionGuard required={PERMISSIONS.marketFinanceView}>
+                {withSuspense(<MarketFinancePage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.marketFinance' },
           },
           {
             path: ROUTES.notifications,
