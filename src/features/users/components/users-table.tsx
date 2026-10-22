@@ -1,4 +1,4 @@
-import { formatDate } from '@/lib/date-time';
+import { formatDateTime } from '@/lib/date-time';
 import { Ban, KeyRound, LockOpen, Pencil, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -101,11 +101,11 @@ export function UsersTable({
       {
         key: 'lastLogin',
         header: t('users.table.lastLogin'),
-        headerClassName: 'min-w-[150px]',
-        className: 'min-w-[150px]',
+        headerClassName: 'min-w-[190px]',
+        className: 'min-w-[190px]',
         renderCell: (user: User) => (
           <span className="whitespace-nowrap text-sm tabular-nums text-muted-foreground">
-            <span dir="ltr" className="inline-block">{formatDate(user.lastLogin)}</span>
+            <span dir="ltr" className="inline-block">{formatDateTime(user.lastLogin)}</span>
           </span>
         ),
       },
