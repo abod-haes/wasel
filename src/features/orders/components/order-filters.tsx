@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 
 import {
   Button,
@@ -22,16 +23,12 @@ export function OrderFilters({ filters, onChange, onReset }: OrderFiltersProps):
 
   return (
     <div className="grid gap-3 rounded-xl border bg-card p-4 md:grid-cols-[1fr_220px_auto] md:items-end">
-      <Input
-        value={filters.search}
-        placeholder={t('orders.searchPlaceholder')}
-        onChange={(event) =>
-          onChange({
-            ...filters,
-            search: event.target.value,
-          })
-        }
-      />
+      <div className="relative min-w-0">
+        <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input type="search" aria-label={t('orders.searchPlaceholder')} className="ps-10"
+          value={filters.search} placeholder={t('orders.searchPlaceholder')}
+          onChange={(event) => onChange({ ...filters, search: event.target.value })} />
+      </div>
 
       <Select
         value={String(filters.status)}
