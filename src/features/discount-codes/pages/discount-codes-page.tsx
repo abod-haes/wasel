@@ -392,7 +392,7 @@ export default function DiscountCodesPage(): React.JSX.Element {
   if (query.isError) return <ErrorState onRetry={() => void query.refetch()} />;
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="أكواد الخصم"
         descriptionKey="إدارة أكواد الخصم على مستوى الطلب. عروض المنتجات تُطبّق أولاً ثم يطبق الباك كود الخصم."
