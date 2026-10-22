@@ -39,7 +39,7 @@ export default function OrdersPage(): React.JSX.Element {
 
     if (isMarket && isForbidden) {
       return (
-        <PageContainer>
+        <PageContainer fixedTableLayout>
           <SectionHeader titleKey="orders.marketTitle" descriptionKey="orders.marketDescription" />
           <Card className="border-amber-500/25 bg-amber-500/5">
             <CardContent className="space-y-2 p-5">
@@ -81,7 +81,7 @@ export default function OrdersPage(): React.JSX.Element {
   };
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey={isMarket ? 'orders.marketTitle' : 'orders.title'}
         descriptionKey={isMarket ? 'orders.marketDescription' : 'orders.description'}
