@@ -646,7 +646,8 @@
     "openFinance": "Open delivery finance",
     "admin": "Admin",
     "authoritativeBalanceTitle": "Backend-authoritative balance",
-    "authoritativeBalanceHint": "The current balance is never reconstructed from order history. The UI trusts currentCashHeld and the backend ledger, and settlement only happens through the settlement action."
+    "authoritativeBalanceHint": "The current balance is never reconstructed from order history. The UI trusts currentCashHeld and the backend ledger, and settlement only happens through the settlement action.",
+    "backToList": "Back to couriers"
   },
   "deliveryPricing": {
     "title": "Delivery Pricing & Cash Limit",
@@ -737,6 +738,8 @@
     "loadError": "Could not load data or complete the operation.",
     "retry": "Retry",
     "noPermission": "You do not have access to Market Finance.",
-    "orderDate": "Delivered at"
+    "orderDate": "Delivered at",
+    "backToMarkets": "Back to markets",
+    "openAccount": "Open market financial account"
   }
 }
