@@ -219,14 +219,14 @@ const SelectContent = React.forwardRef<
           position={position}
           sideOffset={sideOffset}
           className={cn(
-            'relative z-[100] flex max-h-80 min-w-[8rem] flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg',
+            'relative isolate z-[100] flex max-h-80 min-w-[8rem] flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-[0_12px_32px_-12px_rgba(15,23,42,0.28)] dark:shadow-[0_16px_36px_-16px_rgba(0,0,0,0.65)]',
             position === 'popper' && 'w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-0 data-[side=top]:-translate-y-0',
             className
           )}
           {...props}
         >
           {searchable ? (
-            <div className="relative shrink-0 border-b border-border/60 p-2">
+            <div className="relative shrink-0 border-b border-border/60 bg-popover p-2">
               <Search className="pointer-events-none absolute end-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 ref={setInputRef}
@@ -243,7 +243,7 @@ const SelectContent = React.forwardRef<
             </div>
           ) : null}
           <SelectScrollUpButton />
-          <SelectPrimitive.Viewport className="min-h-0 w-full max-h-60 overflow-y-auto p-1.5">
+          <SelectPrimitive.Viewport className="min-h-0 w-full max-h-60 overflow-y-auto bg-popover p-1.5">
             {children}
             {isLoading ? (
               <div role="status" className="flex items-center justify-center gap-2 px-3 py-3 text-xs text-muted-foreground">
