@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowDownLeft, CheckCircle2, RefreshCw, Store, Wallet } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { PageContainer } from '@/components/shared';
 import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -31,10 +34,11 @@ function Pagination({ page, totalCount, onChange }: { page: number; totalCount: 
       <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => onChange(page - 1)}>السابق</Button>
       <Button size="sm" variant="outline" disabled={page >= lastPage} onClick={() => onChange(page + 1)}>التالي</Button>
     </div>
-  </div>;
+  </PageContainer>;
 }
 
 export default function MarketFinancePage(): React.JSX.Element {
+  const { i18n } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const admin = isAdminRole(user?.roles ?? []);
   const allowed = admin || isMarketRole(user?.roles ?? []);
@@ -101,19 +105,19 @@ export default function MarketFinancePage(): React.JSX.Element {
 
   if (!allowed) return <div className="p-6">ليس لديك صلاحية لعرض مالية المحلات.</div>;
 
-  return <div className="space-y-5 p-4 md:p-6" dir="rtl">
+  return <PageContainer className="space-y-5" >
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div><h1 className="text-2xl font-bold">مالية المحلات</h1><p className="text-sm text-muted-foreground">{admin ? 'حسابات المحلات والتسويات المالية' : 'مستحقات محلك لدى الإدارة وسجل المدفوعات'}</p></div>
-      <Button variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}>تحديث البيانات</Button>
+      <div className="space-y-1"><p className="text-xs font-semibold text-primary">RODO / FINANCE</p><h1 className="text-xl font-bold tracking-tight sm:text-2xl">مالية المحلات</h1><p className="text-sm text-muted-foreground">{admin ? 'حسابات المحلات والتسويات المالية' : 'مستحقات محلك لدى الإدارة وسجل المدفوعات'}</p></div>
+      <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: financeKey })}><RefreshCw className="me-2 h-4 w-4" /> تحديث البيانات</Button>
     </div>
     {admin && <Card>
-      <CardHeader><CardTitle>اختر المحل</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2"><Store className="h-4 w-4 text-primary" /> اختر المحل</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         {markets.isPending ? <p>جاري تحميل المحلات...</p> : markets.isError ? failed(markets.error, markets.refetch) : <>
-          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} onClick={() => chooseMarket(market.marketUserId)} className={`rounded-xl border p-3 text-right transition-colors hover:bg-muted ${selectedId === market.marketUserId ? 'border-primary bg-primary/5' : ''}`}>
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} onClick={() => chooseMarket(market.marketUserId)} className={`rounded-lg border p-3 text-start transition-colors hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${selectedId === market.marketUserId ? 'border-primary bg-primary/5' : 'border-border/70'}`}>
               <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground" dir="ltr">{market.phoneNumber ?? '—'}</p>
-              <p className="mt-2 font-semibold">{currency(market.currentAmountDue)} <span className="text-xs font-normal">مستحق</span></p>
+              <p className="mt-2 font-semibold tabular-nums">{currency(market.currentAmountDue)} <span className="text-xs font-normal">مستحق</span></p>
             </button>)}
           </div>
           {!markets.data?.items.length && <p className="text-muted-foreground">لا توجد محلات لعرضها.</p>}
@@ -123,10 +127,10 @@ export default function MarketFinancePage(): React.JSX.Element {
     </Card>}
     {(!admin || selectedId) && <>
       {summary.isPending ? <p>جاري تحميل ملخص الحساب...</p> : summary.isError ? failed(summary.error, summary.refetch) : summary.data && <>
-        <div className="grid gap-3 md:grid-cols-3">
-          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">المبلغ المستحق للمحل من الإدارة</p><p className="mt-2 text-2xl font-bold">{currency(summary.data.currentAmountDue)}</p><p className="text-xs text-muted-foreground">وفق رصيد دفتر الحسابات في السيرفر</p></CardContent></Card>
-          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">الطلبات المسلّمة</p><p className="mt-2 text-2xl font-bold">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
-          <Card><CardContent className="p-5"><p className="text-sm text-muted-foreground">آخر تسوية</p><p className="mt-2 font-semibold">{date(summary.data.lastSettlementAt)}</p></CardContent></Card>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <Card><CardContent className="space-y-2 p-4 sm:p-5"><Wallet className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">المبلغ المستحق للمحل من الإدارة</p><p className="mt-2 text-2xl font-bold tabular-nums">{currency(summary.data.currentAmountDue)}</p><p className="text-xs text-muted-foreground">وفق رصيد دفتر الحسابات في السيرفر</p></CardContent></Card>
+          <Card><CardContent className="space-y-2 p-4 sm:p-5"><CheckCircle2 className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">الطلبات المسلّمة</p><p className="mt-2 text-2xl font-bold">{summary.data.deliveredOrdersCount}</p></CardContent></Card>
+          <Card><CardContent className="space-y-2 p-4 sm:p-5"><ArrowDownLeft className="h-5 w-5 text-primary" /><p className="text-sm text-muted-foreground">آخر تسوية</p><p className="mt-2 font-semibold">{date(summary.data.lastSettlementAt)}</p></CardContent></Card>
         </div>
         {admin && <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">المحل: {summary.data.marketName}</p>
@@ -135,9 +139,9 @@ export default function MarketFinancePage(): React.JSX.Element {
       </>}
       <div className="flex gap-2">
         <Button variant={activeTab === 'orders' ? 'default' : 'outline'} onClick={() => setActiveTab('orders')}>الطلبات المسلّمة</Button>
-        <Button variant={activeTab === 'transactions' ? 'default' : 'outline'} onClick={() => setActiveTab('transactions')}>سجل الحركات</Button>
+        <Button size="sm" variant={activeTab === 'transactions' ? 'default' : 'outline'} onClick={() => setActiveTab('transactions')}>سجل الحركات</Button>
       </div>
-      {activeTab === 'orders' ? <Card><CardContent className="space-y-3 p-4">
+      {activeTab === 'orders' ? <Card><CardContent className="space-y-3 p-3 sm:p-4">
         {orders.isPending ? <p>جاري تحميل الطلبات...</p> : orders.isError ? failed(orders.error, orders.refetch) : <>
           <div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>الطلب</TableHead><TableHead>تاريخ التسليم</TableHead><TableHead>قيمة منتجات المحل</TableHead><TableHead>خصم الطلب (للعرض فقط)</TableHead><TableHead>التفاصيل</TableHead></TableRow></TableHeader><TableBody>
             {(orders.data?.items ?? []).map((order: MarketFinanceOrder) => <TableRow key={order.orderId}>
@@ -161,7 +165,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       </CardContent></Card>}
     </>}
     <Dialog open={Boolean(orderId)} onOpenChange={(open) => { if (!open) setOrderId(''); }}>
-      <DialogContent dir="rtl" className="max-w-2xl"><DialogHeader><DialogTitle>تفاصيل الطلب {orderId && shortOrder(orderId)}</DialogTitle><DialogDescription>تظهر فقط منتجات المحل المعني، دون بيانات حسابات المحلات الأخرى.</DialogDescription></DialogHeader>
+      <DialogContent dir={i18n.dir()} className="max-w-2xl"><DialogHeader><DialogTitle>تفاصيل الطلب {orderId && shortOrder(orderId)}</DialogTitle><DialogDescription>تظهر فقط منتجات المحل المعني، دون بيانات حسابات المحلات الأخرى.</DialogDescription></DialogHeader>
         {detail.isPending ? <p>جاري التحميل...</p> : detail.isError ? failed(detail.error, detail.refetch) : detail.data && <>
           <p className="text-sm">تاريخ التسليم: {date(detail.data.order.deliveredAt)}</p>
           <div className="max-h-80 overflow-auto"><Table><TableHeader><TableRow><TableHead>المنتج</TableHead><TableHead>النوع</TableHead><TableHead>الكمية</TableHead><TableHead>سعر الوحدة</TableHead><TableHead>المجموع</TableHead></TableRow></TableHeader><TableBody>
@@ -173,7 +177,7 @@ export default function MarketFinancePage(): React.JSX.Element {
       </DialogContent>
     </Dialog>
     {admin && <Dialog open={confirmSettlement} onOpenChange={(open) => { if (!settlement.isPending) setConfirmSettlement(open); }}>
-      <DialogContent dir="rtl"><DialogHeader><DialogTitle>تأكيد التسوية الكاملة</DialogTitle><DialogDescription>سيتم تسجيل دفع كامل المستحق الحالي للمحل من الإدارة. لا يمكن اختيار مبلغ جزئي. تحقّق من المبلغ قبل المتابعة.</DialogDescription></DialogHeader>
+      <DialogContent dir={i18n.dir()}><DialogHeader><DialogTitle>تأكيد التسوية الكاملة</DialogTitle><DialogDescription>سيتم تسجيل دفع كامل المستحق الحالي للمحل من الإدارة. لا يمكن اختيار مبلغ جزئي. تحقّق من المبلغ قبل المتابعة.</DialogDescription></DialogHeader>
         <p className="text-xl font-bold">{currency(summary.data?.currentAmountDue ?? 0)}</p>
         <Textarea placeholder="ملاحظة اختيارية (500 حرف كحد أقصى)" maxLength={500} value={note} onChange={(event) => setNote(event.target.value)} />
         <DialogFooter className="gap-2"><Button variant="outline" disabled={settlement.isPending} onClick={() => setConfirmSettlement(false)}>إلغاء</Button>
