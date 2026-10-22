@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -82,7 +83,7 @@ export function NotificationsTable({
         header: t('notifications.table.createdAt'),
         renderCell: (notification: AppNotification) => (
           <span className="text-sm text-muted-foreground">
-            {new Date(notification.createdAt).toLocaleString()}
+            <span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{formatDateTime(notification.createdAt)}</span>
           </span>
         ),
       },
