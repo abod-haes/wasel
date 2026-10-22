@@ -73,7 +73,9 @@
     "myOrders": "My Orders",
     "deliveryFinance": "Delivery Finance",
     "marketFinance": "Market Finance",
-    "discountCodes": "Discount Codes"
+    "discountCodes": "Discount Codes",
+    "appVersions": "App Versions",
+    "productImageStats": "Product Image Statistics"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
@@ -720,7 +722,6 @@
     "scopedItems": "Only this market's order items are shown, not other markets' financial data.",
     "loading": "Loading…",
     "product": "Product",
-    "variant": "Variant",
     "quantity": "Quantity",
     "unitPrice": "Unit price",
     "total": "Total",
