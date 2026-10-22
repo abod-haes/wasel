@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { AppHeader } from '@/app/layouts/app-header';
+import { PushNotificationsBridge } from '@/features/push/push-notifications-bridge';
 import { DesktopSidebar, MobileSidebar } from '@/app/layouts/app-sidebar';
 import { ROUTES } from '@/constants/routes';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,7 @@ export function AppLayout(): React.JSX.Element {
           : 'min-h-screen',
       )}
     >
+      <PushNotificationsBridge />
       <DesktopSidebar />
       <MobileSidebar />
 
