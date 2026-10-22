@@ -25,18 +25,29 @@ export function AppLayout(): React.JSX.Element {
   const fixedTableWorkspace = fixedTableRoutes.has(pathname);
 
   return (
-    <div className={cn('min-h-screen bg-background', fixedTableWorkspace && 'h-dvh overflow-hidden')}>
+    <div
+      className={cn(
+        'bg-background',
+        fixedTableWorkspace
+          ? 'fixed inset-0 flex min-h-0 flex-col overflow-hidden'
+          : 'min-h-screen',
+      )}
+    >
       <DesktopSidebar />
       <MobileSidebar />
 
-      <div className={cn('transition-all duration-200 lg:ps-72', isCollapsed && 'lg:ps-20')}>
+      <div
+        className={cn(
+          'transition-all duration-200 lg:ps-72',
+          isCollapsed && 'lg:ps-20',
+          fixedTableWorkspace && 'flex min-h-0 flex-1 flex-col overflow-hidden',
+        )}
+      >
         <AppHeader />
         <main
           className={cn(
             'min-w-0',
-            fixedTableWorkspace
-              ? 'h-[calc(100dvh-3.5rem)] min-h-0 overflow-hidden'
-              : 'pb-8',
+            fixedTableWorkspace ? 'min-h-0 flex-1 overflow-hidden' : 'pb-8',
           )}
         >
           <Outlet />
