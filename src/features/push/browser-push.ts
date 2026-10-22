@@ -159,13 +159,18 @@ export async function subscribeToBrowserPush(
 }
 
 /** Client cleanup. Backend must independently revoke tokens on logout. */
-export async function revokeBrowserPush(): Promise<void> {
+export async function revokeBrowserPush(authToken?: string): Promise<void> {
   const token = currentToken;
   currentToken = null;
   if (token && trustedApiPath(configuredUnregisterPath)) {
     // Best effort while auth token is still available. Server must authorize
     // removal by JWT, and bind token ownership to its active user.
-    await apiClient.delete(configuredUnregisterPath, { data: { token } }).catch(() => undefined);
+    await apiClient.delete(configuredUnregisterPath, {
+      data: { token },
+      // Logout clears localStorage synchronously, so keep the captured JWT
+      // from the authenticated logout event for the unregistration request.
+      ...(authToken ? { headers: { Authorization: `Bearer ${authToken}` } } : {}),
+    }).catch(() => undefined);
   }
   if (!fcmPromise) return;
   const instance = await fcmPromise.catch(() => null);
