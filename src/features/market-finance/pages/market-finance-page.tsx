@@ -122,7 +122,7 @@ export default function MarketFinancePage(): React.JSX.Element {
         {markets.isPending ? <p>{t('marketFinance.loadingMarkets')}</p> : markets.isError ? failed(markets.error, markets.refetch) : <>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3" role="group" aria-label={t('marketFinance.selectMarket')}>
             {markets.data?.items.map((market) => <button type="button" key={market.marketUserId} aria-label={`${t('marketFinance.openAccount')}: ${market.marketName}`} onClick={() => chooseMarket(market.marketUserId)} className="rounded-lg border border-border/70 p-3 text-start transition-colors hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-              <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground" dir="ltr">{market.phoneNumber ?? '—'}</p>
+              <p className="font-medium">{market.marketName}</p><p className="text-xs text-muted-foreground text-start"><span className="inline-block" dir="ltr">{market.phoneNumber ?? '—'}</span></p>
               <p className="mt-2 font-semibold tabular-nums">{currency(market.currentAmountDue)} <span className="text-xs font-normal">{t('marketFinance.dueShort')}</span></p>
             </button>)}
           </div>
