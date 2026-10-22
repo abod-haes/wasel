@@ -39,9 +39,11 @@ const filterNavByPermission = (
 function SidebarInner({
   collapsed,
   onNavigate,
+  onExpand,
 }: {
   collapsed: boolean;
   onNavigate?: () => void;
+  onExpand?: () => void;
 }): React.JSX.Element {
   const { i18n } = useTranslation();
   const userPermissions = useAuthStore((state) => state.user?.permissions ?? []);
@@ -56,12 +58,21 @@ function SidebarInner({
       return visibleItems;
     }
 
-    return visibleItems.map((item) => {
-      if (item.key === 'dashboard') return { ...item, labelKey: 'nav.storeDashboard' };
-      if (item.key === 'products') return { ...item, labelKey: 'nav.myProducts' };
-      if (item.key === 'orders') return { ...item, labelKey: 'nav.myOrders' };
-      return item;
-    });
+    const relabelForMarket = (entries: SidebarNavItem[]): SidebarNavItem[] =>
+      entries.map((item) => {
+        const labelKey =
+          item.key === 'dashboard' ? 'nav.storeDashboard'
+          : item.key === 'products' ? 'nav.myProducts'
+          : item.key === 'orders' ? 'nav.myOrders'
+          : item.labelKey;
+        return {
+          ...item,
+          labelKey,
+          ...(item.children ? { children: relabelForMarket(item.children) } : {}),
+        };
+      });
+
+    return relabelForMarket(visibleItems);
   }, [isMarket, userPermissions]);
 
   return (
@@ -75,7 +86,7 @@ function SidebarInner({
         {collapsed ? null : <RodoBrandLogo className="h-10 w-36" />}
       </div>
       <ScrollArea dir={direction} className="h-[calc(100vh-64px)] px-3 py-3">
-        <SidebarNav items={items} collapsed={collapsed} onNavigate={onNavigate} />
+        <SidebarNav items={items} collapsed={collapsed} onNavigate={onNavigate} onExpand={onExpand} />
       </ScrollArea>
     </>
   );
@@ -106,7 +117,7 @@ export function DesktopSidebar(): React.JSX.Element {
           : (isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />)}
       </Button>
 
-      <SidebarInner collapsed={isCollapsed} />
+      <SidebarInner collapsed={isCollapsed} onExpand={toggleSidebarCollapse} />
     </aside>
   );
 }
