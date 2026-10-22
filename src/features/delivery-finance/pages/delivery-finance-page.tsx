@@ -301,8 +301,8 @@ export default function DeliveryFinancePage(): React.JSX.Element {
                     : selectedSummary?.deliveryPersonName ?? t('deliveryFinance.details')}
                 </CardTitle>
                 {selectedSummary ? (
-                  <p className="mt-1 text-sm text-muted-foreground" dir="ltr">
-                    {selectedSummary.phoneNumber}
+                  <p className="mt-1 text-start text-sm text-muted-foreground">
+                    <span className="inline-block" dir="ltr">{selectedSummary.phoneNumber}</span>
                   </p>
                 ) : null}
               </div>
@@ -708,7 +708,7 @@ function TransactionsTable({
                     : t('deliveryFinance.settlement')}
                 </Badge>
               </TableCell>
-              <TableCell className="font-mono text-xs">
+              <TableCell className="text-start font-mono text-xs">
                 {transaction.orderId ? <span dir="ltr" className="inline-block">#{transaction.orderId.slice(-3)}</span> : '-'}
               </TableCell>
               <TableCell className="font-medium">{money(transaction.amount)}</TableCell>
