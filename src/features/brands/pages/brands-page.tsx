@@ -112,7 +112,7 @@ export default function BrandsPage(): React.JSX.Element {
   if (query.isError) return <ErrorState onRetry={() => void query.refetch()} />;
 
   return (
-    <PageContainer>
+    <PageContainer fixedTableLayout>
       <SectionHeader
         titleKey="العلامات التجارية"
         descriptionKey="إدارة البراندات الموحّدة المستخدمة في المنتجات."
