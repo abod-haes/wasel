@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/lib/date-time';
 import { Pencil, Plus, TicketPercent, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -83,12 +84,6 @@ const scopeLabel: Record<OrderDiscountScope, string> = {
   DeliveryOnly: 'التوصيل فقط',
   EntireOrder: 'الطلب كامل',
 };
-
-const formatDate = (value: string): string =>
-  new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
 
 const normalizeCode = (value: string): string => value.trim().toUpperCase();
 
@@ -332,7 +327,7 @@ export default function DiscountCodesPage(): React.JSX.Element {
         renderCell: (item: DiscountCode) =>
           item.discountType === 'Percentage' ? `${item.value}%` : `${item.value} USD`,
       },
-      { key: 'expiresAt', header: 'ينتهي في', renderCell: (item: DiscountCode) => <span className="whitespace-nowrap">{formatDate(item.expiresAt)}</span> },
+      { key: 'expiresAt', header: 'ينتهي في', renderCell: (item: DiscountCode) => <span dir="ltr" className="inline-block whitespace-nowrap tabular-nums">{formatDateTime(item.expiresAt)}</span> },
       {
         key: 'status',
         header: 'الحالة',
