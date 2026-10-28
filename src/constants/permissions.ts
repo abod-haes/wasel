@@ -16,6 +16,7 @@ export const PERMISSIONS = {
   marketFinanceView: 'market-finance:view',
   settingsView: 'settings:view',
   settingsEdit: 'settings:edit',
+  contentPagesManage: 'content-pages:manage',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

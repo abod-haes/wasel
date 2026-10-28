@@ -75,7 +75,8 @@
     "marketFinance": "Market Finance",
     "discountCodes": "Discount Codes",
     "appVersions": "App Versions",
-    "productImageStats": "Product Image Statistics"
+    "productImageStats": "Product Image Statistics",
+    "contentPages": "Content Pages"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
@@ -741,5 +742,38 @@
     "orderDate": "Delivered at",
     "backToMarkets": "Back to markets",
     "openAccount": "Open market financial account"
+  },
+  "contentPages": {
+    "title": "Content pages",
+    "description": "Set up and edit the privacy, help and support pages. Saved content is immediately public.",
+    "slugs": {
+      "privacy": "Privacy policy",
+      "help": "Help / FAQ",
+      "support": "Support information"
+    },
+    "configured": "Configured",
+    "notConfigured": "Not configured",
+    "edit": "Edit content",
+    "add": "Add content",
+    "unsaved": "Unsaved changes",
+    "reload": "Reload pages",
+    "retry": "Try again",
+    "saved": "Content saved successfully",
+    "save": "Save content",
+    "savedState": "Saved on server",
+    "lastUpdated": "Last updated",
+    "preview": "Safe preview",
+    "previewHint": "Preview of the current HTML; the backend sanitizes saved content.",
+    "noPreview": "No content to preview",
+    "editorHint": "Paste business-approved HTML. No placeholder policies are generated. Maximum 200,000 characters.",
+    "editorPlaceholder": "Paste approved HTML content...",
+    "errors": {
+      "unauthorized": "Your admin session expired. Sign in again.",
+      "forbidden": "You don't have permission to manage content pages.",
+      "validation": "HTML was rejected. Correct the content and try again.",
+      "network": "Unable to contact the server. Your draft is preserved.",
+      "empty": "Enter real HTML content before saving.",
+      "tooLong": "The content exceeds 200,000 characters."
+    }
   }
 }
