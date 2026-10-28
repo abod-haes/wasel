@@ -40,7 +40,8 @@ function getSaveError(error: unknown): string {
  * slug and subsequent PUTs update it. No legal or support template is seeded.
  */
 export default function ContentPagesPage(): React.JSX.Element {
-  const roles = useAuthStore((state) => state.user?.roles ?? []);
+  const user = useAuthStore((state) => state.user);
+  const roles = user?.roles ?? [];
   const queryClient = useQueryClient();
   const [slug, setSlug] = useState<ContentPageSlug>('privacy');
   const [draft, setDraft] = useState('');
