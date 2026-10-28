@@ -22,6 +22,8 @@ export const ROUTES = {
   notifications: '/notifications',
   otpAdmin: '/otp-whatsapp',
   settings: '/settings',
+  contentPages: '/settings/content-pages',
+  help: '/help',
   settingsPricing: '/settings/pricing',
   settingsPreferences: '/settings/preferences',
   productImageStats: '/settings/product-image-stats',
