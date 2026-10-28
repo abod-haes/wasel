@@ -9,6 +9,7 @@ import { PERMISSIONS } from '@/constants/permissions';
 import { ROUTES } from '@/constants/routes';
 import AccountDeletionPage from '@/pages/account-deletion-page';
 import LoginPage from '@/pages/login-page';
+import HelpPage from '@/pages/help-page';
 import NotFoundPage from '@/pages/not-found-page';
 import PrivacyPage from '@/pages/privacy-page';
 import RouteErrorPage from '@/pages/route-error-page';
@@ -69,6 +70,10 @@ export const appRoutes: RouteObject[] = [
   {
     path: ROUTES.support,
     element: <SupportPage />,
+  },
+  {
+    path: ROUTES.help,
+    element: <HelpPage />,
   },
   {
     path: ROUTES.unauthorized,
