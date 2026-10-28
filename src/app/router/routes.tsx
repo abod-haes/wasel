@@ -33,6 +33,7 @@ const MarketFinancePage = lazyRoute(() => import('@/features/market-finance/page
 const NotificationsPage = lazyRoute(() => import('@/features/notifications/pages/notifications-page'));
 const OtpAdminPage = lazyRoute(() => import('@/features/otp-admin/pages/otp-admin-page'));
 const SettingsPage = lazyRoute(() => import('@/features/settings/pages/settings-page'));
+const ContentPagesPage = lazyRoute(() => import('@/features/content-pages/pages/content-pages-page'));
 const AppVersionsPage = lazyRoute(() => import('@/features/app-versions/pages/app-versions-page'));
 const PricingSettingsPage = lazyRoute(() => import('@/features/settings/pages/pricing-settings-page'));
 const ProductImageStatsPage = lazyRoute(() => import('@/features/settings/pages/product-image-stats-page'));
@@ -302,6 +303,15 @@ export const appRoutes: RouteObject[] = [
               </PermissionGuard>
             ),
             handle: { breadcrumbKey: 'إحصائيات صور المنتجات' },
+          },
+          {
+            path: ROUTES.contentPages,
+            element: (
+              <PermissionGuard required={PERMISSIONS.settingsEdit}>
+                {withSuspense(<ContentPagesPage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.contentPages' },
           },
           {
             path: ROUTES.appVersions,
