@@ -44,3 +44,22 @@ test('no default legal content is seeded, preview sanitizes markup', () => {
   assert.match(sanitize, /removeAttribute/);
   assert.doesNotMatch(api, /apiClient\.delete/);
 });
+
+test('public web SPA views read all three slugs with safe rendering and unconfigured 404', () => {
+  const viewer = source('src/features/content-pages/components/public-content-page.tsx');
+  const api = source('src/features/content-pages/api/content-pages-api.ts');
+  const router = source('src/app/router/routes.tsx');
+  assert.match(viewer, /contentPagesApi\.getPublic\(slug\)/);
+  assert.match(viewer, /sanitizeContentHtml\(query\.data\.html\)/);
+  assert.match(viewer, /هذه الصفحة غير متاحة حالياً/);
+  assert.match(api, /axios\.get<PublicContentPage>/);
+  assert.match(api, /error\.response\?\.status === 404/);
+  for (const [slug, page] of [
+    ['privacy', 'src/pages/privacy-page.tsx'],
+    ['help', 'src/pages/help-page.tsx'],
+    ['support', 'src/pages/support-page.tsx'],
+  ]) {
+    assert.match(source(page), new RegExp('<PublicContentPage slug="' + slug + '"'));
+    assert.match(router, new RegExp('path: ROUTES\\.' + (slug === 'privacy' ? 'privacy' : slug)));
+  }
+});
