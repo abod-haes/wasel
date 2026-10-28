@@ -14,6 +14,7 @@ import PrivacyPage from '@/pages/privacy-page';
 import RouteErrorPage from '@/pages/route-error-page';
 import SupportPage from '@/pages/support-page';
 import HelpPage from '@/pages/help-page';
+import PublicContentPage from '@/pages/public-content-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
 const ContentPagesPage = lazyRoute(() => import('@/features/content-pages/pages/content-pages-page'));
@@ -72,6 +73,7 @@ export const appRoutes: RouteObject[] = [
     element: <SupportPage />,
   },
   { path: ROUTES.help, element: <HelpPage /> },
+  { path: '/content/:slug', element: <PublicContentPage /> },
   {
     path: ROUTES.unauthorized,
     element: <UnauthorizedPage />,
