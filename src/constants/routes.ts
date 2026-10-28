@@ -23,7 +23,6 @@ export const ROUTES = {
   otpAdmin: '/otp-whatsapp',
   settings: '/settings',
   contentPages: '/settings/content-pages',
-  help: '/help',
   settingsPricing: '/settings/pricing',
   settingsPreferences: '/settings/preferences',
   productImageStats: '/settings/product-image-stats',
