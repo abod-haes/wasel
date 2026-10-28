@@ -2,6 +2,7 @@ import { ChevronLeft, HelpCircle, Mail, ShieldCheck, Trash2 } from 'lucide-react
 import { Link } from 'react-router-dom';
 
 import { RodoBrandLogo } from '@/components/shared';
+import { PublicContentSection } from '@/features/content-pages/components/public-content-section';
 import { ROUTES } from '@/constants/routes';
 import { env } from '@/env';
 
@@ -35,6 +36,8 @@ export default function SupportPage(): React.JSX.Element {
             </p>
           </div>
         </header>
+
+        <PublicContentSection slug="support" />
 
         <section className="animate-stagger rounded-[28px] border border-border/80 bg-card p-6 shadow-card">
           <div className="flex items-start gap-4">

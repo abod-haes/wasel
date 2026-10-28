@@ -13,8 +13,10 @@ import NotFoundPage from '@/pages/not-found-page';
 import PrivacyPage from '@/pages/privacy-page';
 import RouteErrorPage from '@/pages/route-error-page';
 import SupportPage from '@/pages/support-page';
+import HelpPage from '@/pages/help-page';
 import UnauthorizedPage from '@/pages/unauthorized-page';
 
+const ContentPagesPage = lazyRoute(() => import('@/features/content-pages/pages/content-pages-page'));
 const DashboardPage = lazyRoute(() => import('@/features/dashboard/pages/dashboard-page'));
 const ProfilePage = lazyRoute(() => import('@/features/profile/pages/profile-page'));
 const UsersPage = lazyRoute(() => import('@/features/users/pages/users-page'));
@@ -69,6 +71,7 @@ export const appRoutes: RouteObject[] = [
     path: ROUTES.support,
     element: <SupportPage />,
   },
+  { path: ROUTES.help, element: <HelpPage /> },
   {
     path: ROUTES.unauthorized,
     element: <UnauthorizedPage />,
@@ -302,6 +305,15 @@ export const appRoutes: RouteObject[] = [
               </PermissionGuard>
             ),
             handle: { breadcrumbKey: 'إحصائيات صور المنتجات' },
+          },
+          {
+            path: ROUTES.contentPages,
+            element: (
+              <PermissionGuard required={PERMISSIONS.contentPagesManage}>
+                {withSuspense(<ContentPagesPage />)}
+              </PermissionGuard>
+            ),
+            handle: { breadcrumbKey: 'nav.contentPages' },
           },
           {
             path: ROUTES.appVersions,

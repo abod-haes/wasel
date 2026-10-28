@@ -13,6 +13,7 @@ import {
 import { Link } from 'react-router-dom';
 
 import { RodoBrandLogo } from '@/components/shared';
+import { PublicContentSection } from '@/features/content-pages/components/public-content-section';
 import { ROUTES } from '@/constants/routes';
 import { env } from '@/env';
 
@@ -80,6 +81,8 @@ export default function PrivacyPage(): React.JSX.Element {
             </p>
           </div>
         </header>
+
+        <PublicContentSection slug="privacy" />
 
         <section className="grid gap-4 sm:grid-cols-2">
           {sections.map((section, index) => {

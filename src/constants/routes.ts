@@ -26,5 +26,7 @@ export const ROUTES = {
   settingsPreferences: '/settings/preferences',
   productImageStats: '/settings/product-image-stats',
   appVersions: '/settings/app-versions',
+  contentPages: '/settings/content-pages',
+  help: '/help',
   unauthorized: '/unauthorized',
 } as const;
