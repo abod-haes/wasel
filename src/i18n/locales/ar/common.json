@@ -75,7 +75,8 @@
     "marketFinance": "مالية المحلات",
     "discountCodes": "أكواد الخصم",
     "appVersions": "إصدارات التطبيق",
-    "productImageStats": "إحصائيات صور المنتجات"
+    "productImageStats": "إحصائيات صور المنتجات",
+    "contentPages": "صفحات المحتوى"
   },
   "layout": {
     "searchPlaceholder": "ابحث عن أي شيء...",
