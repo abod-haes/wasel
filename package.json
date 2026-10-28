@@ -35,14 +35,15 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "npm run typecheck && npm run test:store-pages && npm run test:mobile-layout && npm run test:push && vite build && node scripts/generate-store-pages.mjs",
+    "build": "npm run typecheck && npm run test:store-pages && npm run test:content-pages && npm run test:mobile-layout && npm run test:push && vite build && node scripts/generate-store-pages.mjs",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "store:pages:build": "node scripts/generate-store-pages.mjs",
     "test:store-pages": "node --test tests/store-public-pages.test.mjs",
     "test:mobile-layout": "node --test tests/mobile-dashboard-layout.test.mjs",
-    "test:push": "node --test tests/browser-push-contract.test.mjs"
+    "test:push": "node --test tests/browser-push-contract.test.mjs",
+    "test:content-pages": "node --test tests/content-pages-contract.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
