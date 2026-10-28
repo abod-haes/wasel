@@ -35,7 +35,9 @@ test('no default legal content is seeded, preview sanitizes markup', () => {
   const page = source('src/features/content-pages/pages/content-pages-page.tsx');
   const api = source('src/features/content-pages/api/content-pages-api.ts');
   const sanitize = source('src/features/content-pages/utils/sanitize-content-html.ts');
-  assert.doesNotMatch(page, /useEffect\([\s\S]*?contentPagesApi\.save/);
+  assert.match(page, /mutationFn: \(input:/);
+  assert.match(page, /const save = \(\) =>/);
+  assert.doesNotMatch(page, /defaultPrivacyHtml|seedContentPages|autoPublish/);
   assert.match(page, /sanitizeContentHtml\(draft\)/);
   assert.match(sanitize, /DROP_WITH_CONTENT/);
   assert.match(sanitize, /noopener noreferrer nofollow/);
