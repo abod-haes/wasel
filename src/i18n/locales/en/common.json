@@ -75,7 +75,8 @@
     "marketFinance": "Market Finance",
     "discountCodes": "Discount Codes",
     "appVersions": "App Versions",
-    "productImageStats": "Product Image Statistics"
+    "productImageStats": "Product Image Statistics",
+    "contentPages": "Content Pages"
   },
   "layout": {
     "searchPlaceholder": "Search anything...",
