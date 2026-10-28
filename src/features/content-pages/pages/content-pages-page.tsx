@@ -39,7 +39,6 @@ export default function ContentPagesPage(): React.JSX.Element {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<ContentPageSlug>('privacy');
   const [drafts, setDrafts] = useState<Partial<Record<ContentPageSlug, string>>>({});
-  const [confirmed, setConfirmed] = useState<Partial<Record<ContentPageSlug, AdminContentPage>>>({});
   const [formError, setFormError] = useState('');
 
   const pages = useQuery({
@@ -51,15 +50,14 @@ export default function ContentPagesPage(): React.JSX.Element {
       ? attempt < 1 : false,
   });
 
-  const persisted = useMemo(() => {
-    const data = new Map<ContentPageSlug, AdminContentPage>(
-      (pages.data ?? []).filter((page) => CONTENT_SLUGS.includes(page.slug)).map((page) => [page.slug, page]),
-    );
-    CONTENT_SLUGS.forEach((slug) => {
-      if (confirmed[slug]) data.set(slug, confirmed[slug]);
-    });
-    return data;
-  }, [pages.data, confirmed]);
+  const persisted = useMemo(
+    () => new Map<ContentPageSlug, AdminContentPage>(
+      (pages.data ?? [])
+        .filter((page) => CONTENT_SLUGS.includes(page.slug))
+        .map((page) => [page.slug, page]),
+    ),
+    [pages.data],
+  );
 
   const saved = persisted.get(selected);
   const draft = drafts[selected] ?? saved?.html ?? '';
@@ -71,7 +69,6 @@ export default function ContentPagesPage(): React.JSX.Element {
       contentPagesApi.save(slug, html),
     onSuccess: (result, request) => {
       // Server sanitization may change HTML. Never show the submitted draft as saved.
-      setConfirmed((previous) => ({ ...previous, [request.slug]: result }));
       setDrafts((previous) => ({ ...previous, [request.slug]: result.html }));
       queryClient.setQueryData<AdminContentPage[]>(['content-pages', 'admin'], (previous = []) => [
         ...previous.filter((page) => page.slug !== request.slug),
